@@ -1,91 +1,54 @@
-# project-seed
+# Observe Dashboard
 
-A basic starting point for web projects
+A dashboard to browse and manage Observe platform data.
 
-## Overview
+## Installation and Usage
 
-Steps to follow as soon as you download this structure to start a project:
-- [ ] Update `package.js` with data about the project (name, repo, license...)
-- [ ] If the license is known update `LICENSE`
-- [ ] Update `.circleci/config.yml` with correct repo and other needed information.
-- [ ] On `index.html` update the project title and check for other boostrap information that can be changed or removed.
-- [ ] Remove unneeded images from the `graphics` folder and replace the favicon with a project related one.
-- [ ] Update the modules to the most recent version.
-- [ ] **Delete this `README.md` and rename `_README.md`. Fill in the needed data. This is the most important task.** Others need to be able to know what the project is about and how to work with it. This can't be stressed enough.
+The steps below will walk you through setting up a development environment for the frontend.
 
-It's better to do this straight away so no traces of project-seed are ever pushed to github and just looks more professional.
-The values that are not immediately know should be left blank and filled ASAP.
+### Install dependencies
 
-## Gulp for building
-The gulpfile is based on the [gulp-webapp](https://github.com/yeoman/generator-gulp-webapp) yeoman generator. The build system currently supports:
+Install the following on your system:
 
-- Image optimization
-- Sass compilation
-- Watchify for JS bundling
-- Minification/uglification where appropriate
-- Serving and live reloading of pages
+- [Git](https://git-scm.com)
+- [nvm](https://github.com/creationix/nvm)
+- [yarn](https://yarnpkg.com/docs/install)
 
-There are two commands, both run via [`yarn`](https://yarnpkg.com/en/).
-
-- `yarn build` - clean & build everything and put it into dist folder
-- `yarn serve` - serve the pages and utilize live reload on changes to styles, fonts, images, scripts and HTML.
-
-
-## Assets Structure
+Clone this repository locally and activate required Node.js version:
 
 ```
-app/assets/
-|
-+- scripts/: The user scripts
-|  |
-|  +- config/: configuration files (see configuration section)
-|
-+- styles/: The sass styles
-|
-+- vendor/: Any third-party script that can't be required()
-|
-+- graphics/: Images for the site divided in:
-|  |
-|  +- layout/: Images for layout elements (Ex: background images)
-|  +- meta/: Images for the meta tags (Mostly icons and facebook images)
-|  +- content/: Content image
-|
+nvm install
 ```
 
-### Configurations and environment variables
+Install Node.js dependencies:
 
-At times, it may be necessary to include options/variables specific to `production`, `staging` or `local` in the code. To handle this, there is a master config.js file. This file should not be modified.  Instead, modify one of:
+```
+yarn install
+```
 
-- config/production.js - production settings
-- config/staging.js - overrides the production settings for staging server (basically Travis not on the DEPLOY branch)
-- config/local.js - local (development) overrides. This file is gitignored, so you can safely change it without polluting the repo.
+#### Config files
 
-When developing locally with `yarn run serve`, the default will be to use `production.js` (with overrides from `local.js`).  However, if you need to run with the staging settings, use: `yarn run stage` (this will not start a server)
+The config files can be found in `app/assets/scripts/config`. After installing the project, there will be an empty `local.js` that you can use to set the config. This file should not be committed.
 
+Please refer to [defaults.js](app/assets/scripts/config/defaults.js) for the available configuration properties.
 
-### How scripts are built
+### Development
 
-The script build, which uses `browserify`, outputs two js files: `bundle.js` and
-`vendor.js`:
- - `bundle.js`, created by the `javascript` task in deployment and by
-   `watchify` during development, contains all the app-specific code:
-   `app/scripts/main.js` and all the scripts it `require`s that are local to
-   this app.
- - `vendor.js`, created by the `vendorBundle` task, contains all the external
-   dependencies of the app: namely, all the packages you install using `yarn
-   add ...`.
+Start server with live code reload at [http://localhost:9000](http://localhost:9000):
 
-## Circle CI for testing and deployment
-The `.circleci/config.yml` file enables the usage of [Circle CI](http://circleci.com/) as a test and deployment system. In this particular case, Travis will be looking for any changes to the repo and when a change is made to the `master` branch, Travis will build the project and deploy it to the `gh-pages` branch.
+    yarn serve
 
-## Linting
+### Build to production
 
-Our [ESLint rules](.eslintrc) are based on `standard` rules, with semicolons enabled. To check  linting errors run:
+Generate a minified build to `dist` folder:
 
-    yarn lint
+    yarn build
 
-## Coding style
+## References & Related Repositories
 
-File [.editorconfig](.editorconfig) defines basic code styling rules, like indent sizes. 
+- [API](https://github.com/developmentseed/observe-api)
+- [Mobile app](https://github.com/developmentseed/observe)
 
-[Prettier](https://prettier.io) is the recommended code formatter. Atom and VSCode have extensions supporting Prettier-ESLint integration, which will help maintain style consistency while following linting rules.
+## License
+
+[MIT](LICENSE)
