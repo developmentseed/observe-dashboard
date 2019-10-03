@@ -1,6 +1,6 @@
 # Observe Dashboard
 
-A dashboard to browse and manage Observe platform data.
+A dashboard to browse and manage data from the [Observe](https://github.com/developmentseed/observe) mobile mapping application.
 
 ## Installation and Usage
 
