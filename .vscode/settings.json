@@ -1,6 +1,8 @@
 {
-  "css.validate": false,
-  "scss.validate": false,
-  "stylelint.enable": true,
-  "prettier.singleQuote": true
+  // "css.validate": false,
+  // "scss.validate": false,
+  // "stylelint.enable": true,
+  "prettier.singleQuote": true,
+  "prettier.jsxSingleQuote": true
+  // "eslint.packageManager": "yarn",
 }
