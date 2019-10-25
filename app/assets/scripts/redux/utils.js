@@ -14,7 +14,7 @@ function delay (millis) {
  * or throwing an error.
  *
  * @param {string} url Url to query
- * @param {object} options Options for fetch
+ * @param {object} options Options for fecth
  */
 export async function fetchJSON (url, options) {
   let response;
@@ -31,7 +31,7 @@ export async function fetchJSON (url, options) {
 
     return json;
   } catch (error) {
-    error.statusCode = response.status || null;
+    error.statusCode = response ? response.status || null : null;
     throw error;
   }
 }
@@ -68,19 +68,47 @@ export function fetchDispatchCacheFactory (opts) {
  * @param {object} options Options.
  * @param {string} options.statePath Path to where data is on the state.
  * @param {string} options.url Url to query.
+ * @param {string} options.options Options for the fetch request.
+ *                                 See fetch documentation.
  * @param {func} options.requestFn Request action to dispatch.
  * @param {func} options.receiveFn Receive action to dispatch.
  * @param {func} options.mutator Function to change the response before sending
  *                               it to the receive function.
+ * @example
+ * function fetchSearchResults (query) {
+ *  return fetchDispatchFactory({
+ *    statePath: 'searchResults',
+ *    url: `${config.api}/search`,
+ *    requestFn: requestSearchResults.bind(this),
+ *    receiveFn: receiveSearchResults.bind(this)
+ *  });
+ * }
+ *
+ * // Example with request options.
+ * function fetchSearchResults (query) {
+ *  return fetchDispatchFactory({
+ *    statePath: 'searchResults',
+ *    url: `${config.api}/search`,
+ *    options: {
+ *      headers: {
+ *        'Content-Type': 'application/json'
+ *      },
+ *      method: 'POST',
+ *      body: JSON.stringify(query)
+ *    },
+ *    requestFn: requestSearchResults.bind(this),
+ *    receiveFn: receiveSearchResults.bind(this)
+ *  });
+ * }
  */
 export function fetchDispatchFactory (opts) {
-  let { url, requestFn, receiveFn, mutator, __devDelay } = opts;
+  let { url, requestFn, receiveFn, mutator, options, __devDelay } = opts;
   mutator = mutator || (v => v);
   return async function (dispatch, getState) {
     dispatch(requestFn());
 
     try {
-      const response = await fetchJSON(url);
+      const response = await fetchJSON(url, options);
       const content = mutator(response);
       if (__devDelay) await delay(__devDelay);
       return dispatch(receiveFn(content));
@@ -105,39 +133,84 @@ export function fetchDispatchFactory (opts) {
  * @param {object} state The state.
  * @param {object} action The action.
  * @param {string} actionName The action name to use as suffix
+ *
+ * @example
+ * const resultsReducer = baseAPIReducer('RESULTS', resultsInitialState);
  */
-export function baseAPIReducer (state, action, actionName) {
-  const hasId = typeof action.id !== 'undefined';
-  switch (action.type) {
-    case `INVALIDATE_${actionName}`:
-      return hasId ? { ...state, [action.id]: state } : state;
-    case `REQUEST_${actionName}`: {
-      const changeReq = {
-        fetching: true,
-        fetched: false,
-        data: {},
-        error: null
-      };
-      return hasId ? { ...state, [action.id]: changeReq } : changeReq;
-    }
-    case `RECEIVE_${actionName}`: {
-      // eslint-disable-next-line prefer-const
-      let st = {
-        fetching: false,
-        fetched: true,
-        receivedAt: action.receivedAt,
-        data: {},
-        error: null
-      };
-
-      if (action.error) {
-        st.error = action.error;
-      } else {
-        st.data = action.data;
+export function baseAPIReducer (actionName, initial) {
+  return (state = initial, action) => {
+    const hasId = typeof action.id !== 'undefined';
+    switch (action.type) {
+      case `INVALIDATE_${actionName}`:
+        return hasId ? { ...state, [action.id]: initial } : initial;
+      case `REQUEST_${actionName}`: {
+        const changeReq = {
+          fetching: true,
+          fetched: false,
+          data: {},
+          error: null
+        };
+        return hasId ? { ...state, [action.id]: changeReq } : changeReq;
       }
+      case `RECEIVE_${actionName}`: {
+        // eslint-disable-next-line prefer-const
+        let st = {
+          fetching: false,
+          fetched: true,
+          receivedAt: action.receivedAt,
+          data: {},
+          error: null
+        };
 
-      return hasId ? { ...state, [action.id]: st } : st;
+        if (action.error) {
+          st.error = action.error;
+        } else {
+          st.data = action.data;
+        }
+
+        return hasId ? { ...state, [action.id]: st } : st;
+      }
     }
-  }
-  return state;
+    return state;
+  };
+}
+
+/**
+ * Wraps the api result with helpful functions.
+ * To be used in the state selector.
+ *
+ * @param {object} stateData Object as returned from an api request. Expected to
+ *                           be in the following format:
+ *                           {
+ *                             fetched: bool,
+ *                             fetching: bool,
+ *                             data: object,
+ *                             error: null | error
+ *                           }
+ *
+ * @returns {object}
+ * {
+ *   raw(): returns the data as is.
+ *   isReady(): Whether or not the fetching finished and was fetched.
+ *   hasError(): Whether the request finished with an error.
+ *   getData(): Returns the data. If the data has a results list will return that
+ *   getMeta(): If there's a meta object it will be returned
+ *
+ * As backward compatibility all data properties are accessible directly.
+ * }
+ */
+export function wrapApiResult (stateData) {
+  const { fetched, fetching, data, error } = stateData;
+  const ready = fetched && !fetching;
+  return Object.assign(
+    {},
+    {
+      raw: () => stateData,
+      isReady: () => ready,
+      hasError: () => ready && !!error,
+      getData: (def = {}) => (ready ? data.results || data : def),
+      getMeta: (def = {}) => (ready ? data.meta : def)
+    },
+    stateData
+  );
 }
