@@ -22,7 +22,7 @@ export function receiveAuthenticatedProfile (data, error = null) {
   };
 }
 
-export default function authenticate (accessToken) {
+export function authenticate (accessToken) {
   return fetchDispatchFactory({
     statePath: ['authenticatedUser'],
     url: `${apiUrl}/profile`,
@@ -34,4 +34,8 @@ export default function authenticate (accessToken) {
     receiveFn: receiveAuthenticatedProfile,
     requestFn: requestAuthenticatedProfile
   });
+}
+
+export function logout () {
+  return { type: INVALIDATE_AUTHENTICATED_USER };
 }

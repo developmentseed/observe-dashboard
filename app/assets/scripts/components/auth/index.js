@@ -3,7 +3,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { environment, apiUrl, baseUrl } from '../../config';
 import { Inpage, InpageBody } from '../common/Inpage';
-import authenticateAction from '../../redux/actions/authenticate';
+import * as authActions from '../../redux/actions/auth';
 import { PropTypes as T } from 'prop-types';
 import { showGlobalLoading, hideGlobalLoading } from '../common/GlobalLoading';
 import { wrapApiResult } from '../../redux/utils';
@@ -62,6 +62,14 @@ class Login extends React.Component {
   }
 
   renderContent () {
+    const { pathname, search } = this.props.location;
+
+    // At /logout route, remove user credentials and redirect to home
+    if (pathname === '/logout') {
+      this.props.logout();
+      return <Redirect to='/' />;
+    }
+
     // If user is logged in redirect to index
     const { isReady, hasError, getData } = this.props.authenticatedUser;
     if (isReady() && !hasError()) {
@@ -73,7 +81,6 @@ class Login extends React.Component {
 
     // Route "/login/redirect" is the final OAuth step. This will pass the
     // access token to the opener window and close popup.
-    const { pathname, search } = this.props.location;
     if (pathname === '/login/redirect') {
       const { accessToken } = qs.parse(search.substring(1));
       opener.authenticate(accessToken);
@@ -113,7 +120,8 @@ if (environment !== 'production') {
   Login.propTypes = {
     location: T.object,
     authenticatedUser: T.object,
-    authenticate: T.func
+    authenticate: T.func,
+    logout: T.func
   };
 }
 
@@ -125,7 +133,8 @@ function mapStateToProps (state) {
 
 function dispatcher (dispatch) {
   return {
-    authenticate: (...args) => dispatch(authenticateAction(...args))
+    authenticate: (...args) => dispatch(authActions.authenticate(...args)),
+    logout: (...args) => dispatch(authActions.logout(...args))
   };
 }
 
