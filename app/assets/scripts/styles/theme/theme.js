@@ -31,7 +31,7 @@ const type = {
     size: '1rem',
     line: '1.5',
     color: tint(0.16, color.base),
-    family: 'Poppins, sans-serif',
+    family: 'sans-serif',
     style: 'normal',
     weight: 300,
     light: 300,
@@ -40,7 +40,7 @@ const type = {
     bold: 600
   },
   heading: {
-    family: 'Poppins, sans-serif',
+    family: 'sans-serif',
     style: 'normal',
     weight: 600,
     light: 300,
