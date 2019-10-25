@@ -17,6 +17,7 @@ import GlobalStyles from './styles/global';
 import Home from './components/home';
 import Sandbox from './components/sandbox';
 import About from './components/about';
+import Login from './components/login';
 import Traces from './components/traces';
 import Photos from './components/photos';
 import UhOh from './components/uhoh';
@@ -31,6 +32,8 @@ const Root = () => (
           <GlobalStyles />
           <Switch>
             <Route exact path='/' component={Home} />
+            <Route exact path='/login/redirect' component={Login} />
+            <Route exact path='/login' component={Login} />
             <Route exact path='/traces' component={Traces} />
             <Route exact path='/photos' component={Photos} />
             <Route exact path='/sandbox' component={Sandbox} />

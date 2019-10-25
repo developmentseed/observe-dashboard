@@ -83,6 +83,11 @@ const PageHeader = props => {
         <PageNav>
           <GlobalMenu>
             <li>
+              <NavLink exact to='/login' title='Login page'>
+                <span>Login</span>
+              </NavLink>
+            </li>
+            <li>
               <NavLink exact to='/traces' title='View page'>
                 <span>Traces</span>
               </NavLink>
