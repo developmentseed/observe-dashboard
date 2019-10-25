@@ -8,6 +8,8 @@ import MetaTags from './meta-tags';
 import PageHeader from './page-header';
 import PageFooter from './page-footer';
 
+import GlobalLoading from '../common/GlobalLoading';
+
 import { appTitle, appDescription } from '../../config';
 
 const Page = styled.div`
@@ -28,12 +30,14 @@ class App extends Component {
     const title = pageTitle ? `${pageTitle} — ` : '';
     return (
       <Page className={c('page', className)}>
+        <GlobalLoading />
         <MetaTags title={`${title}${appTitle} `} description={appDescription} />
         <PageHeader pageTitle='Observe Dashboard' />
-        <PageBody role='main'>
-          {children}
-        </PageBody>
-        <PageFooter isHidden={hideFooter} credits='Made by Development Seed Impact Team' />
+        <PageBody role='main'>{children}</PageBody>
+        <PageFooter
+          isHidden={hideFooter}
+          credits='Made by Development Seed Impact Team'
+        />
       </Page>
     );
   }
