@@ -16,7 +16,7 @@ const Page = styled.div`
   display: grid;
   height: 100vh;
   max-height: 100vh;
-  grid-template-rows: 4.5rem 1fr;
+  grid-template-rows: 4rem 1fr;
 `;
 
 const PageBody = styled.main`

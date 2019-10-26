@@ -24,7 +24,7 @@ const getHeadingColor = ({ variation, theme }) => {
 };
 
 const Heading = styled.h1`
-  font-family: ${themeVal('type.base.family')};
+  font-family: ${themeVal('type.heading.family')};
   font-weight: ${themeVal('type.heading.weight')};
   text-transform: uppercase;
 

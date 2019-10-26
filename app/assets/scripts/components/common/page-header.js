@@ -1,43 +1,75 @@
 import React from 'react';
 import styled from 'styled-components';
 import { PropTypes as T } from 'prop-types';
-
+import { rgba } from 'polished';
 import { connect } from 'react-redux';
 import config from '../../config';
 import { wrapApiResult } from '../../redux/utils';
 import { Link, NavLink } from 'react-router-dom';
-import { themeVal } from '../../styles/utils/general';
+import { themeVal, stylizeFunction } from '../../styles/utils/general';
 import { multiply } from '../../styles/utils/math';
 import { stackSkin } from '../../styles/skins';
+import collecticon from '../../styles/collecticons';
+
+const _rgba = stylizeFunction(rgba);
+
+// eslint-disable-next-line react/display-name
+const componentFilterProps = (Comp, toFilter = []) =>
+  React.forwardRef((rawProps, ref) => {
+    const props = Object.keys(rawProps).reduce(
+      (acc, p) => (toFilter.includes(p) ? acc : { ...acc, [p]: rawProps[p] }),
+      {}
+    );
+    return <Comp ref={ref} {...props} />;
+  });
 
 const PageHead = styled.header`
   ${stackSkin()}
   position: relative;
   z-index: 10;
+  display: flex;
+  overflow: hidden;
 `;
 
 const PageHeadInner = styled.div`
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
-  padding: ${themeVal('layout.space')} ${multiply(themeVal('layout.space'), 2)};
-  margin: 0 auto;
+  justify-content: space-between;
+  min-width: 100%;
 `;
 
 const PageTitle = styled.h1`
   font-size: 1.25rem;
-  line-height: 1.25rem;
-  margin: 0;
-
+  font-family: ${themeVal('type.heading.family')};
+  line-height: 2rem;
+  text-transform: uppercase;
+  color: white;
+  background-color: ${themeVal('color.primary')};
+  padding: 1rem 2rem;
+  margin: -1rem 0;
+  letter-spacing: 0.2rem;
+  font-weight: ${themeVal('type.heading.black')};
+  img {
+    margin-right: 0.5rem;
+  }
   a {
     color: inherit;
-    display: block;
+    display: flex;
+    padding: 0 2rem 0.5rem;
+  }
+  span {
+    font-size: 0.575rem;
+    font-weight: ${themeVal('type.heading.light')};
+    position: absolute;
+    bottom: 0.125rem;
+    left: 6.5rem;
   }
 `;
 
 const PageNav = styled.nav`
   display: flex;
-  margin: 0 0 0 auto;
+  margin: 0 ${multiply(themeVal('layout.space'), 2)} 0 auto;
 `;
 
 const GlobalMenu = styled.ul`
@@ -50,28 +82,47 @@ const GlobalMenu = styled.ul`
   > * {
     margin: 0 0 0 ${multiply(themeVal('layout.space'), 2)};
   }
+`;
 
-  a {
-    display: block;
+const GlobalMenuLink = styled.a.attrs({
+  'data-place': 'right'
+})`
+  position: relative;
+  display: flex;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+  text-align: center;
+  transition: all 0.24s ease 0s;
+  font-weight: ${themeVal('type.base.regular')};
+  &::before {
+    ${({ useIcon }) => collecticon(useIcon)}
+    margin-right: 0.5rem;
     position: relative;
-    font-size: 0.875rem;
-    line-height: 2rem;
-    color: inherit;
-    text-transform: uppercase;
-    font-weight: ${themeVal('type.base.regular')};
+    top: -1px;
   }
-
-  .active::before {
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    width: 1rem;
-    height: 1px;
-    background: ${themeVal('type.base.color')};
-    content: '';
-    transform: translate(-50%, 0);
+  &,
+  &:visited {
+    color: inherit;
+  }
+  &:hover {
+    color: ${themeVal('color.link')};
+    opacity: 1;
+    background: ${_rgba(themeVal('color.link'), 0.08)};
+  }
+  &.active {
+    color: ${themeVal('color.link')};
+    font-weight: ${themeVal('type.base.medium')};
+    background: ${_rgba(themeVal('color.link'), 0.08)};
+    &::after {
+      opacity: 1;
+    }
   }
 `;
+// Special components to prevent styled-components error when properties are
+// passed to the DOM element.
+// https://github.com/styled-components/styled-components/issues/2131
+const propsToFilter = ['variation', 'size', 'hideText', 'useIcon', 'active'];
+const NavLinkFilter = componentFilterProps(NavLink, propsToFilter);
 
 class PageHeader extends React.Component {
   render () {
@@ -89,45 +140,79 @@ class PageHeader extends React.Component {
         <PageHeadInner>
           <PageTitle>
             <Link to='/' title='Go to Dashboard'>
+              <img src='../../assets/graphics/content/ObserveIcon.svg' />
               {this.props.pageTitle}
+              <span>API Dashboard</span>
             </Link>
           </PageTitle>
           <PageNav>
             <GlobalMenu>
               {config.environment !== 'production' && (
                 <li>
-                  <NavLink exact to='/sandbox' title='View page'>
+                  <GlobalMenuLink
+                    as={NavLinkFilter}
+                    exact
+                    to='/sandbox'
+                    title='View sandbox page'
+                  >
                     <span>Sandbox</span>
-                  </NavLink>
+                  </GlobalMenuLink>
                 </li>
               )}
               <li>
-                <NavLink exact to='/about' title='View page'>
+                <GlobalMenuLink
+                  as={NavLinkFilter}
+                  exact
+                  to='/about'
+                  title='View about page'
+                >
                   <span>About</span>
-                </NavLink>
+                </GlobalMenuLink>
               </li>
               {!isLogged ? (
                 <li>
-                  <NavLink exact to='/login' title='Login page'>
+                  <GlobalMenuLink
+                    as={NavLinkFilter}
+                    exact
+                    to='/login'
+                    title='Proceed to login'
+                  >
                     <span>Login</span>
-                  </NavLink>
+                  </GlobalMenuLink>
                 </li>
               ) : (
                 <>
                   <li>
-                    <NavLink exact to='/traces' title='View page'>
+                    <GlobalMenuLink
+                      as={NavLinkFilter}
+                      exact
+                      to='/traces'
+                      useIcon='chart-line'
+                      title='View traces page'
+                    >
                       <span>Traces</span>
-                    </NavLink>
+                    </GlobalMenuLink>
                   </li>
                   <li>
-                    <NavLink exact to='/photos' title='View page'>
+                    <GlobalMenuLink
+                      as={NavLinkFilter}
+                      exact
+                      to='/photos'
+                      useIcon='camera'
+                      title='View photos page'
+                    >
                       <span>Photos</span>
-                    </NavLink>
+                    </GlobalMenuLink>
                   </li>
                   <li>
-                    <NavLink exact to='/logout' title='Logout'>
+                    <GlobalMenuLink
+                      as={NavLinkFilter}
+                      exact
+                      to='/logout'
+                      title='Proceed to logout'
+                    >
                       <span>Logout</span>
-                    </NavLink>
+                    </GlobalMenuLink>
                   </li>
                 </>
               )}
