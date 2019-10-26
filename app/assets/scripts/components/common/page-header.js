@@ -27,6 +27,7 @@ const PageHead = styled.header`
   position: relative;
   z-index: 10;
   display: flex;
+  overflow: hidden;
 `;
 
 const PageHeadInner = styled.div`
@@ -46,10 +47,22 @@ const PageTitle = styled.h1`
   background-color: ${themeVal('color.primary')};
   padding: 1rem 2rem;
   margin: -1rem 0;
-  letter-spacing: 0.1rem;
+  letter-spacing: 0.2rem;
+  font-weight: ${themeVal('type.heading.black')};
+  img {
+    margin-right: 0.5rem;
+  }
   a {
     color: inherit;
-    display: block;
+    display: flex;
+    padding: 0 2rem 0.5rem;
+  }
+  span {
+    font-size: 0.575rem;
+    font-weight: ${themeVal('type.heading.light')};
+    position: absolute;
+    bottom: 0.125rem;
+    left: 6.5rem;
   }
 `;
 
@@ -109,7 +122,6 @@ const GlobalMenuLink = styled.a.attrs({
 // https://github.com/styled-components/styled-components/issues/2131
 const propsToFilter = ['variation', 'size', 'hideText', 'useIcon', 'active'];
 const NavLinkFilter = componentFilterProps(NavLink, propsToFilter);
-const AFilter = componentFilterProps('a', propsToFilter);
 
 const PageHeader = props => {
   return (
@@ -117,7 +129,9 @@ const PageHeader = props => {
       <PageHeadInner>
         <PageTitle>
           <Link to='/' title='Go to Dashboard'>
+            <img src='../../assets/graphics/content/ObserveIcon.svg' />
             {props.pageTitle}
+            <span>API Dashboard</span>
           </Link>
         </PageTitle>
         <PageNav>

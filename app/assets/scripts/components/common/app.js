@@ -29,7 +29,7 @@ class App extends Component {
     return (
       <Page className={c('page', className)}>
         <MetaTags title={`${title}${appTitle} `} description={appDescription} />
-        <PageHeader pageTitle='Observe Dashboard' />
+        <PageHeader pageTitle='Observe' />
         <PageBody role='main'>
           {children}
         </PageBody>

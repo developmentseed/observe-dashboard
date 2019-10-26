@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="37px" viewBox="0 0 32 37" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 58 (84663) - https://sketch.com -->
+    <title>Group</title>
+    <desc>Created with Sketch.</desc>
+    <g id="navigation" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="nav-drawer--side" transform="translate(-16.000000, -40.000000)">
+            <g id="drawer">
+                <g id="header" transform="translate(0.000000, 24.000000)">
+                    <g id="logo" transform="translate(16.000000, 16.000000)">
+                        <g id="Group">
+                            <ellipse id="Oval" stroke="#FFFFFF" stroke-width="10.6666667" cx="16" cy="15.8571429" rx="10.6666667" ry="10.5238095"></ellipse>
+                            <polygon id="Triangle" fill="#FFFFFF" transform="translate(16.011271, 33.636947) scale(1, -1) translate(-16.011271, -33.636947) " points="16 30.2738931 22.6876628 37 9.33487956 37"></polygon>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
