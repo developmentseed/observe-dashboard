@@ -32,12 +32,11 @@ class App extends Component {
       <Page className={c('page', className)}>
         <GlobalLoading />
         <MetaTags title={`${title}${appTitle} `} description={appDescription} />
-        <PageHeader pageTitle='Observe Dashboard' />
-        <PageBody role='main'>{children}</PageBody>
-        <PageFooter
-          isHidden={hideFooter}
-          credits='Made by Development Seed Impact Team'
-        />
+        <PageHeader pageTitle='Observe' />
+        <PageBody role='main'>
+          {children}
+        </PageBody>
+        <PageFooter isHidden={hideFooter} credits='Made by Development Seed Impact Team' />
       </Page>
     );
   }
