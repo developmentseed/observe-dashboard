@@ -1,9 +1,9 @@
 import { rgba, tint } from 'polished';
 
 let color = {
-  base: '#000000',
-  primary: '#0C59F7',
-  secondary: '#FC3D21'
+  base: '#133C55',
+  primary: '#6579FC',
+  secondary: '#CE1042'
 };
 
 color = {
@@ -11,7 +11,7 @@ color = {
   background: '#FFFFFF',
   surface: '#FFFFFF',
   mist: rgba(color.base, 0.04),
-  shadow: rgba(color.base, 0.08),
+  shadow: rgba(color.base, 0.12),
   smoke: rgba(color.base, 0.16),
   link: color.primary,
   danger: '#C0392B',
@@ -31,22 +31,24 @@ const type = {
     size: '1rem',
     line: '1.5',
     color: tint(0.16, color.base),
-    family: 'Poppins, sans-serif',
+    family: '"Roboto", sans-serif',
     style: 'normal',
-    weight: 300,
+    weight: 400,
     light: 300,
     regular: 400,
-    medium: 400,
-    bold: 600
+    medium: 500,
+    bold: 700,
+    black: 900
   },
   heading: {
-    family: 'Poppins, sans-serif',
+    family: '"Roboto", sans-serif',
     style: 'normal',
-    weight: 600,
+    weight: 500,
     light: 300,
     regular: 400,
-    medium: 400,
-    bold: 600
+    medium: 500,
+    bold: 700,
+    black: 900
   }
 };
 
