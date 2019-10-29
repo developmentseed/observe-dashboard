@@ -142,7 +142,6 @@ const PageHeader = props => {
                 exact
                 to='/traces'
                 useIcon='chart-line'
-                data-tip='View traces page'
                 title='View traces page'
               >
                 <span>Traces</span>
@@ -154,7 +153,6 @@ const PageHeader = props => {
                 exact
                 to='/photos'
                 useIcon='camera'
-                data-tip='View photos page'
                 title='View photos page'
               >
                 <span>Photos</span>
@@ -166,7 +164,6 @@ const PageHeader = props => {
                 exact
                 to='/about'
                 useIcon='circle-information'
-                data-tip='View about page'
                 title='View about page'
               >
                 <span>About</span>
@@ -179,7 +176,6 @@ const PageHeader = props => {
                   exact
                   to='/sandbox'
                   useIcon='brand-development-seed-2'
-                  data-tip='View sandbox page'
                   title='View sandbox page'
                 >
                   <span>Sandbox</span>
