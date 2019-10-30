@@ -1,3 +1,5 @@
+import { environment } from '../config';
+
 export function loadState () {
   try {
     const serializedState = localStorage.getItem('state');
@@ -15,6 +17,9 @@ export const saveState = state => {
     const serializedState = JSON.stringify(state);
     localStorage.setItem('state', serializedState);
   } catch (error) {
-    console.log("Couldn't save state to local storage.");
+    if (environment !== 'production') {
+      // eslint-disable-next-line
+      console.log("Couldn't save state to local storage.");
+    }
   }
 };
