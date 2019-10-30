@@ -152,6 +152,7 @@ class PageHeader extends React.Component {
                   <GlobalMenuLink
                     as={NavLinkFilter}
                     exact
+                    useIcon='brand-development-seed-2'
                     to='/sandbox'
                     title='View sandbox page'
                   >
@@ -163,6 +164,7 @@ class PageHeader extends React.Component {
                 <GlobalMenuLink
                   as={NavLinkFilter}
                   exact
+                  useIcon='circle-information'
                   to='/about'
                   title='View about page'
                 >
@@ -174,6 +176,7 @@ class PageHeader extends React.Component {
                   <GlobalMenuLink
                     as={NavLinkFilter}
                     exact
+                    useIcon='login'
                     to='/login'
                     title='Proceed to login'
                   >
@@ -208,6 +211,7 @@ class PageHeader extends React.Component {
                     <GlobalMenuLink
                       as={NavLinkFilter}
                       exact
+                      useIcon='logout'
                       to='/logout'
                       title='Proceed to logout'
                     >
