@@ -98,6 +98,7 @@
     "history": "^4.10.1",
     "lodash.defaultsdeep": "^4.6.1",
     "lodash.get": "^4.4.2",
+    "lodash.throttle": "^4.1.1",
     "polished": "^3.4.1",
     "prop-types": "^15.7.2",
     "qs": "^6.9.0",
