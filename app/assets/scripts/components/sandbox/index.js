@@ -113,14 +113,13 @@ export default class Sandbox extends React.Component {
     return (
       <App pageTitle='Sandbox'>
         <Inpage>
-          <InpageHeader>
+          <InpageHeader />
+          <InpageBody>
             <InpageHeaderInner>
               <InpageHeadline>
                 <InpageTitle>Sandbox</InpageTitle>
               </InpageHeadline>
             </InpageHeaderInner>
-          </InpageHeader>
-          <InpageBody>
             <InpageBodyInner>
               <Prose>
                 <h2>Form elements</h2>

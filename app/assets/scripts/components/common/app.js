@@ -16,7 +16,7 @@ const Page = styled.div`
   display: grid;
   height: 100vh;
   max-height: 100vh;
-  grid-template-rows: 4.5rem 1fr;
+  grid-template-rows: 4rem 1fr;
 `;
 
 const PageBody = styled.main`
@@ -32,12 +32,11 @@ class App extends Component {
       <Page className={c('page', className)}>
         <GlobalLoading />
         <MetaTags title={`${title}${appTitle} `} description={appDescription} />
-        <PageHeader pageTitle='Observe Dashboard' />
-        <PageBody role='main'>{children}</PageBody>
-        <PageFooter
-          isHidden={hideFooter}
-          credits='Made by Development Seed Impact Team'
-        />
+        <PageHeader pageTitle='Observe' />
+        <PageBody role='main'>
+          {children}
+        </PageBody>
+        <PageFooter isHidden={hideFooter} credits='Made by Development Seed Impact Team' />
       </Page>
     );
   }
