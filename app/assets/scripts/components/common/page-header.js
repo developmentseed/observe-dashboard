@@ -1,9 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import PropTypes from 'prop-types';
+import { PropTypes as T } from 'prop-types';
 
+import { connect } from 'react-redux';
 import config from '../../config';
-import { Link, withRouter, NavLink } from 'react-router-dom';
+import { wrapApiResult } from '../../redux/utils';
+import { Link, NavLink } from 'react-router-dom';
 import { themeVal } from '../../styles/utils/general';
 import { multiply } from '../../styles/utils/math';
 import { stackSkin } from '../../styles/skins';
@@ -71,48 +73,88 @@ const GlobalMenu = styled.ul`
   }
 `;
 
-const PageHeader = props => {
-  return (
-    <PageHead>
-      <PageHeadInner>
-        <PageTitle>
-          <Link to='/' title='Go to Dashboard'>
-            {props.pageTitle}
-          </Link>
-        </PageTitle>
-        <PageNav>
-          <GlobalMenu>
-            <li>
-              <NavLink exact to='/traces' title='View page'>
-                <span>Traces</span>
-              </NavLink>
-            </li>
-            <li>
-              <NavLink exact to='/photos' title='View page'>
-                <span>Photos</span>
-              </NavLink>
-            </li>
-            <li>
-              <NavLink exact to='/about' title='View page'>
-                <span>About</span>
-              </NavLink>
-            </li>
-            {config.environment !== 'production' && (
+class PageHeader extends React.Component {
+  render () {
+    let isLogged = false;
+    const { isReady, hasError, getData } = this.props.authenticatedUser;
+    if (isReady() && !hasError()) {
+      const user = getData();
+      if (user.osmId) {
+        isLogged = true;
+      }
+    }
+
+    return (
+      <PageHead>
+        <PageHeadInner>
+          <PageTitle>
+            <Link to='/' title='Go to Dashboard'>
+              {this.props.pageTitle}
+            </Link>
+          </PageTitle>
+          <PageNav>
+            <GlobalMenu>
+              {config.environment !== 'production' && (
+                <li>
+                  <NavLink exact to='/sandbox' title='View page'>
+                    <span>Sandbox</span>
+                  </NavLink>
+                </li>
+              )}
               <li>
-                <NavLink exact to='/sandbox' title='View page'>
-                  <span>Sandbox</span>
+                <NavLink exact to='/about' title='View page'>
+                  <span>About</span>
                 </NavLink>
               </li>
-            )}
-          </GlobalMenu>
-        </PageNav>
-      </PageHeadInner>
-    </PageHead>
-  );
-};
+              {!isLogged ? (
+                <li>
+                  <NavLink exact to='/login' title='Login page'>
+                    <span>Login</span>
+                  </NavLink>
+                </li>
+              ) : (
+                <>
+                  <li>
+                    <NavLink exact to='/traces' title='View page'>
+                      <span>Traces</span>
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink exact to='/photos' title='View page'>
+                      <span>Photos</span>
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink exact to='/logout' title='Logout'>
+                      <span>Logout</span>
+                    </NavLink>
+                  </li>
+                </>
+              )}
+            </GlobalMenu>
+          </PageNav>
+        </PageHeadInner>
+      </PageHead>
+    );
+  }
+}
 
 PageHeader.propTypes = {
-  pageTitle: PropTypes.string
+  pageTitle: T.string,
+  authenticatedUser: T.object
 };
 
-export default withRouter(PageHeader);
+function mapStateToProps (state) {
+  return {
+    authenticatedUser: wrapApiResult(state.authenticatedUser)
+  };
+}
+
+function dispatcher (dispatch) {
+  return {};
+}
+
+export default connect(
+  mapStateToProps,
+  dispatcher
+)(PageHeader);

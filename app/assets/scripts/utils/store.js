@@ -5,7 +5,7 @@ import { createLogger } from 'redux-logger';
 import { persistStore } from 'redux-persist';
 
 import { environment } from '../config';
-import reducer from '../redux';
+import reducer from '../redux/reducers';
 
 const initialState = {};
 
