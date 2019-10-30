@@ -1,4 +1,5 @@
 import get from 'lodash.get';
+import merge from 'lodash.merge';
 
 /**
  * Delays the execution in x milliseconds.
@@ -117,6 +118,31 @@ export function fetchDispatchFactory (opts) {
       console.log('error', url, error); // eslint-disable-line
       return dispatch(receiveFn(null, error));
     }
+  };
+}
+
+export function fetchAuth (opts) {
+  return (dispatch, getState) => {
+    const {
+      authenticatedUser: { data }
+    } = getState();
+
+    if (!data || typeof data.osmId === 'undefined') {
+      return dispatch(opts.receiveFn(null, new Error('User not logged id.')));
+    }
+
+    const { accessToken } = data;
+
+    const options = {
+      ...opts,
+      options: merge(opts.options, {
+        headers: {
+          Authorization: accessToken
+        }
+      })
+    };
+
+    return fetchDispatchCacheFactory(options)(dispatch, getState);
   };
 }
 
