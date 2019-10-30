@@ -1,4 +1,9 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import { PropTypes as T } from 'prop-types';
+import { environment } from '../../config';
+import * as actions from '../../redux/actions/traces';
+import { showGlobalLoading, hideGlobalLoading } from '../common/GlobalLoading';
 
 import App from '../common/app';
 import {
@@ -11,8 +16,27 @@ import {
   InpageBodyInner
 } from '../common/Inpage';
 import Prose from '../../styles/type/prose';
+import { wrapApiResult } from '../../redux/utils';
 
-export default class Traces extends React.Component {
+class Traces extends React.Component {
+  async componentDidMount () {
+    showGlobalLoading();
+    await this.props.fetchTraces();
+    hideGlobalLoading();
+  }
+
+  renderContent () {
+    const { isReady, hasError, getMeta } = this.props.traces;
+
+    if (!isReady()) return null;
+    if (hasError()) return <p>Something went wrong. Try again.</p>;
+
+    const { totalCount } = getMeta();
+
+    // return <p>${meta.totalCount} traces found.</p>;
+    return <p>{totalCount} traces found.</p>;
+  }
+
   render () {
     return (
       <App pageTitle='Traces'>
@@ -26,14 +50,7 @@ export default class Traces extends React.Component {
           </InpageHeader>
           <InpageBody>
             <InpageBodyInner>
-              <Prose>
-                <p>
-                  Dolor pariatur ullamco ex anim velit ut amet excepteur. Ex
-                  magna amet proident pariatur nulla quis Lorem irure. Ut elit
-                  mollit cillum sint. Consectetur ut non anim tempor anim
-                  proident consequat incididunt ipsum.
-                </p>
-              </Prose>
+              <Prose>{this.renderContent()}</Prose>
             </InpageBodyInner>
           </InpageBody>
         </Inpage>
@@ -41,3 +58,27 @@ export default class Traces extends React.Component {
     );
   }
 }
+
+if (environment !== 'production') {
+  Traces.propTypes = {
+    fetchTraces: T.func,
+    traces: T.object
+  };
+}
+
+function mapStateToProps (state) {
+  return {
+    traces: wrapApiResult(state.traces)
+  };
+}
+
+function dispatcher (dispatch) {
+  return {
+    fetchTraces: (...args) => dispatch(actions.fetchTraces(...args))
+  };
+}
+
+export default connect(
+  mapStateToProps,
+  dispatcher
+)(Traces);
