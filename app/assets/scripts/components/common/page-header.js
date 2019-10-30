@@ -10,7 +10,7 @@ import { themeVal, stylizeFunction } from '../../styles/utils/general';
 import { multiply } from '../../styles/utils/math';
 import { stackSkin } from '../../styles/skins';
 import collecticon from '../../styles/collecticons';
-
+import ObserveIcon from '../../../graphics/content/ObserveIcon';
 const _rgba = stylizeFunction(rgba);
 
 // eslint-disable-next-line react/display-name
@@ -50,7 +50,7 @@ const PageTitle = styled.h1`
   margin: -1rem 0;
   letter-spacing: 0.2rem;
   font-weight: ${themeVal('type.heading.black')};
-  img {
+  svg {
     margin-right: 0.5rem;
   }
   a {
@@ -140,7 +140,7 @@ class PageHeader extends React.Component {
         <PageHeadInner>
           <PageTitle>
             <Link to='/' title='Go to Dashboard'>
-              <img src='../../assets/graphics/content/ObserveIcon.svg' />
+              <ObserveIcon />
               {this.props.pageTitle}
               <span>API Dashboard</span>
             </Link>
