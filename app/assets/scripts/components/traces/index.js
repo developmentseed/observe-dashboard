@@ -26,15 +26,93 @@ class Traces extends React.Component {
   }
 
   renderContent () {
-    const { isReady, hasError, getMeta } = this.props.traces;
+    const { isReady, hasError } = this.props.traces;
 
     if (!isReady()) return null;
     if (hasError()) return <p>Something went wrong. Try again.</p>;
 
-    const { totalCount } = getMeta();
+    return (
+      <>
+        {this.renderFilters()}
+        {this.renderPagination()}
+        {this.renderTable()}
+      </>
+    );
+  }
 
-    // return <p>${meta.totalCount} traces found.</p>;
-    return <p>{totalCount} traces found.</p>;
+  renderFilters () {
+    return (
+      <>
+        <input type='text' placeholder='Search by user' />
+        <input type='text' placeholder='Start date' />
+        <input type='text' placeholder='End date' />
+        <input type='text' placeholder='Length' />
+      </>
+    );
+  }
+
+  renderPagination () {
+    return (
+      <>
+        <div>1 - 20 of 26</div>
+        <button type='button'>{'<'}</button>
+        <button type='button'>{'>'}</button>
+      </>
+    );
+  }
+
+  renderTable () {
+    return (
+      <table>
+        <thead>
+          <tr>
+            <th scope='col' />
+            <th scope='col'>
+              <span>Trace</span>
+            </th>
+            <th scope='col'>
+              <span>User</span>
+            </th>
+            <th scope='col'>
+              <span>Date</span>
+            </th>
+            <th scope='col'>
+              <span>Length</span>
+            </th>
+            <th scope='col'>
+              <span>Export to JOSM</span>
+            </th>
+            <th scope='col'>
+              <span>Download</span>
+            </th>
+            <th scope='col'>
+              <span>Delete</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>{this.renderTableRows()}</tbody>
+      </table>
+    );
+  }
+
+  renderTableRows () {
+    const { getData } = this.props.traces;
+    return getData().map(trace => {
+      return (
+        <tr key={trace.id}>
+          <td>
+            <input type='checkbox' />
+          </td>
+          <td>{trace.id}</td>
+          <td>{trace.ownerId}</td>
+          <td>{new Date(trace.recordedAt).toLocaleDateString()}</td>
+          <td>{trace.length}</td>
+          <td>JOSM Icon</td>
+          <td>Download Icon</td>
+          <td>Delete Icon</td>
+        </tr>
+      );
+    });
   }
 
   render () {
