@@ -19,8 +19,24 @@ const authenticatedUserReducer = baseAPIReducer(
 );
 
 /**
+ * TRACES reducer
+ */
+const tracesReducerInitialState = {
+  fetching: false,
+  fetched: false,
+  error: null,
+  data: []
+};
+
+const tracesReducer = baseAPIReducer(
+  'TRACES',
+  tracesReducerInitialState
+);
+
+/**
  * Export combined reducers
  */
 export default combineReducers({
-  authenticatedUser: authenticatedUserReducer
+  authenticatedUser: authenticatedUserReducer,
+  traces: tracesReducer
 });

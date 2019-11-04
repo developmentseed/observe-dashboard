@@ -1,35 +1,38 @@
 'use strict';
 import { createStore, applyMiddleware, compose } from 'redux';
 import thunkMiddleware from 'redux-thunk';
-import { createLogger } from 'redux-logger';
-import { persistStore } from 'redux-persist';
+import { loadState, saveState } from './local-storage';
+import throttle from 'lodash.throttle';
 
 import { environment } from '../config';
 import reducer from '../redux/reducers';
 
-const initialState = {};
+// Load persisted state, if any
+const persistedState = loadState();
 
-const logger = createLogger({
-  level: 'info',
-  collapsed: true,
-  predicate: (getState, action) => environment !== 'production'
-});
-
+// Setup middleware composer
 const composeEnhancers =
   environment !== 'production'
     ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
     : compose;
 
-const middleware = applyMiddleware(
-  thunkMiddleware,
-  logger
-);
+// Add middlewares
+const middleware = applyMiddleware(thunkMiddleware);
 
+// Create store
 const store = createStore(
   reducer,
-  initialState,
+  persistedState,
   composeEnhancers(middleware)
 );
 
-const persistor = persistStore(store);
-export { store, persistor };
+// Listen to store changes and update auth state once a second
+store.subscribe(
+  throttle(() => {
+    saveState({
+      authenticatedUser: store.getState().authenticatedUser
+    });
+  }, 1000)
+);
+
+export { store };

@@ -32,7 +32,11 @@ export function authenticate (accessToken) {
       }
     },
     receiveFn: receiveAuthenticatedProfile,
-    requestFn: requestAuthenticatedProfile
+    requestFn: requestAuthenticatedProfile,
+    mutator: data => ({
+      ...data,
+      accessToken // include accessToken after successful request
+    })
   });
 }
 
