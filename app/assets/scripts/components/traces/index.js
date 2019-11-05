@@ -34,8 +34,7 @@ class Traces extends React.Component {
     return (
       <>
         {this.renderFilters()}
-        {this.renderPagination()}
-        {this.renderTable()}
+        {this.renderResults()}
       </>
     );
   }
@@ -51,12 +50,20 @@ class Traces extends React.Component {
     );
   }
 
-  renderPagination () {
+  renderResults () {
+    const { getMeta } = this.props.traces;
+    const { count } = getMeta();
+
+    if (count === 0) {
+      return (
+        <p>There are no results for the current search/filters criteria.</p>
+      );
+    }
+
     return (
       <>
-        <div>1 - 20 of 26</div>
-        <button type='button'>{'<'}</button>
-        <button type='button'>{'>'}</button>
+        {this.renderTable()}
+        <Pagination />
       </>
     );
   }
