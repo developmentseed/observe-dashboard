@@ -27,6 +27,7 @@ import Dropdown, {
   DropMenuItem
 } from '../common/dropdown';
 import RangeSlider from '../common/range-slider';
+import { FormMainAction } from '../../styles/form/actions';
 
 import Form from '../../styles/form/form';
 import {
@@ -94,6 +95,9 @@ const InfoButton = styled(Button)`
   }
 `;
 
+const DropSlider = styled(Dropdown)`
+  max-width: 24rem;
+`;
 // Below the differente button variations and sizes to render all buttons.
 
 const variations = [
@@ -128,9 +132,18 @@ export default class Sandbox extends React.Component {
         min: 15,
         max: 100
       },
+      value2: {
+        min: 0,
+        max: 100
+      },
       valueSingle: 50
     };
   }
+
+  onApplyClick () {
+    this.dropRef.current.close();
+  }
+
   render () {
     if (config.environment === 'production') return <UhOh />;
 
@@ -145,16 +158,16 @@ export default class Sandbox extends React.Component {
               </InpageHeadline>
             </InpageHeaderInner>
             <InpageBodyInner>
-              <h3>Dropdowns</h3>
+              <h2>Dropdowns</h2>
               <Dropdown
-                alignment='right'
+                alignment='left'
                 direction='down'
                 triggerElement={(
                   <Button
                     variation='base-raised-light'
                     title='View options'
                   >
-                    Dropdown options
+                    Dropdown Menu
                   </Button>
                 )}
               >
@@ -187,7 +200,41 @@ export default class Sandbox extends React.Component {
                   </li>
                 </DropMenu>
               </Dropdown>
-              <h3>Ranges</h3>
+              <DropSlider
+                ref={this.dropRef}
+                alignment='left'
+                direction='down'
+                triggerElement={(
+                  <Button
+                    variation='base-raised-light'
+                    title='View dropdown slider'
+                  >
+                    Dropdown Slider
+                  </Button>
+                )}
+              >
+                <DropTitle>Range Slider in Dropdown</DropTitle>
+                <Form>
+                  <RangeSlider
+                    min={0}
+                    max={100}
+                    id='cloud-coverage'
+                    value={this.state.value2}
+                    onChange={v => this.setState({ value2: v })}
+                  />
+                  <FormMainAction>
+                    <Button
+                      size='medium'
+                      variation='primary-raised-dark'
+                      box='block'
+                      onClick={this.onApplyClick}
+                    >
+                      Apply
+                    </Button>
+                  </FormMainAction>
+                </Form>
+              </DropSlider>
+              <h2>Ranges</h2>
               <RangeSlider
                 min={10}
                 max={120}
