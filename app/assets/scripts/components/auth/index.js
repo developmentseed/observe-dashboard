@@ -5,7 +5,7 @@ import { environment, apiUrl, baseUrl } from '../../config';
 import { Inpage, InpageBody } from '../common/Inpage';
 import * as authActions from '../../redux/actions/auth';
 import { PropTypes as T } from 'prop-types';
-import { showGlobalLoading, hideGlobalLoading } from '../common/GlobalLoading';
+import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 import { wrapApiResult } from '../../redux/utils';
 import App from '../common/app';
 import styled from 'styled-components';
