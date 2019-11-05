@@ -15,6 +15,7 @@ import {
   InpageBody,
   InpageBodyInner
 } from '../common/Inpage';
+import Pagination from '../../styles/button/pagination';
 import Prose from '../../styles/type/prose';
 import { wrapApiResult } from '../../redux/utils';
 
