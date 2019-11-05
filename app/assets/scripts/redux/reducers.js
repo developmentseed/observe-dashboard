@@ -34,9 +34,25 @@ const tracesReducer = baseAPIReducer(
 );
 
 /**
+ * PHOTOS reducer
+ */
+const photosReducerInitialState = {
+  fetching: false,
+  fetched: false,
+  error: null,
+  data: []
+};
+
+const photosReducer = baseAPIReducer(
+  'PHOTOS',
+  photosReducerInitialState
+);
+
+/**
  * Export combined reducers
  */
 export default combineReducers({
   authenticatedUser: authenticatedUserReducer,
-  traces: tracesReducer
+  traces: tracesReducer,
+  photos: photosReducer
 });
