@@ -7604,6 +7604,14 @@ react-side-effect@^1.1.0:
   dependencies:
     shallowequal "^1.0.1"
 
+react-tether@^2.0.5:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/react-tether/-/react-tether-2.0.5.tgz#7432bff7276963f5902b1c7695bfc95cc9f1bd07"
+  integrity sha512-59Uh5h5Y31ehhAfAsEHZ0VBIwckvXVICIO/zevSaJQ1yexWaw/ug87FRhqRcQhKJrrR+zxsOZQZ6C8CbBNcjcw==
+  dependencies:
+    prop-types "^15.6.2"
+    tether "^1.4.5"
+
 react-tooltip@^3.11.1:
   version "3.11.1"
   resolved "https://registry.yarnpkg.com/react-tooltip/-/react-tooltip-3.11.1.tgz#7b4ce48ed26a46e996662b19a2afebbfd483513b"
@@ -9223,6 +9231,11 @@ ternary-stream@^3.0.0:
     fork-stream "^0.0.4"
     merge-stream "^2.0.0"
     through2 "^3.0.1"
+
+tether@^1.4.5:
+  version "1.4.7"
+  resolved "https://registry.yarnpkg.com/tether/-/tether-1.4.7.tgz#d56a818590d8fe72e387f77a67f93ab96d8e1fb2"
+  integrity sha512-Z0J1aExjoFU8pybVkQAo/vD2wfSO63r+XOPfWQMC5qtf1bI7IWqNk4MiyBcgvvnY8kqnY06dVdvwTK2S3PU/Fw==
 
 text-table@^0.2.0:
   version "0.2.0"
