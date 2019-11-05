@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { PropTypes as T } from 'prop-types';
 import { environment } from '../../config';
 import * as actions from '../../redux/actions/traces';
-import { showGlobalLoading, hideGlobalLoading } from '../common/GlobalLoading';
+import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 
 import App from '../common/app';
 import {

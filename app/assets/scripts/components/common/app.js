@@ -8,7 +8,7 @@ import MetaTags from './meta-tags';
 import PageHeader from './page-header';
 import PageFooter from './page-footer';
 
-import GlobalLoading from '../common/GlobalLoading';
+import GlobalLoading from '../common/global-loading';
 
 import { appTitle, appDescription } from '../../config';
 

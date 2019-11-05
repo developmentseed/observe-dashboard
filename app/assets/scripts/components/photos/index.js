@@ -1,4 +1,5 @@
 import React from 'react';
+import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 
 import App from '../common/app';
 import {
