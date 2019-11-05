@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { connect } from 'react-redux';
 
 import App from '../common/app';
-import { Inpage, InpageBody } from '../common/Inpage';
+import { Inpage, InpageBody } from '../common/inpage';
 
 const Wrapper = styled.div`
   display: grid;

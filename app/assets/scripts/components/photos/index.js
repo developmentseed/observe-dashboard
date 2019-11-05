@@ -14,7 +14,7 @@ import {
   InpageTitle,
   InpageBody,
   InpageBodyInner
-} from '../common/Inpage';
+} from '../common/inpage';
 
 import Pagination from '../../styles/button/pagination';
 import Prose from '../../styles/type/prose';
