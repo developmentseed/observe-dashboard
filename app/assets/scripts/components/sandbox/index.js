@@ -21,6 +21,13 @@ import Prose from '../../styles/type/prose';
 import Button from '../../styles/button/button';
 import ButtonGroup from '../../styles/button/group';
 
+import Dropdown, {
+  DropTitle,
+  DropMenu,
+  DropMenuItem
+} from '../common/dropdown';
+import RangeSlider from '../common/range-slider';
+
 import Form from '../../styles/form/form';
 import {
   FormFieldset,
@@ -106,12 +113,22 @@ const lightVariations = ['achromic-plain', 'achromic-glass'];
 
 const sizes = ['small', 'default', 'large', 'xlarge'];
 
+const DropMenuIconified = styled(DropMenuItem)`
+  &::before {
+    ${({ useIcon }) => collecticon(useIcon)}
+  }
+`;
+
 export default class Sandbox extends React.Component {
   constructor (props) {
     super(props);
 
     this.state = {
-      value: { min: 2, max: 10 }
+      value: {
+        min: 15,
+        max: 100
+      },
+      valueSingle: 50
     };
   }
   render () {
@@ -128,6 +145,65 @@ export default class Sandbox extends React.Component {
               </InpageHeadline>
             </InpageHeaderInner>
             <InpageBodyInner>
+              <h3>Dropdowns</h3>
+              <Dropdown
+                alignment='right'
+                direction='down'
+                triggerElement={(
+                  <Button
+                    variation='base-raised-light'
+                    title='View options'
+                  >
+                    Dropdown options
+                  </Button>
+                )}
+              >
+                <DropTitle>Options</DropTitle>
+                <DropMenu role='menu' iconified>
+                  <li>
+                    <DropMenuIconified useIcon='circle-exclamation'>
+                      Action 1
+                    </DropMenuIconified>
+                  </li>
+                  <li>
+                    <DropMenuIconified useIcon='circle-tick'>
+                      Action 2
+                    </DropMenuIconified>
+                  </li>
+                </DropMenu>
+                <DropMenu role='menu' iconified>
+                  <li>
+                    <DropMenuIconified useIcon='circle-xmark'>
+                      Action A
+                    </DropMenuIconified>
+                  </li>
+                </DropMenu>
+                <DropMenu role='menu' selectable>
+                  <li>
+                    <DropMenuItem active>Selected</DropMenuItem>
+                  </li>
+                  <li>
+                    <DropMenuItem>Not selected</DropMenuItem>
+                  </li>
+                </DropMenu>
+              </Dropdown>
+              <h3>Ranges</h3>
+              <RangeSlider
+                min={10}
+                max={120}
+                id='example'
+                label='Example Range'
+                value={this.state.value}
+                onChange={v => this.setState({ value: v })}
+              />
+              <RangeSlider
+                min={10}
+                max={120}
+                id='example-single'
+                label='Single Range'
+                value={this.state.valueSingle}
+                onChange={v => this.setState({ valueSingle: v })}
+              />
               <Prose>
                 <h2>Form elements</h2>
                 <Form>
