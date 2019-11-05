@@ -3,6 +3,7 @@ import ReactTooltip from 'react-tooltip';
 import styled from 'styled-components';
 import { themeVal } from '../../styles/utils/general';
 import collecticon from '../../styles/collecticons';
+import InputRange from 'react-input-range';
 
 import App from '../common/app';
 import UhOh from '../uhoh';
@@ -107,6 +108,13 @@ const lightVariations = ['achromic-plain', 'achromic-glass'];
 const sizes = ['small', 'default', 'large', 'xlarge'];
 
 export default class Sandbox extends React.Component {
+  constructor (props) {
+    super(props);
+
+    this.state = {
+      value: { min: 2, max: 10 }
+    };
+  }
   render () {
     if (config.environment === 'production') return <UhOh />;
 
@@ -318,6 +326,12 @@ export default class Sandbox extends React.Component {
                           </FormHelper>
                         </FormGroupBody>
                       </FormGroup>
+                      <InputRange
+                        maxValue={20}
+                        minValue={0}
+                        value={this.state.value}
+                        onChange={value => this.setState({ value })}
+                      />
                     </FormFieldsetBody>
                   </FormFieldset>
                 </Form>
