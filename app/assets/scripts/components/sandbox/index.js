@@ -3,7 +3,6 @@ import ReactTooltip from 'react-tooltip';
 import styled from 'styled-components';
 import { themeVal } from '../../styles/utils/general';
 import collecticon from '../../styles/collecticons';
-import InputRange from 'react-input-range';
 
 import App from '../common/app';
 import UhOh from '../uhoh';
@@ -326,12 +325,6 @@ export default class Sandbox extends React.Component {
                           </FormHelper>
                         </FormGroupBody>
                       </FormGroup>
-                      <InputRange
-                        maxValue={20}
-                        minValue={0}
-                        value={this.state.value}
-                        onChange={value => this.setState({ value })}
-                      />
                     </FormFieldsetBody>
                   </FormFieldset>
                 </Form>
