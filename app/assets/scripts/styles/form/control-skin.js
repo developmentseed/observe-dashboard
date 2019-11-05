@@ -37,7 +37,7 @@ const controlSkin = () => css`
   padding: ${({ size }) => paddingMatrix[size]};
   border: ${themeVal('layout.border')} solid ${_rgba(themeVal('color.base'), 0.16)};
   border-radius: ${themeVal('shape.rounded')};
-  background-color: #FFFFFF;
+  background-color: ${themeVal('color.mist')};
   font-family: inherit;
   font-size: ${({ size }) => fontSizeMatrix[size]};
   line-height: ${({ size }) => lineHeightMatrix[size]};

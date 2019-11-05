@@ -44,9 +44,8 @@ export const InpageHeadline = styled.div`
 `;
 
 export const InpageTitle = styled.h1`
-  font-size: 1.5rem;
   line-height: 2rem;
-  margin: 0;
+  font-size: 2.5rem;
 `;
 
 export const InpageTagline = styled.p`
