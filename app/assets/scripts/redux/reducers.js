@@ -59,11 +59,22 @@ const photosReducer = baseAPIReducer(
 );
 
 /**
+ * INDIVIDUAL PHOTO reducer
+ */
+const photoReducerInitialState = {};
+
+const photoReducer = baseAPIReducer(
+  'PHOTO',
+  photoReducerInitialState
+);
+
+/**
  * Export combined reducers
  */
 export default combineReducers({
   authenticatedUser: authenticatedUserReducer,
   traces: tracesReducer,
+  photos: photosReducer,
   individualTraces: traceReducer,
-  photos: photosReducer
+  individualPhotos: photoReducer
 });

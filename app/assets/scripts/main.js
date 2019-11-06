@@ -20,7 +20,8 @@ import About from './components/about';
 import Auth from './components/auth';
 import TracesIndex from './components/traces';
 import TracesView from './components/traces/view';
-import Photos from './components/photos';
+import PhotosIndex from './components/photos';
+import PhotosView from './components/photos/view';
 import UhOh from './components/uhoh';
 import ErrorBoundary from './fatal-error-boundary';
 
@@ -38,7 +39,8 @@ const Root = () => (
             <Route exact path='/logout' component={Auth} />
             <Route exact path='/traces/:traceId' component={TracesView} />
             <Route exact path='/traces' component={TracesIndex} />
-            <Route exact path='/photos' component={Photos} />
+            <Route exact path='/photos/:photoId' component={PhotosView} />
+            <Route exact path='/photos' component={PhotosIndex} />
             <Route exact path='/sandbox' component={Sandbox} />
             <Route exact path='/about' component={About} />
             <Route path='*' component={UhOh} />
