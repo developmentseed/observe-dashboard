@@ -1,14 +1,6 @@
 import get from 'lodash.get';
 import merge from 'lodash.merge';
-
-/**
- * Delays the execution in x milliseconds.
- *
- * @param {int} millis Milliseconds
- */
-function delay (millis) {
-  return new Promise(resolve => setTimeout(resolve, millis));
-}
+import { delay } from '../utils';
 
 /**
  * Performs a request to the given url returning the response in json format
@@ -264,4 +256,4 @@ export function getFromState (state, path) {
     data: {},
     error: null
   });
-};
+}

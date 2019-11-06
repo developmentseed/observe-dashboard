@@ -8,7 +8,7 @@ import { Router, Route, Switch } from 'react-router-dom';
 
 import theme from './styles/theme/theme';
 
-import { store } from './utils/store';
+import store from './store';
 import history from './utils/history';
 
 import GlobalStyles from './styles/global';
