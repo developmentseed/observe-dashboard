@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { PropTypes as T } from 'prop-types';
@@ -10,15 +11,54 @@ import App from '../common/app';
 import {
   Inpage,
   InpageHeader,
-  InpageHeaderInner,
   InpageHeadline,
   InpageTitle,
   InpageBody,
   InpageBodyInner
-} from '../common/inpage';
+} from '../common/Inpage';
+import Form from '../../styles/form/form';
+import FormInput from '../../styles/form/input';
+import FormLabel from '../../styles/form/label';
+import FormToolbar from '../../styles/form/toolbar';
+import { FormCheckable } from '../../styles/form/checkable';
+import DataTable from '../../styles/table';
 import Pagination from '../../styles/button/pagination';
 import Prose from '../../styles/type/prose';
+import collecticon from '../../styles/collecticons';
+import { themeVal } from '../../styles/utils/general';
 import { wrapApiResult } from '../../redux/utils';
+
+const FilterToolbar = styled(FormToolbar)`
+`;
+
+const InputWrapper = styled.div`
+  position: relative;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-end;
+  &:not(:first-child) {
+    margin-left: 1rem !important;
+  }
+`;
+
+const InputWithIcon = styled(FormInput)`
+  padding-right: 1.25rem;
+`;
+
+const InputIcon = styled(FormLabel)`
+  &::after {
+    ${({ useIcon }) => collecticon(useIcon)}
+    position: absolute;
+    right: 0.25rem;
+    top: 50%;
+    opacity: 0.64;
+  }
+`;
+
+const FilterLabel = styled(FormLabel)`
+  font-size: 0.875rem;
+  font-weight: ${themeVal('type.base.regular')};
+`;
 
 class Traces extends React.Component {
   async componentDidMount () {
@@ -43,12 +83,29 @@ class Traces extends React.Component {
 
   renderFilters () {
     return (
-      <>
-        <input type='text' placeholder='Search by user' />
-        <input type='text' placeholder='Start date' />
-        <input type='text' placeholder='End date' />
-        <input type='text' placeholder='Length' />
-      </>
+      <Form>
+        <FilterToolbar>
+          <InputWrapper>
+            <FilterLabel htmlFor='userSearch'>Search by user</FilterLabel>
+            <InputWithIcon type='text' id='userSearch' placeholder='User Name' />
+            <InputIcon htmlFor='userSearch' useIcon='magnifier-left' />
+          </InputWrapper>
+          <InputWrapper>
+            <FilterLabel htmlFor='startDate'>Start Date</FilterLabel>
+            <InputWithIcon type='date' id='startDate' />
+            <InputIcon htmlFor='startDate' useIcon='calendar' />
+          </InputWrapper>
+          <InputWrapper>
+            <FilterLabel htmlFor='endDate'>End Date</FilterLabel>
+            <InputWithIcon type='date' id='endDate' placeholder='End date' />
+            <InputIcon htmlFor='endDate' useIcon='calendar' />
+          </InputWrapper>
+          <InputWrapper>
+            <FilterLabel htmlFor='length'>Trace Length</FilterLabel>
+            <FormInput type='select' id='length' placeholder='Length' />
+          </InputWrapper>
+        </FilterToolbar>
+      </Form>
     );
   }
 
@@ -72,12 +129,19 @@ class Traces extends React.Component {
 
   renderTable () {
     return (
-      <table>
+      <DataTable>
         <thead>
           <tr>
-            <th scope='col' />
             <th scope='col'>
-              <span>Trace</span>
+              <FormCheckable
+                checked={undefined}
+                type='checkbox'
+                name='checkbox-all'
+                id='checkbox-all'
+              />
+            </th>
+            <th scope='col'>
+              Trace
             </th>
             <th scope='col'>
               <span>User</span>
@@ -100,7 +164,7 @@ class Traces extends React.Component {
           </tr>
         </thead>
         <tbody>{this.renderTableRows()}</tbody>
-      </table>
+      </DataTable>
     );
   }
 
@@ -130,15 +194,12 @@ class Traces extends React.Component {
     return (
       <App pageTitle='Traces'>
         <Inpage>
-          <InpageHeader>
-            <InpageHeaderInner>
+          <InpageHeader />
+          <InpageBody>
+            <InpageBodyInner>
               <InpageHeadline>
                 <InpageTitle>Traces</InpageTitle>
               </InpageHeadline>
-            </InpageHeaderInner>
-          </InpageHeader>
-          <InpageBody>
-            <InpageBodyInner>
               <Prose>{this.renderContent()}</Prose>
             </InpageBodyInner>
           </InpageBody>

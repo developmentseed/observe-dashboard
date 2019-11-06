@@ -14,6 +14,6 @@ export function delay (millis) {
  *
  * @param {object} feature GeoJSON feature
  */
-export function featureToCoords (feature) {  
+export function featureToCoords (feature) {
   return feature.coordinates.join(', ');
 }
