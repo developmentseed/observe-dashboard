@@ -20,6 +20,7 @@ import {
 import Pagination from '../../styles/button/pagination';
 import Prose from '../../styles/type/prose';
 import { wrapApiResult } from '../../redux/utils';
+import { featureToCoords } from '../../utils';
 
 class Photos extends React.Component {
   async componentDidMount () {
@@ -115,7 +116,7 @@ class Photos extends React.Component {
           </td>
           <td>{photo.ownerId}</td>
           <td>{new Date(photo.createdAt).toLocaleDateString()}</td>
-          <td>x,y</td>
+          <td>{featureToCoords(photo.location)}</td>
           <td>W W N</td>
           <td>...</td>
         </tr>

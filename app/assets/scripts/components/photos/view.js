@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { environment } from '../../config';
 import * as actions from '../../redux/actions/photos';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
+import { featureToCoords } from '../../utils';
 
 import App from '../common/app';
 import {
@@ -36,7 +37,7 @@ class Photos extends React.Component {
 
     return (
       <>
-        <Link to={`/photos`}>Back to photos</Link>
+        <Link to='/photos'>Back to photos</Link>
         {this.renderMap()}
         {this.renderInfobox()}
       </>
@@ -59,7 +60,7 @@ class Photos extends React.Component {
         <h2>Owner</h2>
         <p>{photo.ownerId}</p>
         <h2>Location</h2>
-        <p>{photo.bearing}</p>
+        <p>{featureToCoords(photo.location)}</p>
         <h2>Bearing</h2>
         <p>{photo.bearing}</p>
         <h2>Created at</h2>
