@@ -3,6 +3,7 @@ import { rgba, normalize } from 'polished';
 import { themeVal, stylizeFunction } from './utils/general';
 
 import { collecticonsFont } from './collecticons';
+import reactInputRangeStyles from './vendor/react-input-range';
 
 // Global styles for these components are included here for performance reasons.
 // This way they're only rendered when absolutely needed.
@@ -110,5 +111,6 @@ const baseStyles = css`
 export default createGlobalStyle`
   ${normalize()}
   ${collecticonsFont()}
+  ${reactInputRangeStyles()}
   ${baseStyles}
 `;

@@ -64,3 +64,30 @@ export function wrapApiResult (stateData) {
     ...stateData
   };
 }
+
+/**
+ * Created a validator function that ensures a number is within the given range.
+ *
+ * @param {number} min Range lower bound (inclusive)
+ * @param {number} max Range upper bound (inclusive)
+ *
+ * @returns {function} Validator function.
+ */
+export function validateRangeNum (min, max) {
+  return (raw) => {
+    const value = Number(raw);
+    return !isNaN(value) && raw !== '' && value >= min && value <= max;
+  };
+}
+
+/**
+ * Compares two values using JSON stringification.
+ *
+ * @param {mixed} a Data to compare
+ * @param {mixed} b Data to compare
+ */
+export function isEqualObj (a, b) {
+  // Exist early if they're the same.
+  if (a === b) return true;
+  return JSON.stringify(a) === JSON.stringify(b);
+}
