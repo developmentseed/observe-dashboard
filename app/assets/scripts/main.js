@@ -18,7 +18,8 @@ import Home from './components/home';
 import Sandbox from './components/sandbox';
 import About from './components/about';
 import Auth from './components/auth';
-import Traces from './components/traces';
+import TracesIndex from './components/traces';
+import TracesView from './components/traces/view';
 import Photos from './components/photos';
 import UhOh from './components/uhoh';
 import ErrorBoundary from './fatal-error-boundary';
@@ -35,7 +36,8 @@ const Root = () => (
             <Route exact path='/login/redirect' component={Auth} />
             <Route exact path='/login' component={Auth} />
             <Route exact path='/logout' component={Auth} />
-            <Route exact path='/traces' component={Traces} />
+            <Route exact path='/traces/:traceId' component={TracesView} />
+            <Route exact path='/traces' component={TracesIndex} />
             <Route exact path='/photos' component={Photos} />
             <Route exact path='/sandbox' component={Sandbox} />
             <Route exact path='/about' component={About} />

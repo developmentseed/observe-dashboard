@@ -240,3 +240,28 @@ export function wrapApiResult (stateData) {
     stateData
   );
 }
+
+/**
+ * Gets the given path from the state or return the default:
+ * {
+ *   fetched: false,
+ *   fetching: false,
+ *   data: {},
+ *   error: null
+ * }
+ *
+ * @see lodash.get
+ *
+ * @param {object} state The redux state
+ * @param {array | string} path The path to get. Passed to lodash.get
+ *
+ * @returns {object} State or default
+ */
+export function getFromState (state, path) {
+  return get(state, path, {
+    fetched: false,
+    fetching: false,
+    data: {},
+    error: null
+  });
+};

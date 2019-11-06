@@ -34,6 +34,16 @@ const tracesReducer = baseAPIReducer(
 );
 
 /**
+ * INDIVIDUAL TRACE reducer
+ */
+const traceReducerInitialState = {};
+
+const traceReducer = baseAPIReducer(
+  'TRACE',
+  traceReducerInitialState
+);
+
+/**
  * PHOTOS reducer
  */
 const photosReducerInitialState = {
@@ -54,5 +64,6 @@ const photosReducer = baseAPIReducer(
 export default combineReducers({
   authenticatedUser: authenticatedUserReducer,
   traces: tracesReducer,
+  individualTraces: traceReducer,
   photos: photosReducer
 });

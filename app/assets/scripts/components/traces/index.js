@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { PropTypes as T } from 'prop-types';
 import { environment } from '../../config';
 import * as actions from '../../redux/actions/traces';
@@ -111,7 +112,9 @@ class Traces extends React.Component {
           <td>
             <input type='checkbox' />
           </td>
-          <td>{trace.id}</td>
+          <td>
+            <Link to={`/traces/${trace.id}`}>{trace.id}</Link>
+          </td>
           <td>{trace.ownerId}</td>
           <td>{new Date(trace.recordedAt).toLocaleDateString()}</td>
           <td>{trace.length}</td>
