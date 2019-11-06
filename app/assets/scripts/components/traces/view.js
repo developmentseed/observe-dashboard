@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { PropTypes as T } from 'prop-types';
+import { Link } from 'react-router-dom';
 import { environment } from '../../config';
 import * as actions from '../../redux/actions/traces';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
@@ -35,6 +36,7 @@ class Traces extends React.Component {
 
     return (
       <>
+        <Link to='/traces'>Back to traces</Link>
         {this.renderMap()}
         {this.renderInfobox()}
       </>
