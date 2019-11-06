@@ -36,7 +36,13 @@ const tracesReducer = baseAPIReducer(
 /**
  * INDIVIDUAL TRACE reducer
  */
-const traceReducerInitialState = {};
+const traceReducerInitialState = {
+  // Each entry:
+  // fetching: false,
+  // fetched: false,
+  // error: null,
+  // data: []
+};
 
 const traceReducer = baseAPIReducer(
   'TRACE',
@@ -61,7 +67,13 @@ const photosReducer = baseAPIReducer(
 /**
  * INDIVIDUAL PHOTO reducer
  */
-const photoReducerInitialState = {};
+const photoReducerInitialState = {
+  // Each entry:
+  // fetching: false,
+  // fetched: false,
+  // error: null,
+  // data: []
+};
 
 const photoReducer = baseAPIReducer(
   'PHOTO',
