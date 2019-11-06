@@ -108,25 +108,33 @@ export const FormCheckable = styled(FormCheckableElement)`
     width: 1.25rem;
     background: #fff;
     line-height: 1;
-    border: ${themeVal('layout.border')} solid ${_rgba(themeVal('color.base'), 0.16)};
+    overflow: hidden;
+    border: ${themeVal('layout.border')} solid ${_rgba(themeVal('color.primary'), 0.16)};
     border-radius: ${({ type }) => (type === 'checkbox' ? themeVal('shape.rounded') : themeVal('shape.ellipsoid'))};
     &::before {
       transition: all 0.24s ease 0s;
       opacity: 0;
+      color: #FFFFFF;
+      background-color: ${themeVal('color.primary')};
+      width: 1.25rem;
+      height: 1.25rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       ${({ type }) => (type === 'checkbox' ? css`
         ${collecticon('tick--small')}
       ` : css`
         content: '';
         height: 0.5rem;
         width: 0.5rem;
-        background: ${themeVal('color.base')};
+        background: ${themeVal('color.primary')};
         border-radius: ${themeVal('shape.ellipsoid')};
       `)}
     }
   }
   &:hover ${FormCheckableControl} {
     border-width: ${themeVal('layout.border')};
-    border-color: ${_rgba(themeVal('color.base'), 0.32)};
+    border-color: ${_rgba(themeVal('color.primary'), 0.32)};
   }
   ${({ invalid }) => invalid && css`
     ${FormCheckableControl} {
@@ -143,7 +151,7 @@ export const FormCheckable = styled(FormCheckableElement)`
   input:active ~ ${FormCheckableControl} { /* stylelint-disable-line */
     outline: 0;
     border-width: ${themeVal('layout.border')};
-    border-color: ${_rgba(themeVal('color.base'), 0.64)};
+    border-color: ${_rgba(themeVal('color.primary'), 0.64)};
   }
   ${({ checked }) => (checked ? `${FormCheckableControl},` : '')}
   input:checked ~ ${FormCheckableControl} { /* stylelint-disable-line */

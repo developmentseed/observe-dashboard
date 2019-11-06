@@ -10,7 +10,7 @@ import {
   InpageTitle,
   InpageBody,
   InpageBodyInner
-} from '../common/Inpage';
+} from '../common/inpage';
 import Prose from '../../styles/type/prose';
 
 export default class UhOh extends React.Component {

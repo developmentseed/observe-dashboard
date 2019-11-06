@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { PropTypes as T } from 'prop-types';
 import { environment } from '../../config';
 import * as actions from '../../redux/actions/traces';
-import { showGlobalLoading, hideGlobalLoading } from '../common/GlobalLoading';
+import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 
 import App from '../common/app';
 import {
@@ -14,7 +14,8 @@ import {
   InpageTitle,
   InpageBody,
   InpageBodyInner
-} from '../common/Inpage';
+} from '../common/inpage';
+import Pagination from '../../styles/button/pagination';
 import Prose from '../../styles/type/prose';
 import { wrapApiResult } from '../../redux/utils';
 
@@ -34,8 +35,7 @@ class Traces extends React.Component {
     return (
       <>
         {this.renderFilters()}
-        {this.renderPagination()}
-        {this.renderTable()}
+        {this.renderResults()}
       </>
     );
   }
@@ -51,12 +51,20 @@ class Traces extends React.Component {
     );
   }
 
-  renderPagination () {
+  renderResults () {
+    const { getMeta } = this.props.traces;
+    const { count } = getMeta();
+
+    if (count === 0) {
+      return (
+        <p>There are no results for the current search/filters criteria.</p>
+      );
+    }
+
     return (
       <>
-        <div>1 - 20 of 26</div>
-        <button type='button'>{'<'}</button>
-        <button type='button'>{'>'}</button>
+        {this.renderTable()}
+        <Pagination />
       </>
     );
   }

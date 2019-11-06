@@ -9,7 +9,7 @@ import {
   InpageTitle,
   InpageBody,
   InpageBodyInner
-} from '../common/Inpage';
+} from '../common/inpage';
 import Prose from '../../styles/type/prose';
 
 export default class About extends React.Component {
