@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { PropTypes as T } from 'prop-types';
+import { Link } from 'react-router-dom';
 import { environment } from '../../config';
 import * as actions from '../../redux/actions/photos';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
@@ -77,7 +78,7 @@ class Photos extends React.Component {
           <tr>
             <th scope='col' />
             <th scope='col'>
-              <span>Trace</span>
+              <span>ID</span>
             </th>
             <th scope='col'>
               <span>User</span>
@@ -109,7 +110,9 @@ class Photos extends React.Component {
           <td>
             <input type='checkbox' />
           </td>
-          <td>{photo.id}</td>
+          <td>
+            <Link to={`/photos/${photo.id}`}>{photo.id}</Link>
+          </td>
           <td>{photo.ownerId}</td>
           <td>{new Date(photo.createdAt).toLocaleDateString()}</td>
           <td>x,y</td>
