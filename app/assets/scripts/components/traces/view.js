@@ -108,7 +108,9 @@ class Traces extends React.Component {
 
     return (
       <>
-        <Link to='/traces'>Back to traces</Link>
+        <Button useIcon='chevron-left--small' variation='base-plain'>
+          <Link to='/traces'>Back to traces</Link>
+        </Button>
         <h1>Trace {trace.id}</h1>
         <ContentWrapper>
           {this.renderMap()}
