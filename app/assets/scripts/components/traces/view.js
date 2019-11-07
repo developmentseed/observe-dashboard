@@ -2,10 +2,12 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { PropTypes as T } from 'prop-types';
 import { Link } from 'react-router-dom';
-import { environment } from '../../config';
+import { mapboxAccessToken, environment } from '../../config';
 import * as actions from '../../redux/actions/traces';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 import styled from 'styled-components';
+import mapboxgl from 'mapbox-gl';
+import bbox from '@turf/bbox';
 
 import App from '../common/app';
 import {
@@ -18,6 +20,9 @@ import Prose from '../../styles/type/prose';
 import Button from '../../styles/button/button';
 import { wrapApiResult, getFromState } from '../../redux/utils';
 import { formatDateTimeExtended, startCoordinate } from '../../utils';
+
+// Mapbox access token
+mapboxgl.accessToken = mapboxAccessToken;
 
 const ContentWrapper = styled.div`
   display: grid;
@@ -34,11 +39,63 @@ const ActionButtonsWrapper = styled.div`
 `;
 
 class Traces extends React.Component {
+  constructor (props) {
+    super(props);
+    this.state = {
+      mapLoaded: false
+    };
+  }
+
   async componentDidMount () {
     showGlobalLoading();
+
+    // Fetch trace from the API
     const { traceId } = this.props.match.params;
     await this.props.fetchTrace(traceId);
+
     hideGlobalLoading();
+  }
+
+  componentDidUpdate (prevProps) {
+    const { mapLoaded } = this.state;
+
+    // Bypass if map is already loaded
+    if (mapLoaded) return;
+
+    // Check if geometry is available
+    const { isReady, hasError, getData } = this.props.trace;
+    if (!isReady() || hasError()) return null;
+    const { geometry } = getData();
+
+    // Add Map component
+    this.map = new mapboxgl.Map({
+      container: this.mapContainer,
+      style: 'mapbox://styles/mapbox/streets-v9',
+      interactive: false,
+      attributionControl: false,
+      bounds: bbox(geometry),
+      fitBoundsOptions: { padding: 20 }
+    }).addControl(new mapboxgl.AttributionControl({
+      compact: false
+    }));
+
+    // Add trace when map is fully loaded
+    const self = this;
+    this.map.on('load', function () {
+      self.map.addLayer({
+        'id': 'trace',
+        'type': 'line',
+        'source': {
+          'type': 'geojson',
+          'data': {
+            'type': 'Feature',
+            'properties': {},
+            'geometry': geometry
+          }
+        }
+      });
+      self.setState({ mapLoaded: true });
+    });
   }
 
   renderContent () {
@@ -65,7 +122,20 @@ class Traces extends React.Component {
   }
 
   renderMap () {
-    return <Map><h2>Render map here</h2></Map>;
+    return (
+      <Map>
+        {mapboxgl.supported() ? (
+          <div
+            ref={(r) => { this.mapContainer = r; }}
+            style={{ width: '100%', height: '100%' }}
+          />
+        ) : (
+          <div className='mapbox-no-webgl'>
+            <p>WebGL is not supported or disabled.</p>
+          </div>
+        )}
+      </Map>
+    );
   }
 
   renderInfobox () {
