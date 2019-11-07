@@ -17,3 +17,15 @@ export function delay (millis) {
 export function featureToCoords (feature) {
   return feature.coordinates.join(', ');
 }
+
+/**
+ * Format date as extended text.
+ *
+ * @param {string} date Date as ISO string
+ */
+export function formatDateTimeExtended (date) {
+  return new Date(date).toLocaleDateString('en-GB', {
+    dateStyle: 'long',
+    timeStyle: 'short'
+  });
+}

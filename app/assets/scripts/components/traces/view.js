@@ -17,6 +17,7 @@ import UhOh from '../uhoh';
 import Prose from '../../styles/type/prose';
 import Button from '../../styles/button/button';
 import { wrapApiResult, getFromState } from '../../redux/utils';
+import { formatDateTimeExtended } from '../../utils';
 
 const ContentWrapper = styled.div`
   display: grid;
@@ -81,11 +82,11 @@ class Traces extends React.Component {
         <h2>Owner</h2>
         <p>{trace.ownerId}</p>
         <h2>Recorded at</h2>
-        <p>{new Date(trace.recordedAt).toLocaleDateString()}</p>
+        <p>{formatDateTimeExtended(trace.recordedAt)}</p>
         <h2>Uploaded at</h2>
-        <p>{new Date(trace.uploadedAt).toLocaleDateString()}</p>
+        <p>{formatDateTimeExtended(trace.uploadedAt)}</p>
         <h2>Updated at</h2>
-        <p>{new Date(trace.updatedAt).toLocaleDateString()}</p>
+        <p>{formatDateTimeExtended(trace.updatedAt)}</p>
       </Infobox>
     );
   }
