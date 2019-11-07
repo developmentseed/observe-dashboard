@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { environment } from '../../config';
 import * as actions from '../../redux/actions/traces';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
+import styled from 'styled-components';
 
 import App from '../common/app';
 import {
@@ -20,6 +21,17 @@ import UhOh from '../uhoh';
 import Prose from '../../styles/type/prose';
 import { wrapApiResult, getFromState } from '../../redux/utils';
 
+const ContentWrapper = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;  
+`;
+
+const Infobox = styled.div`
+`;
+
+const Map = styled.div`
+`;
+
 class Traces extends React.Component {
   async componentDidMount () {
     showGlobalLoading();
@@ -29,29 +41,34 @@ class Traces extends React.Component {
   }
 
   renderContent () {
-    const { isReady, hasError } = this.props.trace;
+    const { isReady, hasError, getData } = this.props.trace;
 
     if (!isReady()) return null;
     if (hasError()) return <UhOh />;
 
+    const { properties: trace } = getData();
+
     return (
       <>
         <Link to='/traces'>Back to traces</Link>
-        {this.renderMap()}
-        {this.renderInfobox()}
+        <h1>Trace {trace.id}</h1>
+        <ContentWrapper>
+          {this.renderMap()}
+          {this.renderInfobox()}
+        </ContentWrapper>
       </>
     );
   }
 
   renderMap () {
-    return <h2>Map (placeholder)</h2>;
+    return <Map><h2>Render map here</h2></Map>;
   }
 
   renderInfobox () {
     const { getData } = this.props.trace;
     const { properties: trace } = getData();
     return (
-      <>
+      <Infobox>
         <h2>id</h2>
         <p>{trace.id}</p>
         <h2>Description</h2>
@@ -66,7 +83,7 @@ class Traces extends React.Component {
         <p>{new Date(trace.uploadedAt).toLocaleDateString()}</p>
         <h2>Updated at</h2>
         <p>{new Date(trace.updatedAt).toLocaleDateString()}</p>
-      </>
+      </Infobox>
     );
   }
 
@@ -74,13 +91,6 @@ class Traces extends React.Component {
     return (
       <App pageTitle='Traces'>
         <Inpage>
-          <InpageHeader>
-            <InpageHeaderInner>
-              <InpageHeadline>
-                <InpageTitle>Trace</InpageTitle>
-              </InpageHeadline>
-            </InpageHeaderInner>
-          </InpageHeader>
           <InpageBody>
             <InpageBodyInner>
               <Prose>{this.renderContent()}</Prose>
