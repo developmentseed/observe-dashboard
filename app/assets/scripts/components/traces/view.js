@@ -10,15 +10,12 @@ import styled from 'styled-components';
 import App from '../common/app';
 import {
   Inpage,
-  InpageHeader,
-  InpageHeaderInner,
-  InpageHeadline,
-  InpageTitle,
   InpageBody,
   InpageBodyInner
 } from '../common/inpage';
 import UhOh from '../uhoh';
 import Prose from '../../styles/type/prose';
+import Button from '../../styles/button/button';
 import { wrapApiResult, getFromState } from '../../redux/utils';
 
 const ContentWrapper = styled.div`
@@ -30,6 +27,9 @@ const Infobox = styled.div`
 `;
 
 const Map = styled.div`
+`;
+
+const ActionButtonsWrapper = styled.div`
 `;
 
 class Traces extends React.Component {
@@ -56,6 +56,9 @@ class Traces extends React.Component {
           {this.renderMap()}
           {this.renderInfobox()}
         </ContentWrapper>
+        <ActionButtonsWrapper>
+          {this.renderActionButtons()}
+        </ActionButtonsWrapper>
       </>
     );
   }
@@ -84,6 +87,25 @@ class Traces extends React.Component {
         <h2>Updated at</h2>
         <p>{new Date(trace.updatedAt).toLocaleDateString()}</p>
       </Infobox>
+    );
+  }
+
+  renderActionButtons () {
+    return (
+      <ActionButtonsWrapper>
+        <Button useIcon='trash-bin' variation='danger-raised-light'>
+          Delete
+        </Button>
+        <Button useIcon='pencil' variation='primary-raised-dark'>
+          Edit Metadata
+        </Button>
+        <Button useIcon='export' variation='primary-raised-dark'>
+          Export to JOSM
+        </Button>
+        <Button useIcon='download' variation='primary-raised-dark'>
+          Download
+        </Button>
+      </ActionButtonsWrapper>
     );
   }
 
