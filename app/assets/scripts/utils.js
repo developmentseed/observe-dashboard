@@ -19,6 +19,15 @@ export function featureToCoords (feature) {
 }
 
 /**
+ * Get start coordinate of GeoJSON line feature as text.
+ *
+ * @param {object} feature GeoJSON feature
+ */
+export function startCoordinate (feature) {
+  return feature.coordinates[0].join(', ');
+}
+
+/**
  * Format date as extended text.
  *
  * @param {string} date Date as ISO string

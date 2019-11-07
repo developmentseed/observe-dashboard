@@ -17,7 +17,7 @@ import UhOh from '../uhoh';
 import Prose from '../../styles/type/prose';
 import Button from '../../styles/button/button';
 import { wrapApiResult, getFromState } from '../../redux/utils';
-import { formatDateTimeExtended } from '../../utils';
+import { formatDateTimeExtended, startCoordinate } from '../../utils';
 
 const ContentWrapper = styled.div`
   display: grid;
@@ -70,7 +70,7 @@ class Traces extends React.Component {
 
   renderInfobox () {
     const { getData } = this.props.trace;
-    const { properties: trace } = getData();
+    const { properties: trace, geometry } = getData();
     return (
       <Infobox>
         <h2>id</h2>
@@ -81,6 +81,8 @@ class Traces extends React.Component {
         <p>{trace.length}</p>
         <h2>Owner</h2>
         <p>{trace.ownerId}</p>
+        <h2>Start coordinate</h2>
+        <p>{startCoordinate(geometry)}</p>
         <h2>Recorded at</h2>
         <p>{formatDateTimeExtended(trace.recordedAt)}</p>
         <h2>Uploaded at</h2>
