@@ -6,6 +6,7 @@ import { environment } from '../../config';
 import * as actions from '../../redux/actions/photos';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 import { featureToCoords } from '../../utils';
+import styled from 'styled-components';
 
 import App from '../common/app';
 import {
@@ -18,14 +19,29 @@ import {
   InpageBodyInner
 } from '../common/inpage';
 import UhOh from '../uhoh';
+import Button from '../../styles/button/button';
 import Prose from '../../styles/type/prose';
 import { wrapApiResult, getFromState } from '../../redux/utils';
+
+const ContentWrapper = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;  
+`;
+
+const Infobox = styled.div`
+`;
+
+const ActionButtonsWrapper = styled.div`
+`;
 
 class Photos extends React.Component {
   async componentDidMount () {
     showGlobalLoading();
+
+    // Fetch photo from the API
     const { photoId } = this.props.match.params;
     await this.props.fetchPhoto(photoId);
+
     hideGlobalLoading();
   }
 
@@ -35,28 +51,41 @@ class Photos extends React.Component {
     if (!isReady()) return null;
     if (hasError()) return <UhOh />;
 
+    const { getData } = this.props.photo;
+    const photo = getData();
+
     return (
       <>
-        <Link to='/photos'>Back to photos</Link>
-        {this.renderMap()}
-        {this.renderInfobox()}
+        <Button useIcon='chevron-left--small' variation='base-plain'>
+          <Link to='/photos'>Back to photos</Link>
+        </Button>
+        <ContentWrapper>
+          {this.renderPhoto(photo)}
+          {this.renderInfobox(photo)}
+        </ContentWrapper>
+        <ActionButtonsWrapper>
+          {this.renderActionButtons(photo)}
+        </ActionButtonsWrapper>        
       </>
     );
   }
 
-  renderMap () {
-    return <h2>Map (placeholder)</h2>;
+  renderPhoto (photo) {
+    return (
+      <img
+        alt={`Photo {photo.id}`}
+        src='https://via.placeholder.com/800x600'
+      />
+    );
   }
 
-  renderInfobox () {
-    const { getData } = this.props.photo;
-    const photo = getData();
+  renderInfobox (photo) {
     return (
-      <>
+      <Infobox>
         <h2>id</h2>
         <p>{photo.id}</p>
         <h2>Description</h2>
-        <p>{photo.description}</p>
+        <p>{photo.description || 'No description available.'}</p>
         <h2>Owner</h2>
         <p>{photo.ownerId}</p>
         <h2>Location</h2>
@@ -67,7 +96,23 @@ class Photos extends React.Component {
         <p>{new Date(photo.createdAt).toLocaleDateString()}</p>
         <h2>Uploaded at</h2>
         <p>{new Date(photo.uploadedAt).toLocaleDateString()}</p>
-      </>
+      </Infobox>
+    );
+  }
+
+  renderActionButtons () {
+    return (
+      <ActionButtonsWrapper>
+        <Button useIcon='trash-bin' variation='danger-raised-light'>
+          Delete
+        </Button>
+        <Button useIcon='pencil' variation='primary-raised-dark'>
+          Edit Metadata
+        </Button>
+        <Button useIcon='download' variation='primary-raised-dark'>
+          Download
+        </Button>
+      </ActionButtonsWrapper>
     );
   }
 
