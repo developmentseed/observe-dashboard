@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { environment } from '../../config';
 import * as actions from '../../redux/actions/photos';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
-import { featureToCoords } from '../../utils';
+import { featureToCoords, formatDateTimeExtended } from '../../utils';
 import styled from 'styled-components';
 
 import App from '../common/app';
@@ -93,9 +93,9 @@ class Photos extends React.Component {
         <h2>Bearing</h2>
         <p>{photo.bearing}</p>
         <h2>Created at</h2>
-        <p>{new Date(photo.createdAt).toLocaleDateString()}</p>
+        <p>{formatDateTimeExtended(photo.createdAt)}</p>
         <h2>Uploaded at</h2>
-        <p>{new Date(photo.uploadedAt).toLocaleDateString()}</p>
+        <p>{formatDateTimeExtended(photo.uploadedAt)}</p>
       </Infobox>
     );
   }
