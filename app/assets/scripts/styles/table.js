@@ -65,7 +65,7 @@ const DataTable = styled.table`
 
 export default DataTable;
 
-// Aditional table elements.
+// Additional table elements.
 
 export const SortableLink = styled.a.attrs(({ sort }) => ({
   sort: sort || 'none'

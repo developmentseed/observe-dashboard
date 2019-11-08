@@ -65,7 +65,7 @@ class Photos extends React.Component {
         </ContentWrapper>
         <ActionButtonsWrapper>
           {this.renderActionButtons(photo)}
-        </ActionButtonsWrapper>        
+        </ActionButtonsWrapper>
       </>
     );
   }
