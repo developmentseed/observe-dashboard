@@ -21,7 +21,6 @@ const DataTable = styled.table`
   td {
     padding: ${multiply(glbsp, 0.75)} ${glbsp};
     vertical-align: top;
-    font-size:  0.875rem;
   }
 
   thead th {
@@ -55,6 +54,10 @@ const DataTable = styled.table`
   tbody {
     tr:hover {
       background: ${_rgba(themeVal('color.smoke'), 0.25)};
+    }
+
+    tr: active {
+      background: ${_rgba(themeVal('color.primary'), 0.25)};
     }
 
     a {

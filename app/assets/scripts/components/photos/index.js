@@ -5,17 +5,27 @@ import { Link } from 'react-router-dom';
 import { environment } from '../../config';
 import * as actions from '../../redux/actions/photos';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
+import DataTable from '../../styles/table';
 
 import App from '../common/app';
 import {
   Inpage,
   InpageHeader,
-  InpageHeaderInner,
   InpageHeadline,
   InpageTitle,
   InpageBody,
   InpageBodyInner
 } from '../common/inpage';
+
+import Form from '../../styles/form/form';
+import { FormCheckable } from '../../styles/form/checkable';
+import FormInput from '../../styles/form/input';
+import {
+  FilterToolbar,
+  InputWrapper,
+  InputWithIcon,
+  InputIcon,
+  FilterLabel } from '../../styles/form/filters';
 
 import Pagination from '../../styles/button/pagination';
 import Prose from '../../styles/type/prose';
@@ -45,12 +55,29 @@ class Photos extends React.Component {
 
   renderFilters () {
     return (
-      <>
-        <input type='text' placeholder='Search by user' />
-        <input type='text' placeholder='Start date' />
-        <input type='text' placeholder='End date' />
-        <input type='text' placeholder='OSM Object' />
-      </>
+      <Form>
+        <FilterToolbar>
+          <InputWrapper>
+            <FilterLabel htmlFor='userSearch'>Search by user</FilterLabel>
+            <InputWithIcon type='text' id='userSearch' placeholder='User Name' />
+            <InputIcon htmlFor='userSearch' useIcon='magnifier-left' />
+          </InputWrapper>
+          <InputWrapper>
+            <FilterLabel htmlFor='startDate'>Start Date</FilterLabel>
+            <InputWithIcon type='date' id='startDate' />
+            <InputIcon htmlFor='startDate' useIcon='calendar' />
+          </InputWrapper>
+          <InputWrapper>
+            <FilterLabel htmlFor='endDate'>End Date</FilterLabel>
+            <InputWithIcon type='date' id='endDate' placeholder='End date' />
+            <InputIcon htmlFor='endDate' useIcon='calendar' />
+          </InputWrapper>
+          <InputWrapper>
+            <FilterLabel htmlFor='length'>OSM Object</FilterLabel>
+            <FormInput type='select' id='length' placeholder='Length' />
+          </InputWrapper>
+        </FilterToolbar>
+      </Form>
     );
   }
 
@@ -74,12 +101,19 @@ class Photos extends React.Component {
 
   renderTable () {
     return (
-      <table>
+      <DataTable>
         <thead>
           <tr>
-            <th scope='col' />
             <th scope='col'>
-              <span>ID</span>
+              <FormCheckable
+                checked={undefined}
+                type='checkbox'
+                name='checkbox-all'
+                id='checkbox-all'
+              />
+            </th>
+            <th scope='col'>
+              <span>Photo</span>
             </th>
             <th scope='col'>
               <span>User</span>
@@ -99,7 +133,7 @@ class Photos extends React.Component {
           </tr>
         </thead>
         <tbody>{this.renderTableRows()}</tbody>
-      </table>
+      </DataTable>
     );
   }
 
@@ -128,15 +162,12 @@ class Photos extends React.Component {
     return (
       <App pageTitle='Photos'>
         <Inpage>
-          <InpageHeader>
-            <InpageHeaderInner>
+          <InpageHeader />
+          <InpageBody>
+            <InpageBodyInner>
               <InpageHeadline>
                 <InpageTitle>Photos</InpageTitle>
               </InpageHeadline>
-            </InpageHeaderInner>
-          </InpageHeader>
-          <InpageBody>
-            <InpageBodyInner>
               <Prose>{this.renderContent()}</Prose>
             </InpageBodyInner>
           </InpageBody>
