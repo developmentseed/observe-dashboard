@@ -106,6 +106,8 @@ const Button = styled(BaseButton)`
   font-family: ${themeVal('type.base.family')};
   font-weight: ${themeVal('type.base.bold')};
   cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.025rem;
 
   /* States */
 

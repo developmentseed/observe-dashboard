@@ -19,7 +19,7 @@ import {
 
 import Form from '../../styles/form/form';
 import { FormCheckable } from '../../styles/form/checkable';
-import FormInput from '../../styles/form/input';
+import FormSelect from '../../styles/form/select';
 import {
   FilterToolbar,
   InputWrapper,
@@ -74,7 +74,12 @@ class Photos extends React.Component {
           </InputWrapper>
           <InputWrapper>
             <FilterLabel htmlFor='length'>OSM Object</FilterLabel>
-            <FormInput type='select' id='length' placeholder='Length' />
+            <FormSelect type='select' id='length' placeholder='Select Objects'>
+              <option value='Node'>Node</option>
+              <option value='Way'>Way</option>
+              <option value='Relation'>Relation</option>
+              <option value='Tag'>Tag</option>
+            </FormSelect>
           </InputWrapper>
         </FilterToolbar>
       </Form>
@@ -143,7 +148,12 @@ class Photos extends React.Component {
       return (
         <tr key={photo.id}>
           <td>
-            <input type='checkbox' />
+            <FormCheckable
+              checked={undefined}
+              type='checkbox'
+              name={`checkbox-${photo.id}`}
+              id={`checkbox-${photo.id}`}
+            />
           </td>
           <td>
             <Link to={`/photos/${photo.id}`}>{photo.id}</Link>

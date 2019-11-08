@@ -31,6 +31,7 @@ const DataTable = styled.table`
     text-transform: uppercase;
     vertical-align: middle;
     position: relative;
+    text-align: left;
   }
 
   th:first-child,

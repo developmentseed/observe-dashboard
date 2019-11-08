@@ -1,8 +1,8 @@
 import React from 'react';
-import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { PropTypes as T } from 'prop-types';
+import styled from 'styled-components';
 import { environment } from '../../config';
 import * as actions from '../../redux/actions/traces';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
@@ -29,8 +29,26 @@ import DataTable from '../../styles/table';
 import Pagination from '../../styles/button/pagination';
 import Prose from '../../styles/type/prose';
 import { wrapApiResult } from '../../redux/utils';
+import Dropdown from '../common/dropdown';
+import RangeSlider from '../common/range-slider';
+
+const DropSlider = styled(Dropdown)`
+  max-width: 24rem;
+  padding-bottom: 2rem;
+`;
 
 class Traces extends React.Component {
+  constructor (props) {
+    super(props);
+
+    this.state = {
+      traceLength: {
+        min: 0,
+        max: 100
+      }
+    };
+  }
+
   async componentDidMount () {
     showGlobalLoading();
     await this.props.fetchTraces();
@@ -72,7 +90,24 @@ class Traces extends React.Component {
           </InputWrapper>
           <InputWrapper>
             <FilterLabel htmlFor='length'>Trace Length</FilterLabel>
-            <FormInput type='select' id='length' placeholder='Length' />
+            <DropSlider
+              ref={this.dropRef}
+              alignment='left'
+              direction='down'
+              triggerElement={(
+                <FormInput type='select' id='length' placeholder='Length' />
+              )}
+            >
+              <Form>
+                <RangeSlider
+                  min={0}
+                  max={100}
+                  id='trace-length'
+                  value={this.state.traceLength}
+                  onChange={v => this.setState({ traceLength: v })}
+                />
+              </Form>
+            </DropSlider>
           </InputWrapper>
         </FilterToolbar>
       </Form>
@@ -144,7 +179,12 @@ class Traces extends React.Component {
       return (
         <tr key={trace.id}>
           <td>
-            <input type='checkbox' />
+            <FormCheckable
+              checked={undefined}
+              type='checkbox'
+              name={`checkbox-${trace.id}`}
+              id={`checkbox-${trace.id}`}
+            />
           </td>
           <td>
             <Link to={`/traces/${trace.id}`}>{trace.id}</Link>

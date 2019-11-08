@@ -1,37 +1,34 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { PropTypes as T } from 'prop-types';
-import { Link } from 'react-router-dom';
 import { environment } from '../../config';
 import * as actions from '../../redux/actions/photos';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 import { featureToCoords, formatDateTimeExtended } from '../../utils';
+
 import styled from 'styled-components';
+import Form from '../../styles/form/form';
+import FormLabel from '../../styles/form/label';
 
 import App from '../common/app';
 import {
   Inpage,
-  InpageHeader,
-  InpageHeaderInner,
   InpageHeadline,
   InpageTitle,
   InpageBody,
+  InpageBackLink,
   InpageBodyInner
 } from '../common/inpage';
 import UhOh from '../uhoh';
 import Button from '../../styles/button/button';
 import Prose from '../../styles/type/prose';
 import { wrapApiResult, getFromState } from '../../redux/utils';
+import { ContentWrapper, Infobox, ActionButtonsWrapper } from '../common/view-wrappers';
 
-const ContentWrapper = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;  
-`;
-
-const Infobox = styled.div`
-`;
-
-const ActionButtonsWrapper = styled.div`
+const PhotoBox = styled.div`
+  img {
+    max-width: 100%;
+  }
 `;
 
 class Photos extends React.Component {
@@ -56,26 +53,29 @@ class Photos extends React.Component {
 
     return (
       <>
-        <Button useIcon='chevron-left--small' variation='base-plain'>
-          <Link to='/photos'>Back to photos</Link>
-        </Button>
+        <InpageHeadline>
+          <InpageBackLink to='/photos'>Back to photos</InpageBackLink>
+          <InpageTitle>
+            Photo {photo.id}
+          </InpageTitle>
+        </InpageHeadline>
         <ContentWrapper>
           {this.renderPhoto(photo)}
           {this.renderInfobox(photo)}
         </ContentWrapper>
-        <ActionButtonsWrapper>
-          {this.renderActionButtons(photo)}
-        </ActionButtonsWrapper>
+        {this.renderActionButtons(photo)}
       </>
     );
   }
 
   renderPhoto (photo) {
     return (
-      <img
-        alt={`Photo {photo.id}`}
-        src='https://via.placeholder.com/800x600'
-      />
+      <PhotoBox>
+        <img
+          alt={`Photo {photo.id}`}
+          src='https://via.placeholder.com/800x600'
+        />
+      </PhotoBox>
     );
   }
 
@@ -93,38 +93,40 @@ class Photos extends React.Component {
 
     return (
       <Infobox>
-        <h2>id</h2>
-        <p>{id}</p>
-        <h2>Description</h2>
-        <p>{description || 'No description available.'}</p>
-        <h2>Owner</h2>
-        <p>{ownerId}</p>
-        <h2>Location</h2>
-        <p>{featureToCoords(location)}</p>
-        <h2>Bearing</h2>
-        <p>{bearing}</p>
-        <h2>OSM Objects</h2>
-        {osmObjects && osmObjects.length > 0 ? (
-          <ul>
-            {osmObjects.map((o, i) => (
-              <li key={o}>
-                <a
-                  href={`https://www.openstreetmap.org/${o}`}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                >
-                  {o}
-                </a>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No assigned objects</p>
-        )}
-        <h2>Created at</h2>
-        <p>{formatDateTimeExtended(createdAt)}</p>
-        <h2>Uploaded at</h2>
-        <p>{formatDateTimeExtended(uploadedAt)}</p>
+        <Form>
+          <FormLabel>Photo ID</FormLabel>
+          <p>{id}</p>
+          <FormLabel>Description</FormLabel>
+          <p>{description || 'No description available.'}</p>
+          <FormLabel>Owner</FormLabel>
+          <p>{ownerId}</p>
+          <FormLabel>Location</FormLabel>
+          <p>{featureToCoords(location)}</p>
+          <FormLabel>Bearing</FormLabel>
+          <p>{bearing}</p>
+          <FormLabel>OSM Objects</FormLabel>
+          {osmObjects && osmObjects.length > 0 ? (
+            <ul>
+              {osmObjects.map((o, i) => (
+                <li key={o}>
+                  <a
+                    href={`https://www.openstreetmap.org/${o}`}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                  >
+                    {o}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No assigned objects</p>
+          )}
+          <FormLabel>Created at</FormLabel>
+          <p>{formatDateTimeExtended(createdAt)}</p>
+          <FormLabel>Uploaded at</FormLabel>
+          <p>{formatDateTimeExtended(uploadedAt)}</p>
+        </Form>
       </Infobox>
     );
   }
@@ -132,13 +134,13 @@ class Photos extends React.Component {
   renderActionButtons () {
     return (
       <ActionButtonsWrapper>
-        <Button useIcon='trash-bin' variation='danger-raised-light'>
+        <Button useIcon='trash-bin' variation='danger-raised-light' size='xlarge'>
           Delete
         </Button>
-        <Button useIcon='pencil' variation='primary-raised-dark'>
+        <Button useIcon='pencil' variation='primary-raised-semidark' size='xlarge'>
           Edit Metadata
         </Button>
-        <Button useIcon='download' variation='primary-raised-dark'>
+        <Button useIcon='download' variation='primary-raised-dark' size='xlarge'>
           Download
         </Button>
       </ActionButtonsWrapper>
@@ -149,13 +151,6 @@ class Photos extends React.Component {
     return (
       <App pageTitle='Photos'>
         <Inpage>
-          <InpageHeader>
-            <InpageHeaderInner>
-              <InpageHeadline>
-                <InpageTitle>Photo</InpageTitle>
-              </InpageHeadline>
-            </InpageHeaderInner>
-          </InpageHeader>
           <InpageBody>
             <InpageBodyInner>
               <Prose>{this.renderContent()}</Prose>

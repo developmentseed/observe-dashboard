@@ -1,7 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { PropTypes as T } from 'prop-types';
-import { Link } from 'react-router-dom';
 import { mapboxAccessToken, environment } from '../../config';
 import * as actions from '../../redux/actions/traces';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
@@ -13,29 +12,24 @@ import App from '../common/app';
 import {
   Inpage,
   InpageBody,
-  InpageBodyInner
+  InpageTitle,
+  InpageHeadline,
+  InpageBodyInner,
+  InpageBackLink
 } from '../common/inpage';
 import UhOh from '../uhoh';
 import Prose from '../../styles/type/prose';
 import Button from '../../styles/button/button';
 import { wrapApiResult, getFromState } from '../../redux/utils';
 import { formatDateTimeExtended, startCoordinate } from '../../utils';
+import Form from '../../styles/form/form';
+import FormLabel from '../../styles/form/label';
+import { ContentWrapper, Infobox, ActionButtonsWrapper } from '../common/view-wrappers';
 
 // Mapbox access token
 mapboxgl.accessToken = mapboxAccessToken;
 
-const ContentWrapper = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;  
-`;
-
-const Infobox = styled.div`
-`;
-
 const Map = styled.div`
-`;
-
-const ActionButtonsWrapper = styled.div`
 `;
 
 class Traces extends React.Component {
@@ -108,10 +102,12 @@ class Traces extends React.Component {
 
     return (
       <>
-        <Button useIcon='chevron-left--small' variation='base-plain'>
-          <Link to='/traces'>Back to traces</Link>
-        </Button>
-        <h1>Trace {trace.id}</h1>
+        <InpageHeadline>
+          <InpageBackLink to='/traces'>Back to traces</InpageBackLink>
+          <InpageTitle>
+            Trace {trace.id}
+          </InpageTitle>
+        </InpageHeadline>
         <ContentWrapper>
           {this.renderMap(geometry)}
           {this.renderInfobox(trace, geometry)}
@@ -141,22 +137,24 @@ class Traces extends React.Component {
   renderInfobox (trace, geometry) {
     return (
       <Infobox>
-        <h2>id</h2>
-        <p>{trace.id}</p>
-        <h2>Description</h2>
-        <p>{trace.description}</p>
-        <h2>Length</h2>
-        <p>{trace.length}</p>
-        <h2>Owner</h2>
-        <p>{trace.ownerId}</p>
-        <h2>Start coordinate</h2>
-        <p>{startCoordinate(geometry)}</p>
-        <h2>Recorded at</h2>
-        <p>{formatDateTimeExtended(trace.recordedAt)}</p>
-        <h2>Uploaded at</h2>
-        <p>{formatDateTimeExtended(trace.uploadedAt)}</p>
-        <h2>Updated at</h2>
-        <p>{formatDateTimeExtended(trace.updatedAt)}</p>
+        <Form>
+          <FormLabel>id</FormLabel>
+          <p>{trace.id}</p>
+          <FormLabel>Description</FormLabel>
+          <p>{trace.description}</p>
+          <FormLabel>Length</FormLabel>
+          <p>{trace.length}</p>
+          <FormLabel>Owner</FormLabel>
+          <p>{trace.ownerId}</p>
+          <FormLabel>Start coordinate</FormLabel>
+          <p>{startCoordinate(geometry)}</p>
+          <FormLabel>Recorded at</FormLabel>
+          <p>{formatDateTimeExtended(trace.recordedAt)}</p>
+          <FormLabel>Uploaded at</FormLabel>
+          <p>{formatDateTimeExtended(trace.uploadedAt)}</p>
+          <FormLabel>Updated at</FormLabel>
+          <p>{formatDateTimeExtended(trace.updatedAt)}</p>
+        </Form>
       </Infobox>
     );
   }
@@ -164,16 +162,16 @@ class Traces extends React.Component {
   renderActionButtons () {
     return (
       <ActionButtonsWrapper>
-        <Button useIcon='trash-bin' variation='danger-raised-light'>
+        <Button useIcon='trash-bin' variation='danger-raised-light' size='xlarge'>
           Delete
         </Button>
-        <Button useIcon='pencil' variation='primary-raised-dark'>
+        <Button useIcon='pencil' variation='primary-raised-semidark' size='xlarge'>
           Edit Metadata
         </Button>
-        <Button useIcon='export' variation='primary-raised-dark'>
+        <Button useIcon='share' variation='base-raised-semidark' size='xlarge'>
           Export to JOSM
         </Button>
-        <Button useIcon='download' variation='primary-raised-dark'>
+        <Button useIcon='download' variation='primary-raised-dark' size='xlarge'>
           Download
         </Button>
       </ActionButtonsWrapper>
