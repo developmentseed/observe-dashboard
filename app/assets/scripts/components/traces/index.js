@@ -18,47 +18,17 @@ import {
 } from '../common/Inpage';
 import Form from '../../styles/form/form';
 import FormInput from '../../styles/form/input';
-import FormLabel from '../../styles/form/label';
-import FormToolbar from '../../styles/form/toolbar';
+import {
+  FilterToolbar,
+  InputWrapper,
+  InputWithIcon,
+  InputIcon,
+  FilterLabel } from '../../styles/form/filters';
 import { FormCheckable } from '../../styles/form/checkable';
 import DataTable from '../../styles/table';
 import Pagination from '../../styles/button/pagination';
 import Prose from '../../styles/type/prose';
-import collecticon from '../../styles/collecticons';
-import { themeVal } from '../../styles/utils/general';
 import { wrapApiResult } from '../../redux/utils';
-
-const FilterToolbar = styled(FormToolbar)`
-`;
-
-const InputWrapper = styled.div`
-  position: relative;
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: flex-end;
-  &:not(:first-child) {
-    margin-left: 1rem !important;
-  }
-`;
-
-const InputWithIcon = styled(FormInput)`
-  padding-right: 1.25rem;
-`;
-
-const InputIcon = styled(FormLabel)`
-  &::after {
-    ${({ useIcon }) => collecticon(useIcon)}
-    position: absolute;
-    right: 0.25rem;
-    top: 50%;
-    opacity: 0.64;
-  }
-`;
-
-const FilterLabel = styled(FormLabel)`
-  font-size: 0.875rem;
-  font-weight: ${themeVal('type.base.regular')};
-`;
 
 class Traces extends React.Component {
   async componentDidMount () {
