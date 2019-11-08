@@ -56,7 +56,7 @@ class Traces extends React.Component {
     hideGlobalLoading();
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate () {
     const { mapLoaded } = this.state;
 
     // Bypass if map is already loaded
@@ -104,7 +104,7 @@ class Traces extends React.Component {
     if (!isReady()) return null;
     if (hasError()) return <UhOh />;
 
-    const { properties: trace } = getData();
+    const { properties: trace, geometry } = getData();
 
     return (
       <>
@@ -113,12 +113,10 @@ class Traces extends React.Component {
         </Button>
         <h1>Trace {trace.id}</h1>
         <ContentWrapper>
-          {this.renderMap()}
-          {this.renderInfobox()}
+          {this.renderMap(geometry)}
+          {this.renderInfobox(trace, geometry)}
         </ContentWrapper>
-        <ActionButtonsWrapper>
-          {this.renderActionButtons()}
-        </ActionButtonsWrapper>
+        {this.renderActionButtons(trace)}
       </>
     );
   }
@@ -140,9 +138,7 @@ class Traces extends React.Component {
     );
   }
 
-  renderInfobox () {
-    const { getData } = this.props.trace;
-    const { properties: trace, geometry } = getData();
+  renderInfobox (trace, geometry) {
     return (
       <Infobox>
         <h2>id</h2>
