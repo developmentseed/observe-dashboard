@@ -80,22 +80,51 @@ class Photos extends React.Component {
   }
 
   renderInfobox (photo) {
+    const {
+      id,
+      description,
+      ownerId,
+      location,
+      bearing,
+      osmObjects,
+      createdAt,
+      uploadedAt
+    } = photo;
+
     return (
       <Infobox>
         <h2>id</h2>
-        <p>{photo.id}</p>
+        <p>{id}</p>
         <h2>Description</h2>
-        <p>{photo.description || 'No description available.'}</p>
+        <p>{description || 'No description available.'}</p>
         <h2>Owner</h2>
-        <p>{photo.ownerId}</p>
+        <p>{ownerId}</p>
         <h2>Location</h2>
-        <p>{featureToCoords(photo.location)}</p>
+        <p>{featureToCoords(location)}</p>
         <h2>Bearing</h2>
-        <p>{photo.bearing}</p>
+        <p>{bearing}</p>
+        <h2>OSM Objects</h2>
+        {osmObjects && osmObjects.length > 0 ? (
+          <ul>
+            {osmObjects.map((o, i) => (
+              <li key={o}>
+                <a
+                  href={`https://www.openstreetmap.org/${o}`}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                >
+                  {o}
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No assigned objects</p>
+        )}
         <h2>Created at</h2>
-        <p>{formatDateTimeExtended(photo.createdAt)}</p>
+        <p>{formatDateTimeExtended(createdAt)}</p>
         <h2>Uploaded at</h2>
-        <p>{formatDateTimeExtended(photo.uploadedAt)}</p>
+        <p>{formatDateTimeExtended(uploadedAt)}</p>
       </Infobox>
     );
   }
