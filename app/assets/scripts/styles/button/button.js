@@ -3,13 +3,30 @@ import T from 'prop-types';
 import styled, { css } from 'styled-components';
 import { rgba, shade, tint } from 'polished';
 
-import { antialiased, visuallyHidden, disabled } from '../helpers';
+import {
+  antialiased,
+  visuallyHidden,
+  disabled,
+  visuallyDisabled
+} from '../helpers';
 import { themeVal } from '../utils/general';
+import collecticon from '../collecticons';
 
 // eslint-disable-next-line react/display-name
 const BaseButton = React.forwardRef(
   ({
-    children, active, hideText, size, variation, radius, type, element: El, ...rest
+    children,
+    element: El,
+    type,
+    // Props to remove before they get to the DOM.
+    active,
+    hideText,
+    size,
+    variation,
+    radius,
+    visuallyDisabled,
+    useIcon,
+    ...rest
   },
   ref) => {
     const elType = El === 'button' ? type || 'button' : '';
@@ -23,10 +40,12 @@ const BaseButton = React.forwardRef(
 
 BaseButton.propTypes = {
   element: T.oneOfType([T.elementType, T.string]),
+  useIcon: T.oneOfType([T.array, T.string]),
   type: T.string,
   children: T.node,
   active: T.bool,
   hideText: T.bool,
+  visuallyDisabled: T.bool,
   size: T.string,
   variation: T.string,
   radius: T.string
@@ -65,6 +84,10 @@ BaseButton.defaultProps = {
  *                 rounded (default)
  *                 ellipsoid
  *                 square
+ * @param {string|array} useIcon Allows an icon to be added to the button.
+ *                 It can be a string with the icon name which will be added to
+ *                 the "before", or an array where the first element is the icon
+ *                 name and the second the desired position (before|after).
  */
 const Button = styled(BaseButton)`
   ${antialiased()}
@@ -83,6 +106,8 @@ const Button = styled(BaseButton)`
   font-family: ${themeVal('type.base.family')};
   font-weight: ${themeVal('type.base.bold')};
   cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.025rem;
 
   /* States */
 
@@ -91,9 +116,11 @@ const Button = styled(BaseButton)`
     outline: none; /* This causes usability problems. Needs fixing. */
   }
 
-  &:hover {
-    opacity: 1;
-  }
+  ${({ visuallyDisabled: vd }) => !vd && css`
+    &:hover {
+      opacity: 1;
+    }
+  `}
 
   ${({ active }) => (active ? '&,' : '')}
   /* stylelint-disable-line */
@@ -121,6 +148,9 @@ const Button = styled(BaseButton)`
     line-height: inherit !important;
   }
 
+  ${props => renderIcon(props)}
+
+
   /* Checkbox/radio handling */
 
   > input[type=checkbox],
@@ -140,6 +170,9 @@ const Button = styled(BaseButton)`
 
   /* Radius */
   ${props => renderButtonRadius(props)}
+
+  /* Box */
+  ${props => renderButtonBox(props)}
 
   /* Hide Text */
   ${({ hideText }) => hideText &&
@@ -163,10 +196,10 @@ const Button = styled(BaseButton)`
       ${disabled()}
     `}
 
-  /* Disabled */
-  ${({ disabled: dis }) => dis &&
+  /* Visually Disabled */
+  ${({ visuallyDisabled: vd }) => vd &&
     css`
-      ${disabled()}
+      ${visuallyDisabled()}
     `}
 `;
 
@@ -184,6 +217,21 @@ export default Button;
 // /////////////////////////////////////////////////////////////////////////////
 //                                 HELPER FUNCTIONS
 // /////////////////////////////////////////////////////////////////////////////
+
+function renderIcon ({ useIcon }) {
+  if (!useIcon) return;
+  const [icon, position] = Array.isArray(useIcon)
+    ? useIcon
+    : [useIcon, 'before'];
+
+  const selector = `&::${position}`;
+
+  return css`
+    ${selector} {
+      ${collecticon(icon)}
+    }
+  `;
+}
 
 /**
  * Computes the colors for the given button variation
@@ -339,17 +387,19 @@ export function buttonVariation (color, style, brightness, props) {
   return css`
     ${buttonVariationBaseCss(color, style, brightness, props)}
 
-    /* &.button--hover, */
-    &:hover {
-      ${buttonVariationHoverCss(color, style, brightness, props)}
-    }
+    ${({ visuallyDisabled }) => !visuallyDisabled && css`
+      /* &.button--hover, */
+      &:hover {
+        ${buttonVariationHoverCss(color, style, brightness, props)}
+      }
 
-    ${({ active }) => (active ? '&, &:hover,' : '')}
-    /* stylelint-disable-line */
-    &.active,
-    &:active {
-      ${buttonVariationActiveCss(color, style, brightness, props)}
-    }
+      ${({ active }) => (active ? '&, &:hover,' : '')}
+      /* stylelint-disable-line */
+      &.active,
+      &:active {
+        ${buttonVariationActiveCss(color, style, brightness, props)}
+      }
+    `}
   `;
 }
 
@@ -359,89 +409,47 @@ export function buttonVariation (color, style, brightness, props) {
  * @param {object} props The element props
  */
 function renderButtonVariation (props) {
+  const { primary, danger, success } = props.theme.color;
+  const baseType = props.theme.type.base.color;
+
   switch (props.variation) {
-    case 'base-raised-light':
-      return buttonVariation(
-        props.theme.type.base.color,
-        'raised',
-        'light',
-        props
-      );
-    case 'base-raised-semidark':
-      return buttonVariation(
-        props.theme.type.base.color,
-        'raised',
-        'semidark',
-        props
-      );
-    case 'base-raised-dark':
-      return buttonVariation(
-        props.theme.type.base.color,
-        'raised',
-        'dark',
-        props
-      );
     case 'primary-raised-light':
-      return buttonVariation(
-        props.theme.color.primary,
-        'raised',
-        'light',
-        props
-      );
+      return buttonVariation(primary, 'raised', 'light', props);
     case 'primary-raised-semidark':
-      return buttonVariation(
-        props.theme.color.primary,
-        'raised',
-        'semidark',
-        props
-      );
+      return buttonVariation(primary, 'raised', 'semidark', props);
     case 'primary-raised-dark':
-      return buttonVariation(
-        props.theme.color.primary,
-        'raised',
-        'dark',
-        props
-      );
+      return buttonVariation(primary, 'raised', 'dark', props);
     case 'primary-plain':
-      return buttonVariation(
-        props.theme.color.primary,
-        'plain',
-        'light',
-        props
-      );
+      return buttonVariation(primary, 'plain', 'light', props);
+
     case 'danger-raised-light':
-      return buttonVariation(
-        props.theme.color.danger,
-        'raised',
-        'light',
-        props
-      );
+      return buttonVariation(danger, 'raised', 'light', props);
     case 'danger-raised-dark':
-      return buttonVariation(
-        props.theme.color.danger,
-        'raised',
-        'dark',
-        props
-      );
+      return buttonVariation(danger, 'raised', 'dark', props);
     case 'danger-plain':
-      return buttonVariation(
-        props.theme.color.danger,
-        'plain',
-        'light',
-        props
-      );
+      return buttonVariation(danger, 'plain', 'light', props);
+
+    case 'success-raised-light':
+      return buttonVariation(success, 'raised', 'light', props);
+    case 'success-raised-dark':
+      return buttonVariation(success, 'raised', 'dark', props);
+    case 'success-plain':
+      return buttonVariation(success, 'plain', 'light', props);
+
     case 'achromic-plain':
       return buttonVariation('#fff', 'plain', null, props);
     case 'achromic-glass':
       return buttonVariation('#fff', 'glass', null, props);
+
+    case 'base-raised-light':
+      return buttonVariation(baseType, 'raised', 'light', props);
+    case 'base-raised-semidark':
+      return buttonVariation(baseType, 'raised', 'semidark', props);
+    case 'base-raised-dark':
+      return buttonVariation(baseType, 'raised', 'dark', props);
     case 'base-plain':
     default:
-      return buttonVariation(
-        props.theme.color.base,
-        'plain',
-        'light',
-        props
-      );
+      return buttonVariation(baseType, 'plain', 'light', props);
   }
 }
 /**
@@ -465,6 +473,31 @@ function renderButtonRadius (props) {
       `;
   }
 }
+
+/**
+ * Renders the correct box model based on the props.
+ *
+ * @param {object} props The element props
+ */
+function renderButtonBox (props) {
+  switch (props.box) {
+    case 'block':
+      return css`
+        display: block;
+        width: 100%;
+      `;
+    case 'semi-fluid':
+      return css`
+        display: inline-flex;
+        min-width: 16rem;
+      `;
+    default:
+      return css`
+        display: inline-block;
+      `;
+  }
+}
+
 /**
  * Renders the correct button size based on the props.
  *

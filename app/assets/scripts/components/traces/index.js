@@ -1,6 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { PropTypes as T } from 'prop-types';
+import styled from 'styled-components';
 import { environment } from '../../config';
 import * as actions from '../../redux/actions/traces';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
@@ -9,17 +11,44 @@ import App from '../common/app';
 import {
   Inpage,
   InpageHeader,
-  InpageHeaderInner,
   InpageHeadline,
   InpageTitle,
   InpageBody,
   InpageBodyInner
-} from '../common/inpage';
+} from '../common/Inpage';
+import Form from '../../styles/form/form';
+import FormInput from '../../styles/form/input';
+import {
+  FilterToolbar,
+  InputWrapper,
+  InputWithIcon,
+  InputIcon,
+  FilterLabel } from '../../styles/form/filters';
+import { FormCheckable } from '../../styles/form/checkable';
+import DataTable from '../../styles/table';
 import Pagination from '../../styles/button/pagination';
 import Prose from '../../styles/type/prose';
 import { wrapApiResult } from '../../redux/utils';
+import Dropdown from '../common/dropdown';
+import RangeSlider from '../common/range-slider';
+
+const DropSlider = styled(Dropdown)`
+  max-width: 24rem;
+  padding-bottom: 2rem;
+`;
 
 class Traces extends React.Component {
+  constructor (props) {
+    super(props);
+
+    this.state = {
+      traceLength: {
+        min: 0,
+        max: 100
+      }
+    };
+  }
+
   async componentDidMount () {
     showGlobalLoading();
     await this.props.fetchTraces();
@@ -42,12 +71,46 @@ class Traces extends React.Component {
 
   renderFilters () {
     return (
-      <>
-        <input type='text' placeholder='Search by user' />
-        <input type='text' placeholder='Start date' />
-        <input type='text' placeholder='End date' />
-        <input type='text' placeholder='Length' />
-      </>
+      <Form>
+        <FilterToolbar>
+          <InputWrapper>
+            <FilterLabel htmlFor='userSearch'>Search by user</FilterLabel>
+            <InputWithIcon type='text' id='userSearch' placeholder='User Name' />
+            <InputIcon htmlFor='userSearch' useIcon='magnifier-left' />
+          </InputWrapper>
+          <InputWrapper>
+            <FilterLabel htmlFor='startDate'>Start Date</FilterLabel>
+            <InputWithIcon type='date' id='startDate' />
+            <InputIcon htmlFor='startDate' useIcon='calendar' />
+          </InputWrapper>
+          <InputWrapper>
+            <FilterLabel htmlFor='endDate'>End Date</FilterLabel>
+            <InputWithIcon type='date' id='endDate' placeholder='End date' />
+            <InputIcon htmlFor='endDate' useIcon='calendar' />
+          </InputWrapper>
+          <InputWrapper>
+            <FilterLabel htmlFor='length'>Trace Length</FilterLabel>
+            <DropSlider
+              ref={this.dropRef}
+              alignment='left'
+              direction='down'
+              triggerElement={(
+                <FormInput type='select' id='length' placeholder='Length' />
+              )}
+            >
+              <Form>
+                <RangeSlider
+                  min={0}
+                  max={100}
+                  id='trace-length'
+                  value={this.state.traceLength}
+                  onChange={v => this.setState({ traceLength: v })}
+                />
+              </Form>
+            </DropSlider>
+          </InputWrapper>
+        </FilterToolbar>
+      </Form>
     );
   }
 
@@ -71,12 +134,19 @@ class Traces extends React.Component {
 
   renderTable () {
     return (
-      <table>
+      <DataTable>
         <thead>
           <tr>
-            <th scope='col' />
             <th scope='col'>
-              <span>Trace</span>
+              <FormCheckable
+                checked={undefined}
+                type='checkbox'
+                name='checkbox-all'
+                id='checkbox-all'
+              />
+            </th>
+            <th scope='col'>
+              Trace
             </th>
             <th scope='col'>
               <span>User</span>
@@ -99,7 +169,7 @@ class Traces extends React.Component {
           </tr>
         </thead>
         <tbody>{this.renderTableRows()}</tbody>
-      </table>
+      </DataTable>
     );
   }
 
@@ -109,9 +179,16 @@ class Traces extends React.Component {
       return (
         <tr key={trace.id}>
           <td>
-            <input type='checkbox' />
+            <FormCheckable
+              checked={undefined}
+              type='checkbox'
+              name={`checkbox-${trace.id}`}
+              id={`checkbox-${trace.id}`}
+            />
           </td>
-          <td>{trace.id}</td>
+          <td>
+            <Link to={`/traces/${trace.id}`}>{trace.id}</Link>
+          </td>
           <td>{trace.ownerId}</td>
           <td>{new Date(trace.recordedAt).toLocaleDateString()}</td>
           <td>{trace.length}</td>
@@ -127,15 +204,12 @@ class Traces extends React.Component {
     return (
       <App pageTitle='Traces'>
         <Inpage>
-          <InpageHeader>
-            <InpageHeaderInner>
+          <InpageHeader />
+          <InpageBody>
+            <InpageBodyInner>
               <InpageHeadline>
                 <InpageTitle>Traces</InpageTitle>
               </InpageHeadline>
-            </InpageHeaderInner>
-          </InpageHeader>
-          <InpageBody>
-            <InpageBodyInner>
               <Prose>{this.renderContent()}</Prose>
             </InpageBodyInner>
           </InpageBody>

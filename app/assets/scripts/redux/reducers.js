@@ -34,6 +34,22 @@ const tracesReducer = baseAPIReducer(
 );
 
 /**
+ * INDIVIDUAL TRACE reducer
+ */
+const traceReducerInitialState = {
+  // Each entry:
+  // fetching: false,
+  // fetched: false,
+  // error: null,
+  // data: []
+};
+
+const traceReducer = baseAPIReducer(
+  'TRACE',
+  traceReducerInitialState
+);
+
+/**
  * PHOTOS reducer
  */
 const photosReducerInitialState = {
@@ -49,10 +65,28 @@ const photosReducer = baseAPIReducer(
 );
 
 /**
+ * INDIVIDUAL PHOTO reducer
+ */
+const photoReducerInitialState = {
+  // Each entry:
+  // fetching: false,
+  // fetched: false,
+  // error: null,
+  // data: []
+};
+
+const photoReducer = baseAPIReducer(
+  'PHOTO',
+  photoReducerInitialState
+);
+
+/**
  * Export combined reducers
  */
 export default combineReducers({
   authenticatedUser: authenticatedUserReducer,
   traces: tracesReducer,
-  photos: photosReducer
+  photos: photosReducer,
+  individualTraces: traceReducer,
+  individualPhotos: photoReducer
 });

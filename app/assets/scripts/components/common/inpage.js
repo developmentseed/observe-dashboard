@@ -1,5 +1,6 @@
 import styled, { css } from 'styled-components';
 import { rgba } from 'polished';
+import { Link } from 'react-router-dom';
 
 import { visuallyHidden } from '../../styles/helpers';
 import { themeVal, stylizeFunction } from '../../styles/utils/general';
@@ -7,6 +8,7 @@ import { multiply } from '../../styles/utils/math';
 import { stackSkin } from '../../styles/skins';
 import { headingAlt } from '../../styles/type/heading';
 import Constrainer from '../../styles/constrainer';
+import collecticon from '../../styles/collecticons';
 
 const _rgba = stylizeFunction(rgba);
 
@@ -41,6 +43,18 @@ export const InpageHeadline = styled.div`
   display: flex;
   flex-flow: column;
   min-width: 0;
+`;
+
+export const InpageBackLink = styled(Link)`
+  display:flex;
+  position: relative;
+  top: -0.5rem;
+  &:before{
+    ${collecticon('chevron-left--small')};
+  }
+  & + * {
+    margin-top: 0.2rem;;
+  }
 `;
 
 export const InpageTitle = styled.h1`

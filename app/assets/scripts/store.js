@@ -1,11 +1,11 @@
 'use strict';
 import { createStore, applyMiddleware, compose } from 'redux';
 import thunkMiddleware from 'redux-thunk';
-import { loadState, saveState } from './local-storage';
+import { loadState, saveState } from './utils/local-storage';
 import throttle from 'lodash.throttle';
 
-import { environment } from '../config';
-import reducer from '../redux/reducers';
+import { environment } from './config';
+import reducer from './redux/reducers';
 
 // Load persisted state, if any
 const persistedState = loadState();
@@ -35,4 +35,4 @@ store.subscribe(
   }, 1000)
 );
 
-export { store };
+export default store;

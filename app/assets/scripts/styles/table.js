@@ -21,7 +21,6 @@ const DataTable = styled.table`
   td {
     padding: ${multiply(glbsp, 0.75)} ${glbsp};
     vertical-align: top;
-    font-size:  0.875rem;
   }
 
   thead th {
@@ -32,6 +31,7 @@ const DataTable = styled.table`
     text-transform: uppercase;
     vertical-align: middle;
     position: relative;
+    text-align: left;
   }
 
   th:first-child,
@@ -57,6 +57,10 @@ const DataTable = styled.table`
       background: ${_rgba(themeVal('color.smoke'), 0.25)};
     }
 
+    tr: active {
+      background: ${_rgba(themeVal('color.primary'), 0.25)};
+    }
+
     a {
       color: ${themeVal('color.base')};
     }
@@ -65,7 +69,7 @@ const DataTable = styled.table`
 
 export default DataTable;
 
-// Aditional table elements.
+// Additional table elements.
 
 export const SortableLink = styled.a.attrs(({ sort }) => ({
   sort: sort || 'none'

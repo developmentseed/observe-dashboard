@@ -5,7 +5,9 @@ import { multiply } from '../utils/math';
 const Prose = styled.div`
   font-size: ${themeVal('type.base.size')};                                     /* 16px */
   line-height: ${themeVal('type.base.line')};                                   /* 24px */
-
+  display: flex;
+  flex-flow: column nowrap;
+  
   ul, ol, dl {
     padding: 0;
   }
