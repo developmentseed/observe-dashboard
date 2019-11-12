@@ -11,17 +11,8 @@ import { multiply } from '../../styles/utils/math';
 import { stackSkin } from '../../styles/skins';
 import collecticon from '../../styles/collecticons';
 import ObserveIcon from '../../../graphics/content/ObserveIcon';
+import { filterComponentProps } from '../../utils';
 const _rgba = stylizeFunction(rgba);
-
-// eslint-disable-next-line react/display-name
-const componentFilterProps = (Comp, toFilter = []) =>
-  React.forwardRef((rawProps, ref) => {
-    const props = Object.keys(rawProps).reduce(
-      (acc, p) => (toFilter.includes(p) ? acc : { ...acc, [p]: rawProps[p] }),
-      {}
-    );
-    return <Comp ref={ref} {...props} />;
-  });
 
 const PageHead = styled.header`
   ${stackSkin()}
@@ -122,7 +113,7 @@ const GlobalMenuLink = styled.a.attrs({
 // passed to the DOM element.
 // https://github.com/styled-components/styled-components/issues/2131
 const propsToFilter = ['variation', 'size', 'hideText', 'useIcon', 'active'];
-const NavLinkFilter = componentFilterProps(NavLink, propsToFilter);
+const NavLinkFilter = filterComponentProps(NavLink, propsToFilter);
 
 class PageHeader extends React.Component {
   render () {
