@@ -88,9 +88,9 @@ class Photos extends React.Component {
 
   renderResults () {
     const { getMeta } = this.props.photos;
-    const { count } = getMeta();
+    const meta = getMeta();
 
-    if (count === 0) {
+    if (meta.count === 0) {
       return (
         <p>There are no results for the current search/filters criteria.</p>
       );
@@ -99,7 +99,7 @@ class Photos extends React.Component {
     return (
       <>
         {this.renderTable()}
-        <Pagination />
+        <Pagination pathname='/photos' meta={meta} />
       </>
     );
   }

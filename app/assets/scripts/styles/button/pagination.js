@@ -1,8 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-
-import collecticon from '../collecticons';
 import Button from './button';
+import { PropTypes as T } from 'prop-types';
+import Link from '../../components/common/link';
+import { environment } from '../../config';
+import { getSearchParams } from '../../utils';
 
 const Pager = styled.ul`
   display: flex;
@@ -15,36 +17,46 @@ const Pager = styled.ul`
   }
 `;
 
-const PrevButton = styled(Button).attrs({
-  variation: 'base-raised-semidark' })`
-  padding: 0.25rem;
-  &::after {
-    margin: 0;
-    ${collecticon('chevron-left--small')};
-`;
-
-const NextButton = styled(Button).attrs({
-  variation: 'base-raised-semidark' })`
-  padding: 0.25rem;
-  &::after {
-    margin: 0;
-    ${collecticon('chevron-right--small')};
-`;
-
-const Pagination = () => {
+const Pagination = ({ pathname, meta }) => {
+  const { previous, next, page, pageCount, totalCount } = meta;
   return (
     <Pager>
       <li>
-        <PrevButton />
+        <Button
+          as={Link}
+          useIcon='chevron-left--small'
+          variation='base-raised-semidark'
+          to={`${pathname}?${getSearchParams(previous)}`}
+          hideText
+          disabled={!previous}
+        >
+          <span>previous</span>
+        </Button>
       </li>
       <li>
-        Displaying X of X Results
+        {page} - {pageCount} of {totalCount} Results
       </li>
       <li>
-        <NextButton />
+        <Button
+          as={Link}
+          useIcon='chevron-right--small'
+          variation='base-raised-semidark'
+          to={`${pathname}?${getSearchParams(next)}`}
+          hideText
+          disabled={!next}
+        >
+          <span>next</span>
+        </Button>
       </li>
     </Pager>
   );
 };
+
+if (environment !== 'production') {
+  Pagination.propTypes = {
+    pathname: T.string,
+    meta: T.object
+  };
+}
 
 export default Pagination;

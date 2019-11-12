@@ -40,6 +40,15 @@ export function formatDateTimeExtended (date) {
 }
 
 /**
+ * Get search params of a URL.
+ *
+ * @param {string} url A valid URL.
+ */
+export function getSearchParams (stringUrl) {
+  return stringUrl && new URL(stringUrl).searchParams;
+}
+
+/**
  * Removes given props from the component returning a new one.
  * This is used to circumvent a bug with styled-components where unwanted props
  * are passed to the DOM causing react to display an error:
