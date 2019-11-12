@@ -10,6 +10,8 @@ const Pager = styled.ul`
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-top: 1rem;
+  font-size: 0.875rem;
   list-style: none;
   list-style-type: none !important;
   & :not(:first-child) {
