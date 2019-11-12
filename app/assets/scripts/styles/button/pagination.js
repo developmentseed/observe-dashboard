@@ -24,7 +24,7 @@ const Pagination = ({ pathname, meta }) => {
       <li>
         <Button
           as={Link}
-          useIcon='chevron-left--small'
+          useIcon='chevron-left-trail--small'
           variation='base-raised-semidark'
           to={`${pathname}?${getSearchParams(first)}`}
           hideText
@@ -63,7 +63,7 @@ const Pagination = ({ pathname, meta }) => {
       <li>
         <Button
           as={Link}
-          useIcon='chevron-right--small'
+          useIcon='chevron-right-trail--small'
           variation='base-raised-semidark'
           to={`${pathname}?${getSearchParams(last)}`}
           hideText
