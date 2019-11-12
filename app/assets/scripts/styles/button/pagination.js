@@ -18,9 +18,21 @@ const Pager = styled.ul`
 `;
 
 const Pagination = ({ pathname, meta }) => {
-  const { previous, next, page, pageCount, totalCount } = meta;
+  const { first, previous, next, last, page, pageCount, totalCount } = meta;
   return (
     <Pager>
+      <li>
+        <Button
+          as={Link}
+          useIcon='chevron-left--small'
+          variation='base-raised-semidark'
+          to={`${pathname}?${getSearchParams(first)}`}
+          hideText
+          disabled={page === 1}
+        >
+          <span>first</span>
+        </Button>
+      </li>
       <li>
         <Button
           as={Link}
@@ -46,6 +58,18 @@ const Pagination = ({ pathname, meta }) => {
           disabled={!next}
         >
           <span>next</span>
+        </Button>
+      </li>
+      <li>
+        <Button
+          as={Link}
+          useIcon='chevron-right--small'
+          variation='base-raised-semidark'
+          to={`${pathname}?${getSearchParams(last)}`}
+          hideText
+          disabled={page === pageCount}
+        >
+          <span>last</span>
         </Button>
       </li>
     </Pager>

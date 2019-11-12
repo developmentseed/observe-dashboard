@@ -26,10 +26,10 @@ export function receivePhotos (data, error = null) {
   };
 }
 
-export function fetchPhotos () {
+export function fetchPhotos (searchParams) {
   return fetchAuth({
     statePath: 'photos',
-    url: `${apiUrl}/photos`,
+    url: `${apiUrl}/photos${searchParams || ''}`,
     requestFn: requestPhotos,
     receiveFn: receivePhotos
   });

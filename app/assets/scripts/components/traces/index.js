@@ -47,11 +47,24 @@ class Traces extends React.Component {
         max: 100
       }
     };
+
+    this.updateData = this.updateData.bind(this);
   }
 
   async componentDidMount () {
+    await this.updateData();
+  }
+
+  async componentDidUpdate (prevProps) {
+    if (prevProps.location.search !== this.props.location.search) {
+      await this.updateData();
+    }
+  }
+
+  async updateData () {
     showGlobalLoading();
-    await this.props.fetchTraces();
+    const searchParams = this.props.location.search;
+    await this.props.fetchTraces(searchParams);
     hideGlobalLoading();
   }
 
@@ -222,7 +235,8 @@ class Traces extends React.Component {
 if (environment !== 'production') {
   Traces.propTypes = {
     fetchTraces: T.func,
-    traces: T.object
+    traces: T.object,
+    location: T.object
   };
 }
 

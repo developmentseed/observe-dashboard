@@ -33,9 +33,26 @@ import { wrapApiResult } from '../../redux/utils';
 import { featureToCoords } from '../../utils';
 
 class Photos extends React.Component {
+  constructor (props) {
+    super(props);
+
+    this.updateData = this.updateData.bind(this);
+  }
+
   async componentDidMount () {
+    await this.updateData();
+  }
+
+  async componentDidUpdate (prevProps) {
+    if (prevProps.location.search !== this.props.location.search) {
+      await this.updateData();
+    }
+  }
+
+  async updateData () {
     showGlobalLoading();
-    await this.props.fetchPhotos();
+    const searchParams = this.props.location.search;
+    await this.props.fetchPhotos(searchParams);
     hideGlobalLoading();
   }
 
@@ -190,7 +207,8 @@ class Photos extends React.Component {
 if (environment !== 'production') {
   Photos.propTypes = {
     fetchPhotos: T.func,
-    photos: T.object
+    photos: T.object,
+    location: T.object
   };
 }
 
