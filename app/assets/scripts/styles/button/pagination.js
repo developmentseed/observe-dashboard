@@ -46,7 +46,7 @@ const Pagination = ({ pathname, meta }) => {
         </Button>
       </li>
       <li>
-        {page} - {pageCount} of {totalCount} Results
+        Page {page} of {pageCount} ({totalCount} items)
       </li>
       <li>
         <Button
