@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { PropTypes as T } from 'prop-types';
-import { environment } from '../../config';
+import { environment, osmUrl } from '../../config';
 import * as actions from '../../redux/actions/photos';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 import { featureToCoords, formatDateTimeExtended } from '../../utils';
@@ -113,7 +113,7 @@ class Photos extends React.Component {
               {osmObjects.map((o, i) => (
                 <li key={o}>
                   <a
-                    href={`https://www.openstreetmap.org/${o}`}
+                    href={`${osmUrl}/${o}`}
                     target='_blank'
                     rel='noopener noreferrer'
                   >
