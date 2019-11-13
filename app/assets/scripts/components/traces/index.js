@@ -47,11 +47,24 @@ class Traces extends React.Component {
         max: 100
       }
     };
+
+    this.updateData = this.updateData.bind(this);
   }
 
   async componentDidMount () {
+    await this.updateData();
+  }
+
+  async componentDidUpdate (prevProps) {
+    if (prevProps.location.search !== this.props.location.search) {
+      await this.updateData();
+    }
+  }
+
+  async updateData () {
     showGlobalLoading();
-    await this.props.fetchTraces();
+    const searchParams = this.props.location.search;
+    await this.props.fetchTraces(searchParams);
     hideGlobalLoading();
   }
 
@@ -116,9 +129,9 @@ class Traces extends React.Component {
 
   renderResults () {
     const { getMeta } = this.props.traces;
-    const { count } = getMeta();
+    const meta = getMeta();
 
-    if (count === 0) {
+    if (meta.count === 0) {
       return (
         <p>There are no results for the current search/filters criteria.</p>
       );
@@ -127,7 +140,7 @@ class Traces extends React.Component {
     return (
       <>
         {this.renderTable()}
-        <Pagination />
+        <Pagination pathname='/traces' meta={meta} />
       </>
     );
   }
@@ -222,7 +235,8 @@ class Traces extends React.Component {
 if (environment !== 'production') {
   Traces.propTypes = {
     fetchTraces: T.func,
-    traces: T.object
+    traces: T.object,
+    location: T.object
   };
 }
 

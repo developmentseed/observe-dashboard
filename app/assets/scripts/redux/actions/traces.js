@@ -26,10 +26,10 @@ export function receiveTraces (data, error = null) {
   };
 }
 
-export function fetchTraces () {
+export function fetchTraces (searchParams) {
   return fetchAuth({
     statePath: 'traces',
-    url: `${apiUrl}/traces`,
+    url: `${apiUrl}/traces${searchParams || ''}`,
     requestFn: requestTraces,
     receiveFn: receiveTraces
   });

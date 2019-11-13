@@ -134,7 +134,7 @@ export function fetchAuth (opts) {
       })
     };
 
-    return fetchDispatchCacheFactory(options)(dispatch, getState);
+    return fetchDispatchFactory(options)(dispatch, getState);
   };
 }
 
