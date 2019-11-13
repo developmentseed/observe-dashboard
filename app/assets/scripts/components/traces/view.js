@@ -25,6 +25,7 @@ import { formatDateTimeExtended, startCoordinate } from '../../utils';
 import Form from '../../styles/form/form';
 import FormLabel from '../../styles/form/label';
 import { ContentWrapper, Infobox, ActionButtonsWrapper } from '../common/view-wrappers';
+import { LinkToOsmProfile } from '../common/link';
 
 // Mapbox access token
 mapboxgl.accessToken = mapboxAccessToken;
@@ -145,7 +146,9 @@ class Traces extends React.Component {
           <FormLabel>Length</FormLabel>
           <p>{trace.length}</p>
           <FormLabel>Owner</FormLabel>
-          <p>{trace.ownerId}</p>
+          <p>
+            <LinkToOsmProfile osmDisplayName={trace.ownerDisplayName} />
+          </p>
           <FormLabel>Start coordinate</FormLabel>
           <p>{startCoordinate(geometry)}</p>
           <FormLabel>Recorded at</FormLabel>

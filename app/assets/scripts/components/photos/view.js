@@ -24,6 +24,7 @@ import Button from '../../styles/button/button';
 import Prose from '../../styles/type/prose';
 import { wrapApiResult, getFromState } from '../../redux/utils';
 import { ContentWrapper, Infobox, ActionButtonsWrapper } from '../common/view-wrappers';
+import { LinkToOsmProfile } from '../common/link';
 
 const PhotoBox = styled.div`
   img {
@@ -83,7 +84,7 @@ class Photos extends React.Component {
     const {
       id,
       description,
-      ownerId,
+      ownerDisplayName,
       location,
       bearing,
       osmObjects,
@@ -99,7 +100,9 @@ class Photos extends React.Component {
           <FormLabel>Description</FormLabel>
           <p>{description || 'No description available.'}</p>
           <FormLabel>Owner</FormLabel>
-          <p>{ownerId}</p>
+          <p>
+            <LinkToOsmProfile osmDisplayName={ownerDisplayName} />
+          </p>
           <FormLabel>Location</FormLabel>
           <p>{featureToCoords(location)}</p>
           <FormLabel>Bearing</FormLabel>

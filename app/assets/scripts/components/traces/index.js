@@ -202,7 +202,7 @@ class Traces extends React.Component {
           <td>
             <Link to={`/traces/${trace.id}`}>{trace.id}</Link>
           </td>
-          <td>{trace.ownerId}</td>
+          <td>{trace.ownerDisplayName}</td>
           <td>{new Date(trace.recordedAt).toLocaleDateString()}</td>
           <td>{trace.length}</td>
           <td>JOSM Icon</td>
