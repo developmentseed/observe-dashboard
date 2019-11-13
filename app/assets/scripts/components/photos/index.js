@@ -175,7 +175,7 @@ class Photos extends React.Component {
           <td>
             <Link to={`/photos/${photo.id}`}>{photo.id}</Link>
           </td>
-          <td>{photo.ownerId}</td>
+          <td>{photo.ownerDisplayName}</td>
           <td>{new Date(photo.createdAt).toLocaleDateString()}</td>
           <td>{featureToCoords(photo.location)}</td>
           <td>W W N</td>
