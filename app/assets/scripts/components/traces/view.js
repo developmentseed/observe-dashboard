@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 import { PropTypes as T } from 'prop-types';
 import { mapboxAccessToken, environment } from '../../config';
 import * as actions from '../../redux/actions/traces';
+import { wrapApiResult, getFromState, deleteItem } from '../../redux/utils';
+import { formatDateTimeExtended, startCoordinate } from '../../utils';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 import styled from 'styled-components';
 import mapboxgl from 'mapbox-gl';
@@ -20,8 +22,6 @@ import {
 import UhOh from '../uhoh';
 import Prose from '../../styles/type/prose';
 import Button from '../../styles/button/button';
-import { wrapApiResult, getFromState } from '../../redux/utils';
-import { formatDateTimeExtended, startCoordinate } from '../../utils';
 import Form from '../../styles/form/form';
 import FormLabel from '../../styles/form/label';
 import { ContentWrapper, Infobox, ActionButtonsWrapper } from '../common/view-wrappers';
@@ -39,6 +39,8 @@ class Traces extends React.Component {
     this.state = {
       mapLoaded: false
     };
+
+    this.deleteTrace = this.deleteTrace.bind(this);
   }
 
   async componentDidMount () {
@@ -91,6 +93,19 @@ class Traces extends React.Component {
       });
       self.setState({ mapLoaded: true });
     });
+  }
+
+  async deleteTrace () {
+    showGlobalLoading();
+
+    try {          
+      await this.props.deleteTrace();
+      this.props.history.push(`/traces`)
+    } catch (error) {
+      alert('error: '+ error.message);
+    }
+
+    hideGlobalLoading();
   }
 
   renderContent () {
@@ -165,7 +180,7 @@ class Traces extends React.Component {
   renderActionButtons () {
     return (
       <ActionButtonsWrapper>
-        <Button useIcon='trash-bin' variation='danger-raised-light' size='xlarge'>
+        <Button useIcon='trash-bin' variation='danger-raised-light' size='xlarge' onClick={this.deleteTrace}>
           Delete
         </Button>
         <Button useIcon='pencil' variation='primary-raised-semidark' size='xlarge'>
@@ -200,15 +215,21 @@ if (environment !== 'production') {
   Traces.propTypes = {
     match: T.object,
     fetchTrace: T.func,
+    deleteTrace: T.func,
     trace: T.object
   };
 }
 
 function mapStateToProps (state, props) {
+  const { traceId } = props.match.params;
+  const { individualTraces, authenticatedUser } = state;
+
   return {
     trace: wrapApiResult(
-      getFromState(state.individualTraces, props.match.params.traceId)
-    )
+      getFromState(individualTraces, traceId)
+    ),
+    authenticatedUser,
+    deleteTrace: () => deleteItem(state, 'traces', traceId)
   };
 }
 
