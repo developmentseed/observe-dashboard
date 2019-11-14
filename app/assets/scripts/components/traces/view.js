@@ -98,11 +98,11 @@ class Traces extends React.Component {
   async deleteTrace () {
     showGlobalLoading();
 
-    try {          
+    try {
       await this.props.deleteTrace();
-      this.props.history.push(`/traces`)
+      this.props.history.push(`/traces`);
     } catch (error) {
-      alert('error: '+ error.message);
+      alert('error: ' + error.message);
     }
 
     hideGlobalLoading();
@@ -213,9 +213,10 @@ class Traces extends React.Component {
 
 if (environment !== 'production') {
   Traces.propTypes = {
-    match: T.object,
-    fetchTrace: T.func,
     deleteTrace: T.func,
+    fetchTrace: T.func,
+    history: T.object,
+    match: T.object,
     trace: T.object
   };
 }

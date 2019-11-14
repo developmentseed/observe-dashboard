@@ -138,7 +138,7 @@ export function fetchAuth (opts) {
     } = getState();
 
     if (!data || typeof data.osmId === 'undefined') {
-      return dispatch(opts.receiveFn(null, new Error('User not logged id.')));
+      return dispatch(opts.receiveFn(null, new Error('User not logged in.')));
     }
 
     const { accessToken } = data;
