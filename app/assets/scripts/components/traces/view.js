@@ -27,6 +27,7 @@ import Form from '../../styles/form/form';
 import FormLabel from '../../styles/form/label';
 import { ContentWrapper, Infobox, ActionButtonsWrapper } from '../common/view-wrappers';
 import { LinkToOsmProfile } from '../common/link';
+import toasts from '../common/toasts';
 
 // Mapbox access token
 mapboxgl.accessToken = mapboxAccessToken;
@@ -113,8 +114,12 @@ class Traces extends React.Component {
 
         // Redirect to index if successful
         this.props.history.push(`/traces`);
+
+        // Show success toast.
+        toasts.info('Trace was successfully deleted.');
       } catch (error) {
-        alert('error: ' + error.message);
+        // Show error toast.
+        toasts.error('An error occurred, trace was not deleted.');
       }
 
       hideGlobalLoading();

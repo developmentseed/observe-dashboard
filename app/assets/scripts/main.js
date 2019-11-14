@@ -25,6 +25,7 @@ import PhotosView from './components/photos/view';
 import UhOh from './components/uhoh';
 import ErrorBoundary from './fatal-error-boundary';
 import ConfirmationPrompt from './components/common/confirmation-prompt';
+import { ToastContainerCustom } from './components/common/toasts';
 
 // Root component. Used by the router.
 const Root = () => (
@@ -47,6 +48,7 @@ const Root = () => (
             <Route path='*' component={UhOh} />
           </Switch>
           <ConfirmationPrompt />
+          <ToastContainerCustom />
         </ErrorBoundary>
       </ThemeProvider>
     </Router>
