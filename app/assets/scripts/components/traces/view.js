@@ -43,6 +43,7 @@ class Traces extends React.Component {
     };
 
     this.deleteTrace = this.deleteTrace.bind(this);
+    this.renderActionButtons = this.renderActionButtons.bind(this);
   }
 
   async componentDidMount () {
@@ -132,6 +133,7 @@ class Traces extends React.Component {
     if (!isReady()) return null;
     if (hasError()) return <UhOh />;
 
+    // Get trace data
     const { properties: trace, geometry } = getData();
 
     return (
@@ -195,15 +197,25 @@ class Traces extends React.Component {
     );
   }
 
-  renderActionButtons () {
+  renderActionButtons (trace) {
+    const { ownerId } = trace;
+
+    const { osmId: userId, isAdmin } = this.props.authenticatedUser.getData();
+
     return (
       <ActionButtonsWrapper>
-        <Button useIcon='trash-bin' variation='danger-raised-light' size='xlarge' onClick={this.deleteTrace}>
-          Delete
-        </Button>
-        <Button useIcon='pencil' variation='primary-raised-semidark' size='xlarge'>
-          Edit Metadata
-        </Button>
+        {
+          (isAdmin || userId === ownerId) && (
+            <>
+              <Button useIcon='trash-bin' variation='danger-raised-light' size='xlarge' onClick={this.deleteTrace}>
+                Delete
+              </Button>
+              <Button useIcon='pencil' variation='primary-raised-semidark' size='xlarge'>
+                Edit Metadata
+              </Button>
+            </>
+          )
+        }
         <Button useIcon='share' variation='base-raised-semidark' size='xlarge'>
           Export to JOSM
         </Button>
@@ -235,7 +247,8 @@ if (environment !== 'production') {
     fetchTrace: T.func,
     history: T.object,
     match: T.object,
-    trace: T.object
+    trace: T.object,
+    authenticatedUser: T.object
   };
 }
 
@@ -247,7 +260,7 @@ function mapStateToProps (state, props) {
     trace: wrapApiResult(
       getFromState(individualTraces, traceId)
     ),
-    authenticatedUser,
+    authenticatedUser: wrapApiResult(authenticatedUser),
     deleteTrace: () => deleteItem(state, 'traces', traceId)
   };
 }
