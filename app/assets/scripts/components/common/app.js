@@ -36,7 +36,7 @@ class App extends Component {
         <PageBody role='main'>
           {children}
         </PageBody>
-        <PageFooter isHidden={hideFooter} credits='Made by Development Seed Impact Team' />
+        <PageFooter isHidden={hideFooter} credits='Made with 🧡 by Development Seed' />
       </Page>
     );
   }
