@@ -1,14 +1,15 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { PropTypes as T } from 'prop-types';
-import { mapboxAccessToken, environment } from '../../config';
-import * as actions from '../../redux/actions/traces';
-import { wrapApiResult, getFromState, deleteItem } from '../../redux/utils';
-import { formatDateTimeExtended, startCoordinate } from '../../utils';
-import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 import styled from 'styled-components';
 import mapboxgl from 'mapbox-gl';
 import bbox from '@turf/bbox';
+import { PropTypes as T } from 'prop-types';
+import { mapboxAccessToken, environment } from '../../config';
+import { formatDateTimeExtended, startCoordinate } from '../../utils';
+import { connect } from 'react-redux';
+import * as actions from '../../redux/actions/traces';
+import { wrapApiResult, getFromState, deleteItem } from '../../redux/utils';
+import { confirmDeleteTrace } from '../common/confirmation-prompt';
+import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 
 import App from '../common/app';
 import {
@@ -95,17 +96,29 @@ class Traces extends React.Component {
     });
   }
 
-  async deleteTrace () {
-    showGlobalLoading();
+  async deleteTrace (e) {
+    e.preventDefault();
 
-    try {
-      await this.props.deleteTrace();
-      this.props.history.push(`/traces`);
-    } catch (error) {
-      alert('error: ' + error.message);
+    // Confirm delete
+    const { traceId } = this.props.match.params;
+    const { result } = await confirmDeleteTrace(traceId);
+
+    // When delete is confirmed
+    if (result) {
+      showGlobalLoading();
+
+      try {
+        // Make delete request
+        await this.props.deleteTrace();
+
+        // Redirect to index if successful
+        this.props.history.push(`/traces`);
+      } catch (error) {
+        alert('error: ' + error.message);
+      }
+
+      hideGlobalLoading();
     }
-
-    hideGlobalLoading();
   }
 
   renderContent () {

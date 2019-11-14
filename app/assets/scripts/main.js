@@ -24,6 +24,7 @@ import PhotosIndex from './components/photos';
 import PhotosView from './components/photos/view';
 import UhOh from './components/uhoh';
 import ErrorBoundary from './fatal-error-boundary';
+import ConfirmationPrompt from './components/common/confirmation-prompt';
 
 // Root component. Used by the router.
 const Root = () => (
@@ -45,6 +46,7 @@ const Root = () => (
             <Route exact path='/about' component={About} />
             <Route path='*' component={UhOh} />
           </Switch>
+          <ConfirmationPrompt />
         </ErrorBoundary>
       </ThemeProvider>
     </Router>
