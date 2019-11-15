@@ -180,19 +180,20 @@ export function showConfirmationPrompt (opts = {}) {
 }
 
 /**
- * Convenience method to show a delete confirmation prompt for a trace.
+ * Convenience method to show a generic delete confirmation prompt.
  * Will display a "Cancel/Delete" buttons and:
- * title: 'Delete this trace?'
- * content: <p>The trace <strong>{id}</strong> will be deleted.</p>
+ * title: 'Delete this <item>?'
+ * content: <p>Item <strong>{id}</strong> will be deleted.</p>
  *
- * @param {string} traceId Id of trace to delete
+ * @param {string} label Item label
+ * @param {string} id Item id
  */
-export function confirmDeleteTrace (traceId) {
+export function confirmDeleteItem (label, id) {
   return showConfirmationPrompt({
-    title: 'Delete this trace?',
+    title: `Delete this ${label}?`,
     content: (
       <p>
-        The trace <strong>{traceId}</strong> will be deleted.
+        Item <strong>{id}</strong> will be deleted.
       </p>
     ),
     // eslint-disable-next-line
@@ -200,14 +201,14 @@ export function confirmDeleteTrace (traceId) {
       <React.Fragment>
         <ModalCancelButton
           variation='base-raised-light'
-          title='Cancel trace deletion'
+          title={`Cancel ${label} deletion`}
           onClick={cancel}
         >
           Cancel
         </ModalCancelButton>
         <ModalDeleteButton
           variation='base-raised-light'
-          title='Confirm trace deletion'
+          title={`Confirm ${label} deletion`}
           onClick={confirm}
         >
           Delete

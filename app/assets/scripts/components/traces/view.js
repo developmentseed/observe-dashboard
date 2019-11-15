@@ -8,8 +8,6 @@ import { formatDateTimeExtended, startCoordinate } from '../../utils';
 import { connect } from 'react-redux';
 import * as actions from '../../redux/actions/traces';
 import { wrapApiResult, getFromState, deleteItem } from '../../redux/utils';
-import { confirmDeleteTrace } from '../common/confirmation-prompt';
-import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 
 import App from '../common/app';
 import {
@@ -28,6 +26,8 @@ import FormLabel from '../../styles/form/label';
 import { ContentWrapper, Infobox, ActionButtonsWrapper } from '../common/view-wrappers';
 import { LinkToOsmProfile } from '../common/link';
 import toasts from '../common/toasts';
+import { confirmDeleteItem } from '../common/confirmation-prompt';
+import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 
 // Mapbox access token
 mapboxgl.accessToken = mapboxAccessToken;
@@ -103,7 +103,7 @@ class Traces extends React.Component {
 
     // Confirm delete
     const { traceId } = this.props.match.params;
-    const { result } = await confirmDeleteTrace(traceId);
+    const { result } = await confirmDeleteItem('trace', traceId);
 
     // When delete is confirmed
     if (result) {
