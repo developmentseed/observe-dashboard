@@ -200,14 +200,14 @@ export function confirmDeleteItem (label, id) {
     renderControls: ({ confirm, cancel }) => (
       <React.Fragment>
         <ModalCancelButton
-          variation='base-raised-light'
+          variation='primary-raised-light'
           title={`Cancel ${label} deletion`}
           onClick={cancel}
         >
           Cancel
         </ModalCancelButton>
         <ModalDeleteButton
-          variation='base-raised-light'
+          variation='danger-raised-light'
           title={`Confirm ${label} deletion`}
           onClick={confirm}
         >
