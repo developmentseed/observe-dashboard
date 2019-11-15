@@ -118,6 +118,7 @@ class ConfirmationPrompt extends Component {
         size='small'
         revealed={revealed}
         toolbarComponent={null}
+        onCloseClick={this.onResult.bind(this, false)}
         headerComponent={
           <ModalHeader>
             <ModalTitle>{title}</ModalTitle>
