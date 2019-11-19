@@ -22,9 +22,11 @@ import {
 import UhOh from '../uhoh';
 import Button from '../../styles/button/button';
 import Prose from '../../styles/type/prose';
-import { wrapApiResult, getFromState } from '../../redux/utils';
+import { wrapApiResult, getFromState, deleteItem } from '../../redux/utils';
 import { ContentWrapper, Infobox, ActionButtonsWrapper } from '../common/view-wrappers';
 import { LinkToOsmProfile } from '../common/link';
+import toasts from '../common/toasts';
+import { confirmDeleteItem } from '../common/confirmation-prompt';
 
 const PhotoBox = styled.div`
   img {
@@ -33,6 +35,13 @@ const PhotoBox = styled.div`
 `;
 
 class Photos extends React.Component {
+  constructor (props) {
+    super(props);
+
+    this.deletePhoto = this.deletePhoto.bind(this);
+    this.renderActionButtons = this.renderActionButtons.bind(this);
+  }
+
   async componentDidMount () {
     showGlobalLoading();
 
@@ -41,6 +50,35 @@ class Photos extends React.Component {
     await this.props.fetchPhoto(photoId);
 
     hideGlobalLoading();
+  }
+
+  async deletePhoto (e) {
+    e.preventDefault();
+
+    // Confirm delete
+    const { photoId } = this.props.match.params;
+    const { result } = await confirmDeleteItem('photo', photoId);
+
+    // When delete is confirmed
+    if (result) {
+      showGlobalLoading();
+
+      try {
+        // Make delete request
+        await this.props.deletePhoto();
+
+        // Redirect to index if successful
+        this.props.history.push(`/photos`);
+
+        // Show success toast.
+        toasts.info('Photo was successfully deleted.');
+      } catch (error) {
+        // Show error toast.
+        toasts.error('An error occurred, photo was not deleted.');
+      }
+
+      hideGlobalLoading();
+    }
   }
 
   renderContent () {
@@ -134,15 +172,24 @@ class Photos extends React.Component {
     );
   }
 
-  renderActionButtons () {
+  renderActionButtons (photo) {
+    const { ownerId } = photo;
+    const { osmId: userId, isAdmin } = this.props.authenticatedUser.getData();
+
     return (
       <ActionButtonsWrapper>
-        <Button useIcon='trash-bin' variation='danger-raised-light' size='xlarge'>
-          Delete
-        </Button>
-        <Button useIcon='pencil' variation='primary-raised-semidark' size='xlarge'>
-          Edit Metadata
-        </Button>
+        {
+          (isAdmin || userId === ownerId) && (
+            <>
+              <Button useIcon='trash-bin' variation='danger-raised-light' size='xlarge' onClick={this.deletePhoto}>
+                Delete
+              </Button>
+              <Button useIcon='pencil' variation='primary-raised-semidark' size='xlarge'>
+                Edit Metadata
+              </Button>
+            </>
+          )
+        }
         <Button useIcon='download' variation='primary-raised-dark' size='xlarge'>
           Download
         </Button>
@@ -169,15 +216,23 @@ if (environment !== 'production') {
   Photos.propTypes = {
     match: T.object,
     fetchPhoto: T.func,
-    photo: T.object
+    photo: T.object,
+    history: T.object,
+    deletePhoto: T.func,
+    authenticatedUser: T.object
   };
 }
 
 function mapStateToProps (state, props) {
+  const { photoId } = props.match.params;
+  const { individualPhotos, authenticatedUser } = state;
+
   return {
     photo: wrapApiResult(
-      getFromState(state.individualPhotos, props.match.params.photoId)
-    )
+      getFromState(individualPhotos, photoId)
+    ),
+    authenticatedUser: wrapApiResult(authenticatedUser),
+    deletePhoto: () => deleteItem(state, 'photos', photoId)
   };
 }
 

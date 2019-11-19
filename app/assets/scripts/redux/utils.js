@@ -1,6 +1,7 @@
 import get from 'lodash.get';
 import merge from 'lodash.merge';
 import { delay } from '../utils';
+import { apiUrl } from '../config';
 
 /**
  * Performs a request to the given url returning the response in json format
@@ -27,6 +28,23 @@ export async function fetchJSON (url, options) {
     error.statusCode = response ? response.status || null : null;
     throw error;
   }
+}
+
+export async function deleteItem (state, type, id) {
+  // Get accessToken
+  const accessToken = get(state, 'authenticatedUser.data.accessToken');
+
+  // Thrown error if not defined
+  if (!accessToken) throw Error('User is not logged in.');
+
+  // Make the request
+  const url = `${apiUrl}/${type}/${id}`;
+  await fetchJSON(url, {
+    method: 'DELETE',
+    headers: {
+      Authorization: accessToken
+    }
+  });
 }
 
 /**
@@ -120,7 +138,7 @@ export function fetchAuth (opts) {
     } = getState();
 
     if (!data || typeof data.osmId === 'undefined') {
-      return dispatch(opts.receiveFn(null, new Error('User not logged id.')));
+      return dispatch(opts.receiveFn(null, new Error('User not logged in.')));
     }
 
     const { accessToken } = data;
