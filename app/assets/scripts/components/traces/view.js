@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import mapboxgl from 'mapbox-gl';
 import bbox from '@turf/bbox';
 import { PropTypes as T } from 'prop-types';
-import { mapboxAccessToken, environment } from '../../config';
+import { apiUrl, mapboxAccessToken, environment } from '../../config';
 import { formatDateTimeExtended, startCoordinate } from '../../utils';
 import { connect } from 'react-redux';
 import * as actions from '../../redux/actions/traces';
@@ -23,10 +23,17 @@ import Prose from '../../styles/type/prose';
 import Button from '../../styles/button/button';
 import Form from '../../styles/form/form';
 import FormLabel from '../../styles/form/label';
-import { ContentWrapper, Infobox, ActionButtonsWrapper } from '../common/view-wrappers';
+import {
+  ContentWrapper,
+  Infobox,
+  ActionButtonsWrapper
+} from '../common/view-wrappers';
 import { LinkToOsmProfile } from '../common/link';
 import toasts from '../common/toasts';
-import { confirmDeleteItem } from '../common/confirmation-prompt';
+import {
+  confirmDeleteItem,
+  confirmJosmExport
+} from '../common/confirmation-prompt';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 
 // Mapbox access token
@@ -43,6 +50,7 @@ class Traces extends React.Component {
     };
 
     this.deleteTrace = this.deleteTrace.bind(this);
+    this.exportToJosm = this.exportToJosm.bind(this);
     this.renderActionButtons = this.renderActionButtons.bind(this);
   }
 
@@ -127,6 +135,20 @@ class Traces extends React.Component {
     }
   }
 
+  async exportToJosm (e) {
+    e.preventDefault();
+
+    const { result } = await confirmJosmExport();
+
+    // When delete is confirmed, open JOSM Remote Control link in a
+    // separate window
+    if (result) {
+      const { traceId } = this.props.match.params;
+      const gpxUrl = `${apiUrl}/traces/${traceId}.gpx`;
+      window.open(`http://127.0.0.1:8111/import?url=${gpxUrl}`, '_blank');
+    }
+  }
+
   renderContent () {
     const { isReady, hasError, getData } = this.props.trace;
 
@@ -204,22 +226,38 @@ class Traces extends React.Component {
 
     return (
       <ActionButtonsWrapper>
-        {
-          (isAdmin || userId === ownerId) && (
-            <>
-              <Button useIcon='trash-bin' variation='danger-raised-light' size='xlarge' onClick={this.deleteTrace}>
-                Delete
-              </Button>
-              <Button useIcon='pencil' variation='primary-raised-semidark' size='xlarge'>
-                Edit Metadata
-              </Button>
-            </>
-          )
-        }
-        <Button useIcon='share' variation='base-raised-semidark' size='xlarge'>
+        {(isAdmin || userId === ownerId) && (
+          <>
+            <Button
+              useIcon='trash-bin'
+              variation='danger-raised-light'
+              size='xlarge'
+              onClick={this.deleteTrace}
+            >
+              Delete
+            </Button>
+            <Button
+              useIcon='pencil'
+              variation='primary-raised-semidark'
+              size='xlarge'
+            >
+              Edit Metadata
+            </Button>
+          </>
+        )}
+        <Button
+          useIcon='share'
+          variation='base-raised-semidark'
+          size='xlarge'
+          onClick={this.exportToJosm}
+        >
           Export to JOSM
         </Button>
-        <Button useIcon='download' variation='primary-raised-dark' size='xlarge'>
+        <Button
+          useIcon='download'
+          variation='primary-raised-dark'
+          size='xlarge'
+        >
           Download
         </Button>
       </ActionButtonsWrapper>
@@ -257,9 +295,7 @@ function mapStateToProps (state, props) {
   const { individualTraces, authenticatedUser } = state;
 
   return {
-    trace: wrapApiResult(
-      getFromState(individualTraces, traceId)
-    ),
+    trace: wrapApiResult(getFromState(individualTraces, traceId)),
     authenticatedUser: wrapApiResult(authenticatedUser),
     deleteTrace: () => deleteItem(state, 'traces', traceId)
   };

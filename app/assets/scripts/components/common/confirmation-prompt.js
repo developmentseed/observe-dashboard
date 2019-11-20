@@ -7,6 +7,7 @@ import {
   ModalFooter,
   ModalCancelButton,
   ModalDeleteButton,
+  ModalExportButton,
   ModalTitle
 } from './modal';
 import Button from '../../styles/button/button';
@@ -213,6 +214,47 @@ export function confirmDeleteItem (label, id) {
         >
           Delete
         </ModalDeleteButton>
+      </React.Fragment>
+    )
+  });
+}
+
+/**
+ * Show JOSM Export instructions.
+ */
+export function confirmJosmExport () {
+  return showConfirmationPrompt({
+    title: `Export to JOSM?`,
+    content: (
+      <p>
+        <a
+          target='_blank'
+          rel='noopener noreferrer'
+          href='https://wiki.openstreetmap.org/wiki/JOSM/RemoteControl'
+        >
+          JOSM Remote Control
+        </a>
+        <span> </span>
+        must be enabled.
+      </p>
+    ),
+    // eslint-disable-next-line
+    renderControls: ({ confirm, cancel }) => (
+      <React.Fragment>
+        <ModalCancelButton
+          variation='primary-raised-light'
+          title='Cancel export'
+          onClick={cancel}
+        >
+          Cancel
+        </ModalCancelButton>
+        <ModalExportButton
+          variation='primary-raised-dark'
+          title='Confirm export'
+          onClick={confirm}
+        >
+          Proceed
+        </ModalExportButton>
       </React.Fragment>
     )
   });
