@@ -28,10 +28,7 @@ const tracesReducerInitialState = {
   data: []
 };
 
-const tracesReducer = baseAPIReducer(
-  'TRACES',
-  tracesReducerInitialState
-);
+const tracesReducer = baseAPIReducer('TRACES', tracesReducerInitialState);
 
 /**
  * INDIVIDUAL TRACE reducer
@@ -44,10 +41,28 @@ const traceReducerInitialState = {
   // data: []
 };
 
-const traceReducer = baseAPIReducer(
-  'TRACE',
-  traceReducerInitialState
-);
+function traceReducer (state = traceReducerInitialState, action) {
+  // Update trace action do not use baseAPIReducer
+  if (action.type === 'UPDATE_TRACE') {
+    // Get full trace data
+    const trace = Object.assign({}, state[action.id].data);
+
+    // Apply changed properties
+    trace.properties = {
+      ...trace.properties,
+      ...action.data
+    };
+
+    // Add trace back to state
+    state[action.id].data = trace;
+
+    // Return state
+    return state;
+  }
+
+  // Pass action to baseAPIReducer
+  return baseAPIReducer('TRACE', traceReducerInitialState)(state, action);
+}
 
 /**
  * PHOTOS reducer
@@ -59,10 +74,7 @@ const photosReducerInitialState = {
   data: []
 };
 
-const photosReducer = baseAPIReducer(
-  'PHOTOS',
-  photosReducerInitialState
-);
+const photosReducer = baseAPIReducer('PHOTOS', photosReducerInitialState);
 
 /**
  * INDIVIDUAL PHOTO reducer
@@ -75,10 +87,7 @@ const photoReducerInitialState = {
   // data: []
 };
 
-const photoReducer = baseAPIReducer(
-  'PHOTO',
-  photoReducerInitialState
-);
+const photoReducer = baseAPIReducer('PHOTO', photoReducerInitialState);
 
 /**
  * Export combined reducers

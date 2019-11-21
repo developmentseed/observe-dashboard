@@ -7,7 +7,12 @@ import { apiUrl, mapboxAccessToken, environment } from '../../config';
 import { formatDateTimeExtended, startCoordinate } from '../../utils';
 import { connect } from 'react-redux';
 import * as actions from '../../redux/actions/traces';
-import { wrapApiResult, getFromState, deleteItem } from '../../redux/utils';
+import {
+  wrapApiResult,
+  getFromState,
+  deleteItem,
+  updateItem
+} from '../../redux/utils';
 
 import App from '../common/app';
 import {
@@ -23,6 +28,7 @@ import Prose from '../../styles/type/prose';
 import Button from '../../styles/button/button';
 import Form from '../../styles/form/form';
 import FormLabel from '../../styles/form/label';
+import FormInput from '../../styles/form/input';
 import {
   ContentWrapper,
   Infobox,
@@ -39,17 +45,19 @@ import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 // Mapbox access token
 mapboxgl.accessToken = mapboxAccessToken;
 
-const Map = styled.div`
-`;
+const Map = styled.div``;
 
 class Traces extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
-      mapLoaded: false
+      mapLoaded: false,
+      editing: false,
+      newDescription: ''
     };
 
     this.deleteTrace = this.deleteTrace.bind(this);
+    this.updateTrace = this.updateTrace.bind(this);
     this.exportToJosm = this.exportToJosm.bind(this);
     this.renderActionButtons = this.renderActionButtons.bind(this);
   }
@@ -83,22 +91,24 @@ class Traces extends React.Component {
       attributionControl: false,
       bounds: bbox(geometry),
       fitBoundsOptions: { padding: 20 }
-    }).addControl(new mapboxgl.AttributionControl({
-      compact: false
-    }));
+    }).addControl(
+      new mapboxgl.AttributionControl({
+        compact: false
+      })
+    );
 
     // Add trace when map is fully loaded
     const self = this;
     this.map.on('load', function () {
       self.map.addLayer({
-        'id': 'trace',
-        'type': 'line',
-        'source': {
-          'type': 'geojson',
-          'data': {
-            'type': 'Feature',
-            'properties': {},
-            'geometry': geometry
+        id: 'trace',
+        type: 'line',
+        source: {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: {},
+            geometry: geometry
           }
         }
       });
@@ -135,6 +145,38 @@ class Traces extends React.Component {
     }
   }
 
+  async updateTrace (e) {
+    e.preventDefault();
+
+    // Confirm delete
+    const { traceId } = this.props.match.params;
+    // const { result } = await confirmUpdateItem('trace', traceId);
+    const result = true;
+
+    // When delete is confirmed
+    if (result) {
+      showGlobalLoading();
+
+      try {
+        const { newDescription } = this.state;
+
+        // Make delete request
+        await this.props.updateTrace(traceId, { description: newDescription });
+
+        // Show success toast.
+        toasts.info('Trace was successfully updated.');
+
+        // Disable editing state
+        this.setState({ editing: false });
+      } catch (error) {
+        // Show error toast.
+        toasts.error('An error occurred, trace was not updated.');
+      }
+
+      hideGlobalLoading();
+    }
+  }
+
   async exportToJosm (e) {
     e.preventDefault();
 
@@ -162,9 +204,7 @@ class Traces extends React.Component {
       <>
         <InpageHeadline>
           <InpageBackLink to='/traces'>Back to traces</InpageBackLink>
-          <InpageTitle>
-            Trace {trace.id}
-          </InpageTitle>
+          <InpageTitle>Trace {trace.id}</InpageTitle>
         </InpageHeadline>
         <ContentWrapper>
           {this.renderMap(geometry)}
@@ -180,7 +220,9 @@ class Traces extends React.Component {
       <Map>
         {mapboxgl.supported() ? (
           <div
-            ref={(r) => { this.mapContainer = r; }}
+            ref={r => {
+              this.mapContainer = r;
+            }}
             style={{ width: '100%', height: '100%' }}
           />
         ) : (
@@ -193,13 +235,28 @@ class Traces extends React.Component {
   }
 
   renderInfobox (trace, geometry) {
+    const { editing, newDescription } = this.state;
     return (
       <Infobox>
         <Form>
           <FormLabel>id</FormLabel>
           <p>{trace.id}</p>
           <FormLabel>Description</FormLabel>
-          <p>{trace.description}</p>
+          {editing ? (
+            <FormInput
+              ref={this.descriptionInput}
+              type='text'
+              size='large'
+              id='input-text-a'
+              placeholder='Enter a description'
+              value={newDescription}
+              onChange={e => this.setState({ newDescription: e.target.value })}
+              autoFocus
+            />
+          ) : (
+            <p>{trace.description}</p>
+          )}
+
           <FormLabel>Length</FormLabel>
           <p>{trace.length}</p>
           <FormLabel>Owner</FormLabel>
@@ -214,13 +271,32 @@ class Traces extends React.Component {
           <p>{formatDateTimeExtended(trace.uploadedAt)}</p>
           <FormLabel>Updated at</FormLabel>
           <p>{formatDateTimeExtended(trace.updatedAt)}</p>
+          {editing && (
+            <>
+              <Button
+                variation='base-raised-light'
+                title='Cancel this action'
+                onClick={() => this.setState({ editing: false })}
+              >
+                Cancel
+              </Button>
+              <Button
+                variation='base-raised-light'
+                title='Confirm this action'
+                onClick={this.updateTrace}
+              >
+                Confirm
+              </Button>
+            </>
+          )}
         </Form>
       </Infobox>
     );
   }
 
   renderActionButtons (trace) {
-    const { ownerId } = trace;
+    const { editing } = this.state;
+    const { ownerId, description } = trace;
 
     const { osmId: userId, isAdmin } = this.props.authenticatedUser.getData();
 
@@ -233,6 +309,7 @@ class Traces extends React.Component {
               variation='danger-raised-light'
               size='xlarge'
               onClick={this.deleteTrace}
+              disabled={editing}
             >
               Delete
             </Button>
@@ -240,6 +317,9 @@ class Traces extends React.Component {
               useIcon='pencil'
               variation='primary-raised-semidark'
               size='xlarge'
+              onClick={() =>
+                this.setState({ editing: true, newDescription: description })}
+              disabled={editing}
             >
               Edit Metadata
             </Button>
@@ -250,6 +330,7 @@ class Traces extends React.Component {
           variation='base-raised-semidark'
           size='xlarge'
           onClick={this.exportToJosm}
+          disabled={editing}
         >
           Export to JOSM
         </Button>
@@ -257,6 +338,7 @@ class Traces extends React.Component {
           useIcon='download'
           variation='primary-raised-dark'
           size='xlarge'
+          disabled={editing}
         >
           Download
         </Button>
@@ -282,6 +364,7 @@ class Traces extends React.Component {
 if (environment !== 'production') {
   Traces.propTypes = {
     deleteTrace: T.func,
+    updateTrace: T.func,
     fetchTrace: T.func,
     history: T.object,
     match: T.object,
@@ -303,11 +386,9 @@ function mapStateToProps (state, props) {
 
 function dispatcher (dispatch) {
   return {
-    fetchTrace: (...args) => dispatch(actions.fetchTrace(...args))
+    fetchTrace: (...args) => dispatch(actions.fetchTrace(...args)),
+    updateTrace: (...args) => dispatch(actions.updateTrace(...args))
   };
 }
 
-export default connect(
-  mapStateToProps,
-  dispatcher
-)(Traces);
+export default connect(mapStateToProps, dispatcher)(Traces);

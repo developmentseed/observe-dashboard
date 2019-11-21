@@ -30,6 +30,38 @@ export async function fetchJSON (url, options) {
   }
 }
 
+/**
+ * Performs a patch request using accessToken from state.
+ *
+ * @param {string} url Request URL
+ * @param {object} payload Data payload
+ * @param {object} state Application state
+ */
+export async function patch (url, payload, state) {
+  // Get accessToken
+  const accessToken = get(state, 'authenticatedUser.data.accessToken');
+
+  // Thrown error if not defined
+  if (!accessToken) throw Error('User is not logged in.');
+
+  // Make the request
+  await fetchJSON(url, {
+    method: 'PATCH',
+    headers: {
+      Authorization: accessToken,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  });
+}
+
+/**
+ * Performs a delete request to a trace/photo using accessToken from state.
+ *
+ * @param {object} state Application state
+ * @param {string} type Item type: 'trace' or 'photo'
+ * @param {string} id Item id
+ */
 export async function deleteItem (state, type, id) {
   // Get accessToken
   const accessToken = get(state, 'authenticatedUser.data.accessToken');
