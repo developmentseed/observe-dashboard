@@ -44,20 +44,20 @@ const traceReducerInitialState = {
 function traceReducer (state = traceReducerInitialState, action) {
   // Update trace action do not use baseAPIReducer
   if (action.type === 'UPDATE_TRACE') {
-    // Get full trace data
-    const trace = Object.assign({}, state[action.id].data);
+    // Get item
+    const st = Object.assign({}, state[action.id]);
 
     // Apply changed properties
-    trace.properties = {
-      ...trace.properties,
+    st.data.properties = {
+      ...st.data.properties,
       ...action.data
     };
 
-    // Add trace back to state
-    state[action.id].data = trace;
-
     // Return state
-    return state;
+    return {
+      ...state,
+      [action.id]: st
+    };
   }
 
   // Pass action to baseAPIReducer
