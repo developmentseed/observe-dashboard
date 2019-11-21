@@ -238,7 +238,7 @@ class Traces extends React.Component {
     const { editing, newDescription } = this.state;
     return (
       <Infobox>
-        <Form>
+        <Form onSubmit={this.updateTrace}>
           <FormLabel>id</FormLabel>
           <p>{trace.id}</p>
           <FormLabel>Description</FormLabel>
