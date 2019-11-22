@@ -155,33 +155,32 @@ class Traces extends React.Component {
   async updateTrace (e) {
     e.preventDefault();
 
-    // Confirm delete
     const { traceId } = this.props.match.params;
-    // const { result } = await confirmUpdateItem('trace', traceId);
-    const result = true;
+    const { newDescription } = this.state;
 
-    // When delete is confirmed
-    if (result) {
-      showGlobalLoading();
-
-      try {
-        const { newDescription } = this.state;
-
-        // Make delete request
-        await this.props.updateTrace(traceId, { description: newDescription });
-
-        // Show success toast.
-        toasts.info('Trace was successfully updated.');
-
-        // Disable editing state
-        this.setState({ editing: false });
-      } catch (error) {
-        // Show error toast.
-        toasts.error('An error occurred, trace was not updated.');
-      }
-
-      hideGlobalLoading();
+    // Do not allow empty descriptions
+    if (!newDescription || newDescription.length === 0) {
+      toasts.error('Please enter a description.');
+      return;
     }
+
+    showGlobalLoading();
+
+    try {
+      // Make update request
+      await this.props.updateTrace(traceId, { description: newDescription });
+
+      // Show success toast.
+      toasts.info('Trace was successfully updated.');
+
+      // Disable editing state
+      this.setState({ editing: false });
+    } catch (error) {
+      // Show error toast.
+      toasts.error('An error occurred, trace was not updated.');
+    }
+
+    hideGlobalLoading();
   }
 
   async exportToJosm (e) {
