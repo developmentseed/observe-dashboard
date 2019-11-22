@@ -47,6 +47,13 @@ mapboxgl.accessToken = mapboxAccessToken;
 
 const Map = styled.div``;
 
+const EditButtons = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-left: 45%;
+`;
+
 class Traces extends React.Component {
   constructor (props) {
     super(props);
@@ -272,22 +279,26 @@ class Traces extends React.Component {
           <FormLabel>Updated at</FormLabel>
           <p>{formatDateTimeExtended(trace.updatedAt)}</p>
           {editing && (
-            <>
+            <EditButtons>
               <Button
-                variation='base-raised-light'
+                variation='danger-raised-light'
                 title='Cancel this action'
+                size='large'
+                useIcon='circle-xmark'
                 onClick={() => this.setState({ editing: false })}
               >
                 Cancel
               </Button>
               <Button
-                variation='base-raised-light'
+                variation='primary-raised-dark'
                 title='Confirm this action'
+                size='large'
+                useIcon='circle-tick'
                 onClick={this.updateTrace}
               >
                 Confirm
               </Button>
-            </>
+            </EditButtons>
           )}
         </Form>
       </Infobox>
