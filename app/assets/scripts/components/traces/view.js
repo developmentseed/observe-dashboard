@@ -9,8 +9,7 @@ import { connect } from 'react-redux';
 import * as actions from '../../redux/actions/traces';
 import {
   wrapApiResult,
-  getFromState,
-  deleteItem
+  getFromState
 } from '../../redux/utils';
 import { handleExportToJosm } from './utils';
 
@@ -37,8 +36,7 @@ import {
 import { LinkToOsmProfile } from '../common/link';
 import toasts from '../common/toasts';
 import {
-  confirmDeleteItem,
-  confirmJosmExport
+  confirmDeleteItem
 } from '../common/confirmation-prompt';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 
@@ -135,16 +133,16 @@ class Traces extends React.Component {
 
       try {
         // Make delete request
-        await this.props.deleteTrace();
+        await this.props.deleteTrace(traceId);
 
         // Redirect to index if successful
         this.props.history.push(`/traces`);
 
         // Show success toast.
-        toasts.info('Trace was successfully deleted.');
+        toasts.info(`Trace ${traceId} was successfully deleted.`);
       } catch (error) {
         // Show error toast.
-        toasts.error('An error occurred, trace was not deleted.');
+        toasts.error(`An error occurred, trace ${traceId} was not deleted.`);
       }
 
       hideGlobalLoading();
@@ -388,15 +386,15 @@ function mapStateToProps (state, props) {
 
   return {
     trace: wrapApiResult(getFromState(individualTraces, traceId)),
-    authenticatedUser: wrapApiResult(authenticatedUser),
-    deleteTrace: () => deleteItem(state, 'traces', traceId)
+    authenticatedUser: wrapApiResult(authenticatedUser)
   };
 }
 
 function dispatcher (dispatch) {
   return {
     fetchTrace: (...args) => dispatch(actions.fetchTrace(...args)),
-    updateTrace: (...args) => dispatch(actions.updateTrace(...args))
+    updateTrace: (...args) => dispatch(actions.updateTrace(...args)),
+    deleteTrace: (...args) => dispatch(actions.deleteTrace(...args))
   };
 }
 

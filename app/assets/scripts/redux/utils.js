@@ -33,16 +33,20 @@ export async function fetchJSON (url, options) {
 /**
  * Performs a patch request using accessToken from state.
  *
+ * @param {object} state Application state
+ * @param {string} type Item
  * @param {string} url Request URL
  * @param {object} payload Data payload
- * @param {object} state Application state
  */
-export async function patch (url, payload, state) {
+export async function patchItem (state, type, id, payload) {
   // Get accessToken
   const accessToken = get(state, 'authenticatedUser.data.accessToken');
 
   // Thrown error if not defined
   if (!accessToken) throw Error('User is not logged in.');
+
+  // Make the request
+  const url = `${apiUrl}/${type}/${id}`;
 
   // Make the request
   await fetchJSON(url, {

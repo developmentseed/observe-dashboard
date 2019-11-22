@@ -9,6 +9,8 @@ import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 import { handleExportToJosm } from './utils';
 
 import App from '../common/app';
+import { confirmDeleteItem } from '../common/confirmation-prompt';
+import toasts from '../common/toasts';
 import {
   Inpage,
   InpageHeader,
@@ -68,6 +70,34 @@ class Traces extends React.Component {
     const searchParams = this.props.location.search;
     await this.props.fetchTraces(searchParams);
     hideGlobalLoading();
+  }
+
+  async deleteTrace (e, traceId) {
+    e.preventDefault();
+
+    // Confirm delete
+    const { result } = await confirmDeleteItem('trace', traceId);
+
+    // When delete is confirmed
+    if (result) {
+      showGlobalLoading();
+
+      try {
+        // Make delete request
+        await this.props.deleteTrace(traceId);
+
+        // Refresh table if successful
+        this.updateData();
+
+        // Show success toast.
+        toasts.info(`Trace ${traceId} was successfully deleted.`);
+      } catch (error) {
+        // Show error toast.
+        toasts.error(`An error occurred, trace ${traceId} was not deleted.`);
+      }
+
+      hideGlobalLoading();
+    }
   }
 
   renderContent () {
@@ -220,6 +250,7 @@ class Traces extends React.Component {
               variation='base-raised-semidark'
               size='small'
               hideText
+              onClick={e => this.deleteTrace(e, trace.id)}
             >
               Delete trace
             </Button>
@@ -252,7 +283,8 @@ if (environment !== 'production') {
   Traces.propTypes = {
     fetchTraces: T.func,
     traces: T.object,
-    location: T.object
+    location: T.object,
+    deleteTrace: T.func
   };
 }
 
@@ -264,7 +296,8 @@ function mapStateToProps (state) {
 
 function dispatcher (dispatch) {
   return {
-    fetchTraces: (...args) => dispatch(actions.fetchTraces(...args))
+    fetchTraces: (...args) => dispatch(actions.fetchTraces(...args)),
+    deleteTrace: (...args) => dispatch(actions.deleteTrace(...args))
   };
 }
 

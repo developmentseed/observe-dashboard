@@ -1,4 +1,4 @@
-import { fetchAuth, patch } from '../utils';
+import { fetchAuth, patchItem, deleteItem } from '../utils';
 import { apiUrl } from '../../config';
 
 /*
@@ -84,10 +84,22 @@ export function updateTrace (id, data) {
   return async (dispatch, getState) => {
     const state = getState();
 
-    const url = `${apiUrl}/traces/${id}`;
-
-    await patch(url, data, state);
+    await patchItem(state, 'traces', id, data);
 
     dispatch(updateTraceAction(id, data));
+  };
+}
+
+/*
+ * Delete individual trace
+ */
+
+export function deleteTrace (id) {
+  return async (dispatch, getState) => {
+    const state = getState();
+
+    await deleteItem(state, 'traces', id);
+
+    dispatch(invalidateTrace(id));
   };
 }

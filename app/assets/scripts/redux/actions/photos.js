@@ -1,4 +1,4 @@
-import { fetchAuth, patch } from '../utils';
+import { fetchAuth, patchItem } from '../utils';
 import { apiUrl } from '../../config';
 
 /*
@@ -84,9 +84,7 @@ export function updatePhoto (id, data) {
   return async (dispatch, getState) => {
     const state = getState();
 
-    const url = `${apiUrl}/photos/${id}`;
-
-    await patch(url, data, state);
+    await patchItem(state, 'photos', id, data);
 
     dispatch(updatePhotoAction(id, data));
   };
