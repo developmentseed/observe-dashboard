@@ -196,13 +196,13 @@ class Traces extends React.Component {
             <th scope='col'>
               <span>Length</span>
             </th>
-            <th scope='col'>
+            <th scope='col' style={{ width: '10%', textAlign: 'center' }}>
               <span>Export to JOSM</span>
             </th>
-            <th scope='col'>
+            <th scope='col' style={{ width: '10%', textAlign: 'center' }}>
               <span>Download</span>
             </th>
-            <th scope='col'>
+            <th scope='col' style={{ width: '10%', textAlign: 'center' }}>
               <span>Delete</span>
             </th>
           </tr>
@@ -223,10 +223,10 @@ class Traces extends React.Component {
           <td>{trace.ownerDisplayName}</td>
           <td>{new Date(trace.recordedAt).toLocaleDateString()}</td>
           <td>{trace.length}</td>
-          <td>
+          <td style={{ textAlign: 'center' }}>
             <Button
               useIcon='share'
-              variation='base-raised-semidark'
+              variation='base-plain'
               size='small'
               hideText
               onClick={e => handleExportToJosm(e, trace.id)}
@@ -234,20 +234,20 @@ class Traces extends React.Component {
               Export to JOSM
             </Button>
           </td>
-          <td>
+          <td style={{ textAlign: 'center' }}>
             <Button
               useIcon='download'
-              variation='base-raised-semidark'
+              variation='primary-plain'
               size='small'
               hideText
             >
               Download trace
             </Button>
           </td>
-          <td>
+          <td style={{ textAlign: 'center' }}>
             <Button
               useIcon='trash-bin'
-              variation='base-raised-semidark'
+              variation='danger-plain'
               size='small'
               hideText
               onClick={e => this.deleteTrace(e, trace.id)}
