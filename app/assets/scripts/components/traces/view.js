@@ -256,6 +256,7 @@ class Traces extends React.Component {
               id='input-text-a'
               placeholder='Enter a description'
               value={newDescription}
+              autoComplete='off'
               onChange={e => this.setState({ newDescription: e.target.value })}
               autoFocus
             />
