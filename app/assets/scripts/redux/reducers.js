@@ -65,7 +65,7 @@ function traceReducer (state = traceReducerInitialState, action) {
 }
 
 /**
- * PHOTOS reducer
+ * INDIVIDUAL PHOTO reducer
  */
 const photosReducerInitialState = {
   fetching: false,
@@ -87,7 +87,28 @@ const photoReducerInitialState = {
   // data: []
 };
 
-const photoReducer = baseAPIReducer('PHOTO', photoReducerInitialState);
+function photoReducer (state = photoReducerInitialState, action) {
+  // Update photo action do not use baseAPIReducer
+  if (action.type === 'UPDATE_PHOTO') {
+    // Get item
+    const st = Object.assign({}, state[action.id]);
+
+    // Apply changed properties
+    st.data = {
+      ...st.data,
+      ...action.data
+    };
+
+    // Return state
+    return {
+      ...state,
+      [action.id]: st
+    };
+  }
+
+  // Pass action to baseAPIReducer
+  return baseAPIReducer('PHOTO', photoReducerInitialState)(state, action);
+}
 
 /**
  * Export combined reducers
