@@ -24,7 +24,6 @@ import {
   InputWithIcon,
   InputIcon,
   FilterLabel } from '../../styles/form/filters';
-import { FormCheckable } from '../../styles/form/checkable';
 import DataTable from '../../styles/table';
 import Pagination from '../../styles/button/pagination';
 import Prose from '../../styles/type/prose';
@@ -151,14 +150,6 @@ class Traces extends React.Component {
         <thead>
           <tr>
             <th scope='col'>
-              <FormCheckable
-                checked={undefined}
-                type='checkbox'
-                name='checkbox-all'
-                id='checkbox-all'
-              />
-            </th>
-            <th scope='col'>
               Trace
             </th>
             <th scope='col'>
@@ -191,14 +182,6 @@ class Traces extends React.Component {
     return getData().map(trace => {
       return (
         <tr key={trace.id}>
-          <td>
-            <FormCheckable
-              checked={undefined}
-              type='checkbox'
-              name={`checkbox-${trace.id}`}
-              id={`checkbox-${trace.id}`}
-            />
-          </td>
           <td>
             <Link to={`/traces/${trace.id}`}>{trace.id}</Link>
           </td>
