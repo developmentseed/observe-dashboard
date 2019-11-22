@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { environment } from '../../config';
 import * as actions from '../../redux/actions/traces';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
+import { handleExportToJosm } from './utils';
 
 import App from '../common/app';
 import {
@@ -198,6 +199,7 @@ class Traces extends React.Component {
               variation='base-raised-semidark'
               size='small'
               hideText
+              onClick={e => handleExportToJosm(e, trace.id)}
             >
               Export to JOSM
             </Button>

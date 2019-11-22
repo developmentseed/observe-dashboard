@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import mapboxgl from 'mapbox-gl';
 import bbox from '@turf/bbox';
 import { PropTypes as T } from 'prop-types';
-import { apiUrl, mapboxAccessToken, environment } from '../../config';
+import { mapboxAccessToken, environment } from '../../config';
 import { formatDateTimeExtended, startCoordinate } from '../../utils';
 import { connect } from 'react-redux';
 import * as actions from '../../redux/actions/traces';
@@ -12,6 +12,7 @@ import {
   getFromState,
   deleteItem
 } from '../../redux/utils';
+import { handleExportToJosm } from './utils';
 
 import App from '../common/app';
 import {
@@ -64,7 +65,6 @@ class Traces extends React.Component {
 
     this.deleteTrace = this.deleteTrace.bind(this);
     this.updateTrace = this.updateTrace.bind(this);
-    this.exportToJosm = this.exportToJosm.bind(this);
     this.renderActionButtons = this.renderActionButtons.bind(this);
   }
 
@@ -188,20 +188,6 @@ class Traces extends React.Component {
     hideGlobalLoading();
   }
 
-  async exportToJosm (e) {
-    e.preventDefault();
-
-    const { result } = await confirmJosmExport();
-
-    // When delete is confirmed, open JOSM Remote Control link in a
-    // separate window
-    if (result) {
-      const { traceId } = this.props.match.params;
-      const gpxUrl = `${apiUrl}/traces/${traceId}.gpx`;
-      window.open(`http://127.0.0.1:8111/import?url=${gpxUrl}`, '_blank');
-    }
-  }
-
   renderContent () {
     const { isReady, hasError, getData } = this.props.trace;
 
@@ -319,7 +305,7 @@ class Traces extends React.Component {
 
   renderActionButtons (trace) {
     const { isEditing } = this.state;
-    const { ownerId, description } = trace;
+    const { id: traceId, ownerId, description } = trace;
 
     const { osmId: userId, isAdmin } = this.props.authenticatedUser.getData();
 
@@ -352,7 +338,7 @@ class Traces extends React.Component {
           useIcon='share'
           variation='base-raised-semidark'
           size='xlarge'
-          onClick={this.exportToJosm}
+          onClick={e => handleExportToJosm(e, traceId)}
           disabled={isEditing}
         >
           Export to JOSM
