@@ -3,10 +3,11 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { PropTypes as T } from 'prop-types';
 import styled from 'styled-components';
+import get from 'lodash.get';
 import { environment } from '../../config';
 import * as actions from '../../redux/actions/traces';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
-import { handleExportToJosm } from './utils';
+import { handleExportToJosm, downloadTrace } from './utils';
 
 import App from '../common/app';
 import { confirmDeleteItem } from '../common/confirmation-prompt';
@@ -214,6 +215,8 @@ class Traces extends React.Component {
 
   renderTableRows () {
     const { getData } = this.props.traces;
+    const { accessToken } = this.props;
+
     return getData().map(trace => {
       return (
         <tr key={trace.id}>
@@ -239,6 +242,10 @@ class Traces extends React.Component {
               useIcon='download'
               variation='primary-plain'
               size='small'
+              onClick={e => {
+                e.preventDefault();
+                downloadTrace(this.props.accessToken, trace.id);
+              }}
               hideText
             >
               Download trace
@@ -290,7 +297,8 @@ if (environment !== 'production') {
 
 function mapStateToProps (state) {
   return {
-    traces: wrapApiResult(state.traces)
+    traces: wrapApiResult(state.traces),
+    accessToken: get(state, 'authenticatedUser.data.accessToken')
   };
 }
 
