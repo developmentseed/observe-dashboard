@@ -332,7 +332,7 @@ class Traces extends React.Component {
                 this.setState({ editing: true, newDescription: description })}
               disabled={editing}
             >
-              Edit Metadata
+              Edit Description
             </Button>
           </>
         )}
