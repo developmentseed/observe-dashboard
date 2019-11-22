@@ -58,7 +58,7 @@ class Traces extends React.Component {
     super(props);
     this.state = {
       mapLoaded: false,
-      editing: false,
+      isEditing: false,
       newDescription: ''
     };
 
@@ -154,8 +154,14 @@ class Traces extends React.Component {
   async updateTrace (e) {
     e.preventDefault();
 
-    const { traceId } = this.props.match.params;
+    const trace = this.props.trace.getData().properties;
     const { newDescription } = this.state;
+
+    // Avoid request if description didn't change
+    if (trace.description === newDescription) {
+      this.setState({ isEditing: false });
+      return;
+    }
 
     // Do not allow empty descriptions
     if (!newDescription || newDescription.length === 0) {
@@ -167,13 +173,13 @@ class Traces extends React.Component {
 
     try {
       // Make update request
-      await this.props.updateTrace(traceId, { description: newDescription });
+      await this.props.updateTrace(trace.id, { description: newDescription });
 
       // Show success toast.
       toasts.info('Trace was successfully updated.');
 
       // Disable editing state
-      this.setState({ editing: false });
+      this.setState({ isEditing: false });
     } catch (error) {
       // Show error toast.
       toasts.error('An error occurred, trace was not updated.');
@@ -240,14 +246,14 @@ class Traces extends React.Component {
   }
 
   renderInfobox (trace, geometry) {
-    const { editing, newDescription } = this.state;
+    const { isEditing, newDescription } = this.state;
     return (
       <Infobox>
         <Form onSubmit={this.updateTrace}>
           <FormLabel>id</FormLabel>
           <p>{trace.id}</p>
           <FormLabel>Description</FormLabel>
-          {editing ? (
+          {isEditing ? (
             <FormInput
               ref={this.descriptionInput}
               type='text'
@@ -277,14 +283,14 @@ class Traces extends React.Component {
           <p>{formatDateTimeExtended(trace.uploadedAt)}</p>
           <FormLabel>Updated at</FormLabel>
           <p>{formatDateTimeExtended(trace.updatedAt)}</p>
-          {editing && (
+          {isEditing && (
             <EditButtons>
               <Button
                 variation='danger-raised-light'
                 title='Cancel this action'
                 size='large'
                 useIcon='circle-xmark'
-                onClick={() => this.setState({ editing: false })}
+                onClick={() => this.setState({ isEditing: false })}
               >
                 Cancel
               </Button>
@@ -305,7 +311,7 @@ class Traces extends React.Component {
   }
 
   renderActionButtons (trace) {
-    const { editing } = this.state;
+    const { isEditing } = this.state;
     const { ownerId, description } = trace;
 
     const { osmId: userId, isAdmin } = this.props.authenticatedUser.getData();
@@ -319,7 +325,7 @@ class Traces extends React.Component {
               variation='danger-raised-light'
               size='xlarge'
               onClick={this.deleteTrace}
-              disabled={editing}
+              disabled={isEditing}
             >
               Delete
             </Button>
@@ -328,8 +334,8 @@ class Traces extends React.Component {
               variation='primary-raised-semidark'
               size='xlarge'
               onClick={() =>
-                this.setState({ editing: true, newDescription: description })}
-              disabled={editing}
+                this.setState({ isEditing: true, newDescription: description })}
+              disabled={isEditing}
             >
               Edit Description
             </Button>
@@ -340,7 +346,7 @@ class Traces extends React.Component {
           variation='base-raised-semidark'
           size='xlarge'
           onClick={this.exportToJosm}
-          disabled={editing}
+          disabled={isEditing}
         >
           Export to JOSM
         </Button>
@@ -348,7 +354,7 @@ class Traces extends React.Component {
           useIcon='download'
           variation='primary-raised-dark'
           size='xlarge'
-          disabled={editing}
+          disabled={isEditing}
         >
           Download
         </Button>
