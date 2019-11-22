@@ -16,6 +16,7 @@ import {
   InpageBody,
   InpageBodyInner
 } from '../common/Inpage';
+import Button from '../../styles/button/button';
 import Form from '../../styles/form/form';
 import FormInput from '../../styles/form/input';
 import {
@@ -23,7 +24,8 @@ import {
   InputWrapper,
   InputWithIcon,
   InputIcon,
-  FilterLabel } from '../../styles/form/filters';
+  FilterLabel
+} from '../../styles/form/filters';
 import DataTable from '../../styles/table';
 import Pagination from '../../styles/button/pagination';
 import Prose from '../../styles/type/prose';
@@ -87,7 +89,11 @@ class Traces extends React.Component {
         <FilterToolbar>
           <InputWrapper>
             <FilterLabel htmlFor='userSearch'>Search by user</FilterLabel>
-            <InputWithIcon type='text' id='userSearch' placeholder='User Name' />
+            <InputWithIcon
+              type='text'
+              id='userSearch'
+              placeholder='User Name'
+            />
             <InputIcon htmlFor='userSearch' useIcon='magnifier-left' />
           </InputWrapper>
           <InputWrapper>
@@ -106,9 +112,9 @@ class Traces extends React.Component {
               ref={this.dropRef}
               alignment='left'
               direction='down'
-              triggerElement={(
+              triggerElement={
                 <FormInput type='select' id='length' placeholder='Length' />
-              )}
+              }
             >
               <Form>
                 <RangeSlider
@@ -186,9 +192,36 @@ class Traces extends React.Component {
           <td>{trace.ownerDisplayName}</td>
           <td>{new Date(trace.recordedAt).toLocaleDateString()}</td>
           <td>{trace.length}</td>
-          <td>JOSM Icon</td>
-          <td>Download Icon</td>
-          <td>Delete Icon</td>
+          <td>
+            <Button
+              useIcon='share'
+              variation='base-raised-semidark'
+              size='small'
+              hideText
+            >
+              Export to JOSM
+            </Button>
+          </td>
+          <td>
+            <Button
+              useIcon='download'
+              variation='base-raised-semidark'
+              size='small'
+              hideText
+            >
+              Download trace
+            </Button>
+          </td>
+          <td>
+            <Button
+              useIcon='trash-bin'
+              variation='base-raised-semidark'
+              size='small'
+              hideText
+            >
+              Delete trace
+            </Button>
+          </td>
         </tr>
       );
     });
@@ -233,7 +266,4 @@ function dispatcher (dispatch) {
   };
 }
 
-export default connect(
-  mapStateToProps,
-  dispatcher
-)(Traces);
+export default connect(mapStateToProps, dispatcher)(Traces);
