@@ -244,7 +244,7 @@ class Traces extends React.Component {
               size='small'
               onClick={e => {
                 e.preventDefault();
-                downloadTrace(this.props.accessToken, trace.id);
+                downloadTrace(accessToken, trace.id);
               }}
               hideText
             >
@@ -288,6 +288,7 @@ class Traces extends React.Component {
 
 if (environment !== 'production') {
   Traces.propTypes = {
+    accessToken: T.string,
     fetchTraces: T.func,
     traces: T.object,
     location: T.object,
