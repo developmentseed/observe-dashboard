@@ -10,8 +10,7 @@ import * as actions from '../../redux/actions/traces';
 import {
   wrapApiResult,
   getFromState,
-  deleteItem,
-  updateItem
+  deleteItem
 } from '../../redux/utils';
 
 import App from '../common/app';
