@@ -6,8 +6,11 @@ import styled from 'styled-components';
 import { environment } from '../../config';
 import * as actions from '../../redux/actions/traces';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
+import { handleExportToJosm } from './utils';
 
 import App from '../common/app';
+import { confirmDeleteItem } from '../common/confirmation-prompt';
+import toasts from '../common/toasts';
 import {
   Inpage,
   InpageHeader,
@@ -16,6 +19,7 @@ import {
   InpageBody,
   InpageBodyInner
 } from '../common/Inpage';
+import Button from '../../styles/button/button';
 import Form from '../../styles/form/form';
 import FormInput from '../../styles/form/input';
 import {
@@ -23,8 +27,8 @@ import {
   InputWrapper,
   InputWithIcon,
   InputIcon,
-  FilterLabel } from '../../styles/form/filters';
-import { FormCheckable } from '../../styles/form/checkable';
+  FilterLabel
+} from '../../styles/form/filters';
 import DataTable from '../../styles/table';
 import Pagination from '../../styles/button/pagination';
 import Prose from '../../styles/type/prose';
@@ -68,6 +72,34 @@ class Traces extends React.Component {
     hideGlobalLoading();
   }
 
+  async deleteTrace (e, traceId) {
+    e.preventDefault();
+
+    // Confirm delete
+    const { result } = await confirmDeleteItem('trace', traceId);
+
+    // When delete is confirmed
+    if (result) {
+      showGlobalLoading();
+
+      try {
+        // Make delete request
+        await this.props.deleteTrace(traceId);
+
+        // Refresh table if successful
+        this.updateData();
+
+        // Show success toast.
+        toasts.info(`Trace ${traceId} was successfully deleted.`);
+      } catch (error) {
+        // Show error toast.
+        toasts.error(`An error occurred, trace ${traceId} was not deleted.`);
+      }
+
+      hideGlobalLoading();
+    }
+  }
+
   renderContent () {
     const { isReady, hasError } = this.props.traces;
 
@@ -88,7 +120,11 @@ class Traces extends React.Component {
         <FilterToolbar>
           <InputWrapper>
             <FilterLabel htmlFor='userSearch'>Search by user</FilterLabel>
-            <InputWithIcon type='text' id='userSearch' placeholder='User Name' />
+            <InputWithIcon
+              type='text'
+              id='userSearch'
+              placeholder='User Name'
+            />
             <InputIcon htmlFor='userSearch' useIcon='magnifier-left' />
           </InputWrapper>
           <InputWrapper>
@@ -107,9 +143,9 @@ class Traces extends React.Component {
               ref={this.dropRef}
               alignment='left'
               direction='down'
-              triggerElement={(
+              triggerElement={
                 <FormInput type='select' id='length' placeholder='Length' />
-              )}
+              }
             >
               <Form>
                 <RangeSlider
@@ -150,19 +186,9 @@ class Traces extends React.Component {
       <DataTable>
         <thead>
           <tr>
+            <th scope='col'>ID</th>
             <th scope='col'>
-              <FormCheckable
-                checked={undefined}
-                type='checkbox'
-                name='checkbox-all'
-                id='checkbox-all'
-              />
-            </th>
-            <th scope='col'>
-              Trace
-            </th>
-            <th scope='col'>
-              <span>User</span>
+              <span>Owner</span>
             </th>
             <th scope='col'>
               <span>Date</span>
@@ -170,13 +196,13 @@ class Traces extends React.Component {
             <th scope='col'>
               <span>Length</span>
             </th>
-            <th scope='col'>
+            <th scope='col' style={{ width: '10%', textAlign: 'center' }}>
               <span>Export to JOSM</span>
             </th>
-            <th scope='col'>
+            <th scope='col' style={{ width: '10%', textAlign: 'center' }}>
               <span>Download</span>
             </th>
-            <th scope='col'>
+            <th scope='col' style={{ width: '10%', textAlign: 'center' }}>
               <span>Delete</span>
             </th>
           </tr>
@@ -192,22 +218,43 @@ class Traces extends React.Component {
       return (
         <tr key={trace.id}>
           <td>
-            <FormCheckable
-              checked={undefined}
-              type='checkbox'
-              name={`checkbox-${trace.id}`}
-              id={`checkbox-${trace.id}`}
-            />
-          </td>
-          <td>
             <Link to={`/traces/${trace.id}`}>{trace.id}</Link>
           </td>
           <td>{trace.ownerDisplayName}</td>
           <td>{new Date(trace.recordedAt).toLocaleDateString()}</td>
           <td>{trace.length}</td>
-          <td>JOSM Icon</td>
-          <td>Download Icon</td>
-          <td>Delete Icon</td>
+          <td style={{ textAlign: 'center' }}>
+            <Button
+              useIcon='share'
+              variation='base-plain'
+              size='small'
+              hideText
+              onClick={e => handleExportToJosm(e, trace.id)}
+            >
+              Export to JOSM
+            </Button>
+          </td>
+          <td style={{ textAlign: 'center' }}>
+            <Button
+              useIcon='download'
+              variation='primary-plain'
+              size='small'
+              hideText
+            >
+              Download trace
+            </Button>
+          </td>
+          <td style={{ textAlign: 'center' }}>
+            <Button
+              useIcon='trash-bin'
+              variation='danger-plain'
+              size='small'
+              hideText
+              onClick={e => this.deleteTrace(e, trace.id)}
+            >
+              Delete trace
+            </Button>
+          </td>
         </tr>
       );
     });
@@ -236,7 +283,8 @@ if (environment !== 'production') {
   Traces.propTypes = {
     fetchTraces: T.func,
     traces: T.object,
-    location: T.object
+    location: T.object,
+    deleteTrace: T.func
   };
 }
 
@@ -248,11 +296,9 @@ function mapStateToProps (state) {
 
 function dispatcher (dispatch) {
   return {
-    fetchTraces: (...args) => dispatch(actions.fetchTraces(...args))
+    fetchTraces: (...args) => dispatch(actions.fetchTraces(...args)),
+    deleteTrace: (...args) => dispatch(actions.deleteTrace(...args))
   };
 }
 
-export default connect(
-  mapStateToProps,
-  dispatcher
-)(Traces);
+export default connect(mapStateToProps, dispatcher)(Traces);

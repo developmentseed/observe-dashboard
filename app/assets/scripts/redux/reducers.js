@@ -28,10 +28,7 @@ const tracesReducerInitialState = {
   data: []
 };
 
-const tracesReducer = baseAPIReducer(
-  'TRACES',
-  tracesReducerInitialState
-);
+const tracesReducer = baseAPIReducer('TRACES', tracesReducerInitialState);
 
 /**
  * INDIVIDUAL TRACE reducer
@@ -44,13 +41,31 @@ const traceReducerInitialState = {
   // data: []
 };
 
-const traceReducer = baseAPIReducer(
-  'TRACE',
-  traceReducerInitialState
-);
+function traceReducer (state = traceReducerInitialState, action) {
+  // Update trace action do not use baseAPIReducer
+  if (action.type === 'UPDATE_TRACE') {
+    // Get item
+    const st = Object.assign({}, state[action.id]);
+
+    // Apply changed properties
+    st.data.properties = {
+      ...st.data.properties,
+      ...action.data
+    };
+
+    // Return state
+    return {
+      ...state,
+      [action.id]: st
+    };
+  }
+
+  // Pass action to baseAPIReducer
+  return baseAPIReducer('TRACE', traceReducerInitialState)(state, action);
+}
 
 /**
- * PHOTOS reducer
+ * INDIVIDUAL PHOTO reducer
  */
 const photosReducerInitialState = {
   fetching: false,
@@ -59,10 +74,7 @@ const photosReducerInitialState = {
   data: []
 };
 
-const photosReducer = baseAPIReducer(
-  'PHOTOS',
-  photosReducerInitialState
-);
+const photosReducer = baseAPIReducer('PHOTOS', photosReducerInitialState);
 
 /**
  * INDIVIDUAL PHOTO reducer
@@ -75,10 +87,28 @@ const photoReducerInitialState = {
   // data: []
 };
 
-const photoReducer = baseAPIReducer(
-  'PHOTO',
-  photoReducerInitialState
-);
+function photoReducer (state = photoReducerInitialState, action) {
+  // Update photo action do not use baseAPIReducer
+  if (action.type === 'UPDATE_PHOTO') {
+    // Get item
+    const st = Object.assign({}, state[action.id]);
+
+    // Apply changed properties
+    st.data = {
+      ...st.data,
+      ...action.data
+    };
+
+    // Return state
+    return {
+      ...state,
+      [action.id]: st
+    };
+  }
+
+  // Pass action to baseAPIReducer
+  return baseAPIReducer('PHOTO', photoReducerInitialState)(state, action);
+}
 
 /**
  * Export combined reducers

@@ -1,4 +1,4 @@
-import { fetchAuth } from '../utils';
+import { fetchAuth, patchItem, deleteItem } from '../utils';
 import { apiUrl } from '../../config';
 
 /*
@@ -36,7 +36,7 @@ export function fetchTraces (searchParams) {
 }
 
 /*
- * Individual trace
+ * Fetch individual trace
  */
 
 export const REQUEST_TRACE = 'REQUEST_TRACE';
@@ -68,4 +68,38 @@ export function fetchTrace (id) {
     requestFn: requestTrace.bind(this, id),
     receiveFn: receiveTrace.bind(this, id)
   });
+}
+
+/*
+ * Update individual trace
+ */
+
+export const UPDATE_TRACE = 'UPDATE_TRACE';
+
+export function updateTraceAction (id, data) {
+  return { type: UPDATE_TRACE, id, data };
+}
+
+export function updateTrace (id, data) {
+  return async (dispatch, getState) => {
+    const state = getState();
+
+    await patchItem(state, 'traces', id, data);
+
+    dispatch(updateTraceAction(id, data));
+  };
+}
+
+/*
+ * Delete individual trace
+ */
+
+export function deleteTrace (id) {
+  return async (dispatch, getState) => {
+    const state = getState();
+
+    await deleteItem(state, 'traces', id);
+
+    dispatch(invalidateTrace(id));
+  };
 }

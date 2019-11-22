@@ -169,6 +169,12 @@ export const ModalSaveButton = styled(Button)`
   }
 `;
 
+export const ModalExportButton = styled(Button)`
+  ::before {
+    ${collecticon('share')}
+  }
+`;
+
 export const ModalDeleteButton = styled(Button)`
   ::before {
     ${collecticon('trash-bin')}

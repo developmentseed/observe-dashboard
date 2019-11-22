@@ -18,7 +18,6 @@ import {
 } from '../common/inpage';
 
 import Form from '../../styles/form/form';
-import { FormCheckable } from '../../styles/form/checkable';
 import FormSelect from '../../styles/form/select';
 import {
   FilterToolbar,
@@ -127,18 +126,10 @@ class Photos extends React.Component {
         <thead>
           <tr>
             <th scope='col'>
-              <FormCheckable
-                checked={undefined}
-                type='checkbox'
-                name='checkbox-all'
-                id='checkbox-all'
-              />
+              <span>ID</span>
             </th>
             <th scope='col'>
-              <span>Photo</span>
-            </th>
-            <th scope='col'>
-              <span>User</span>
+              <span>Owner</span>
             </th>
             <th scope='col'>
               <span>Date</span>
@@ -164,14 +155,6 @@ class Photos extends React.Component {
     return getData().map(photo => {
       return (
         <tr key={photo.id}>
-          <td>
-            <FormCheckable
-              checked={undefined}
-              type='checkbox'
-              name={`checkbox-${photo.id}`}
-              id={`checkbox-${photo.id}`}
-            />
-          </td>
           <td>
             <Link to={`/photos/${photo.id}`}>{photo.id}</Link>
           </td>

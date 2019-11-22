@@ -7,7 +7,11 @@ import { mapboxAccessToken, environment } from '../../config';
 import { formatDateTimeExtended, startCoordinate } from '../../utils';
 import { connect } from 'react-redux';
 import * as actions from '../../redux/actions/traces';
-import { wrapApiResult, getFromState, deleteItem } from '../../redux/utils';
+import {
+  wrapApiResult,
+  getFromState
+} from '../../redux/utils';
+import { handleExportToJosm } from './utils';
 
 import App from '../common/app';
 import {
@@ -23,26 +27,42 @@ import Prose from '../../styles/type/prose';
 import Button from '../../styles/button/button';
 import Form from '../../styles/form/form';
 import FormLabel from '../../styles/form/label';
-import { ContentWrapper, Infobox, ActionButtonsWrapper } from '../common/view-wrappers';
+import FormInput from '../../styles/form/input';
+import {
+  ContentWrapper,
+  Infobox,
+  ActionButtonsWrapper
+} from '../common/view-wrappers';
 import { LinkToOsmProfile } from '../common/link';
 import toasts from '../common/toasts';
-import { confirmDeleteItem } from '../common/confirmation-prompt';
+import {
+  confirmDeleteItem
+} from '../common/confirmation-prompt';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 
 // Mapbox access token
 mapboxgl.accessToken = mapboxAccessToken;
 
-const Map = styled.div`
+const Map = styled.div``;
+
+const EditButtons = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-left: 45%;
 `;
 
 class Traces extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
-      mapLoaded: false
+      mapLoaded: false,
+      isEditing: false,
+      newDescription: ''
     };
 
     this.deleteTrace = this.deleteTrace.bind(this);
+    this.updateTrace = this.updateTrace.bind(this);
     this.renderActionButtons = this.renderActionButtons.bind(this);
   }
 
@@ -75,22 +95,24 @@ class Traces extends React.Component {
       attributionControl: false,
       bounds: bbox(geometry),
       fitBoundsOptions: { padding: 20 }
-    }).addControl(new mapboxgl.AttributionControl({
-      compact: false
-    }));
+    }).addControl(
+      new mapboxgl.AttributionControl({
+        compact: false
+      })
+    );
 
     // Add trace when map is fully loaded
     const self = this;
     this.map.on('load', function () {
       self.map.addLayer({
-        'id': 'trace',
-        'type': 'line',
-        'source': {
-          'type': 'geojson',
-          'data': {
-            'type': 'Feature',
-            'properties': {},
-            'geometry': geometry
+        id: 'trace',
+        type: 'line',
+        source: {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: {},
+            geometry: geometry
           }
         }
       });
@@ -111,20 +133,57 @@ class Traces extends React.Component {
 
       try {
         // Make delete request
-        await this.props.deleteTrace();
+        await this.props.deleteTrace(traceId);
 
         // Redirect to index if successful
         this.props.history.push(`/traces`);
 
         // Show success toast.
-        toasts.info('Trace was successfully deleted.');
+        toasts.info(`Trace ${traceId} was successfully deleted.`);
       } catch (error) {
         // Show error toast.
-        toasts.error('An error occurred, trace was not deleted.');
+        toasts.error(`An error occurred, trace ${traceId} was not deleted.`);
       }
 
       hideGlobalLoading();
     }
+  }
+
+  async updateTrace (e) {
+    e.preventDefault();
+
+    const trace = this.props.trace.getData().properties;
+    const { newDescription } = this.state;
+
+    // Avoid request if description didn't change
+    if (trace.description === newDescription) {
+      this.setState({ isEditing: false });
+      return;
+    }
+
+    // Do not allow empty descriptions
+    if (!newDescription || newDescription.length === 0) {
+      toasts.error('Please enter a description.');
+      return;
+    }
+
+    showGlobalLoading();
+
+    try {
+      // Make update request
+      await this.props.updateTrace(trace.id, { description: newDescription });
+
+      // Show success toast.
+      toasts.info('Trace was successfully updated.');
+
+      // Disable editing state
+      this.setState({ isEditing: false });
+    } catch (error) {
+      // Show error toast.
+      toasts.error('An error occurred, trace was not updated.');
+    }
+
+    hideGlobalLoading();
   }
 
   renderContent () {
@@ -140,9 +199,7 @@ class Traces extends React.Component {
       <>
         <InpageHeadline>
           <InpageBackLink to='/traces'>Back to traces</InpageBackLink>
-          <InpageTitle>
-            Trace {trace.id}
-          </InpageTitle>
+          <InpageTitle>Trace {trace.id}</InpageTitle>
         </InpageHeadline>
         <ContentWrapper>
           {this.renderMap(geometry)}
@@ -158,7 +215,9 @@ class Traces extends React.Component {
       <Map>
         {mapboxgl.supported() ? (
           <div
-            ref={(r) => { this.mapContainer = r; }}
+            ref={r => {
+              this.mapContainer = r;
+            }}
             style={{ width: '100%', height: '100%' }}
           />
         ) : (
@@ -171,13 +230,36 @@ class Traces extends React.Component {
   }
 
   renderInfobox (trace, geometry) {
+    const { isEditing, newDescription } = this.state;
     return (
       <Infobox>
-        <Form>
+        <Form onSubmit={this.updateTrace}>
           <FormLabel>id</FormLabel>
           <p>{trace.id}</p>
           <FormLabel>Description</FormLabel>
-          <p>{trace.description}</p>
+          {isEditing ? (
+            <FormInput
+              ref={this.descriptionInput}
+              type='text'
+              size='large'
+              id='input-text-a'
+              placeholder='Enter a description'
+              value={newDescription}
+              autoComplete='off'
+              onKeyDown={e => {
+                if (e.key === 'Escape') {
+                  this.setState({
+                    isEditing: false
+                  });
+                }
+              }}
+              onChange={e => this.setState({ newDescription: e.target.value })}
+              autoFocus
+            />
+          ) : (
+            <p>{trace.description}</p>
+          )}
+
           <FormLabel>Length</FormLabel>
           <p>{trace.length}</p>
           <FormLabel>Owner</FormLabel>
@@ -192,34 +274,79 @@ class Traces extends React.Component {
           <p>{formatDateTimeExtended(trace.uploadedAt)}</p>
           <FormLabel>Updated at</FormLabel>
           <p>{formatDateTimeExtended(trace.updatedAt)}</p>
+          {isEditing && (
+            <EditButtons>
+              <Button
+                variation='danger-raised-light'
+                title='Cancel this action'
+                size='large'
+                useIcon='circle-xmark'
+                onClick={() => this.setState({ isEditing: false })}
+              >
+                Cancel
+              </Button>
+              <Button
+                variation='primary-raised-dark'
+                title='Confirm this action'
+                size='large'
+                useIcon='circle-tick'
+                onClick={this.updateTrace}
+              >
+                Confirm
+              </Button>
+            </EditButtons>
+          )}
         </Form>
       </Infobox>
     );
   }
 
   renderActionButtons (trace) {
-    const { ownerId } = trace;
+    const { isEditing } = this.state;
+    const { id: traceId, ownerId, description } = trace;
 
     const { osmId: userId, isAdmin } = this.props.authenticatedUser.getData();
 
     return (
       <ActionButtonsWrapper>
-        {
-          (isAdmin || userId === ownerId) && (
-            <>
-              <Button useIcon='trash-bin' variation='danger-raised-light' size='xlarge' onClick={this.deleteTrace}>
-                Delete
-              </Button>
-              <Button useIcon='pencil' variation='primary-raised-semidark' size='xlarge'>
-                Edit Metadata
-              </Button>
-            </>
-          )
-        }
-        <Button useIcon='share' variation='base-raised-semidark' size='xlarge'>
+        {(isAdmin || userId === ownerId) && (
+          <>
+            <Button
+              useIcon='trash-bin'
+              variation='danger-raised-light'
+              size='xlarge'
+              onClick={this.deleteTrace}
+              disabled={isEditing}
+            >
+              Delete
+            </Button>
+            <Button
+              useIcon='pencil'
+              variation='primary-raised-semidark'
+              size='xlarge'
+              onClick={() =>
+                this.setState({ isEditing: true, newDescription: description })}
+              disabled={isEditing}
+            >
+              Edit Description
+            </Button>
+          </>
+        )}
+        <Button
+          useIcon='share'
+          variation='base-raised-semidark'
+          size='xlarge'
+          onClick={e => handleExportToJosm(e, traceId)}
+          disabled={isEditing}
+        >
           Export to JOSM
         </Button>
-        <Button useIcon='download' variation='primary-raised-dark' size='xlarge'>
+        <Button
+          useIcon='download'
+          variation='primary-raised-dark'
+          size='xlarge'
+          disabled={isEditing}
+        >
           Download
         </Button>
       </ActionButtonsWrapper>
@@ -244,6 +371,7 @@ class Traces extends React.Component {
 if (environment !== 'production') {
   Traces.propTypes = {
     deleteTrace: T.func,
+    updateTrace: T.func,
     fetchTrace: T.func,
     history: T.object,
     match: T.object,
@@ -257,21 +385,17 @@ function mapStateToProps (state, props) {
   const { individualTraces, authenticatedUser } = state;
 
   return {
-    trace: wrapApiResult(
-      getFromState(individualTraces, traceId)
-    ),
-    authenticatedUser: wrapApiResult(authenticatedUser),
-    deleteTrace: () => deleteItem(state, 'traces', traceId)
+    trace: wrapApiResult(getFromState(individualTraces, traceId)),
+    authenticatedUser: wrapApiResult(authenticatedUser)
   };
 }
 
 function dispatcher (dispatch) {
   return {
-    fetchTrace: (...args) => dispatch(actions.fetchTrace(...args))
+    fetchTrace: (...args) => dispatch(actions.fetchTrace(...args)),
+    updateTrace: (...args) => dispatch(actions.updateTrace(...args)),
+    deleteTrace: (...args) => dispatch(actions.deleteTrace(...args))
   };
 }
 
-export default connect(
-  mapStateToProps,
-  dispatcher
-)(Traces);
+export default connect(mapStateToProps, dispatcher)(Traces);

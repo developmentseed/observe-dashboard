@@ -17,7 +17,7 @@ export const Infobox = styled.div`
   padding: 2rem;
 
   form {
-    display: block;
+    grid-gap: 0;
 
     label {
       color: ${themeVal('color.primary')};

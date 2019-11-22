@@ -1,4 +1,4 @@
-import { fetchAuth } from '../utils';
+import { fetchAuth, patchItem } from '../utils';
 import { apiUrl } from '../../config';
 
 /*
@@ -36,7 +36,7 @@ export function fetchPhotos (searchParams) {
 }
 
 /*
- * Individual photo
+ * Fetch individual photo
  */
 
 export const REQUEST_PHOTO = 'REQUEST_PHOTO';
@@ -68,4 +68,24 @@ export function fetchPhoto (id) {
     requestFn: requestPhoto.bind(this, id),
     receiveFn: receivePhoto.bind(this, id)
   });
+}
+
+/*
+ * Update individual photo
+ */
+
+export const UPDATE_PHOTO = 'UPDATE_PHOTO';
+
+export function updatePhotoAction (id, data) {
+  return { type: UPDATE_PHOTO, id, data };
+}
+
+export function updatePhoto (id, data) {
+  return async (dispatch, getState) => {
+    const state = getState();
+
+    await patchItem(state, 'photos', id, data);
+
+    dispatch(updatePhotoAction(id, data));
+  };
 }
