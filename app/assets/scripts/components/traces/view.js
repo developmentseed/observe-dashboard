@@ -257,7 +257,7 @@ class Traces extends React.Component {
           )}
 
           <FormLabel>Length</FormLabel>
-          <p>{trace.length}</p>
+          <p>{trace.length} m</p>
           <FormLabel>Owner</FormLabel>
           <p>
             <LinkToOsmProfile osmDisplayName={trace.ownerDisplayName} />

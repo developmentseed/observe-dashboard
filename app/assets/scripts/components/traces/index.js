@@ -225,7 +225,7 @@ class Traces extends React.Component {
           </td>
           <td>{trace.ownerDisplayName}</td>
           <td>{new Date(trace.recordedAt).toLocaleDateString()}</td>
-          <td>{trace.length}</td>
+          <td>{trace.length} m</td>
           <td style={{ textAlign: 'center' }}>
             <Button
               useIcon='share'
