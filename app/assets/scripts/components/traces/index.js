@@ -149,11 +149,9 @@ class Traces extends React.Component {
       <DataTable>
         <thead>
           <tr>
+            <th scope='col'>ID</th>
             <th scope='col'>
-              Trace
-            </th>
-            <th scope='col'>
-              <span>User</span>
+              <span>Owner</span>
             </th>
             <th scope='col'>
               <span>Date</span>

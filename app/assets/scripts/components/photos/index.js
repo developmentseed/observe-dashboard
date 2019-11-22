@@ -126,10 +126,10 @@ class Photos extends React.Component {
         <thead>
           <tr>
             <th scope='col'>
-              <span>Photo</span>
+              <span>ID</span>
             </th>
             <th scope='col'>
-              <span>User</span>
+              <span>Owner</span>
             </th>
             <th scope='col'>
               <span>Date</span>
