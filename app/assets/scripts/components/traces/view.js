@@ -262,6 +262,13 @@ class Traces extends React.Component {
               placeholder='Enter a description'
               value={newDescription}
               autoComplete='off'
+              onKeyDown={e => {
+                if (e.key === 'Escape') {
+                  this.setState({
+                    isEditing: false
+                  });
+                }
+              }}
               onChange={e => this.setState({ newDescription: e.target.value })}
               autoFocus
             />
