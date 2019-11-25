@@ -1,7 +1,6 @@
 import { apiUrl } from '../../config';
-import {
-  confirmJosmExport
-} from '../common/confirmation-prompt';
+import { saveAs } from 'file-saver';
+import { confirmJosmExport } from '../common/confirmation-prompt';
 
 /*
  * Handle "ExportToJosm" events.
@@ -17,4 +16,12 @@ export async function handleExportToJosm (e, traceId) {
     const gpxUrl = `${apiUrl}/traces/${traceId}.gpx`;
     window.open(`http://127.0.0.1:8111/import?url=${gpxUrl}`, '_blank');
   }
+}
+
+/*
+ * Helper function to download a trace from the API using a token.
+ */
+export async function downloadTrace (accessToken, traceId) {
+  const geojsonUrl = `${apiUrl}/traces/${traceId}?token=${accessToken}`;
+  saveAs(geojsonUrl, `${traceId}.geojson`);
 }

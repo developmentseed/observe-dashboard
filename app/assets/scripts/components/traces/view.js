@@ -2,16 +2,14 @@ import React from 'react';
 import styled from 'styled-components';
 import mapboxgl from 'mapbox-gl';
 import bbox from '@turf/bbox';
+import get from 'lodash.get';
 import { PropTypes as T } from 'prop-types';
 import { mapboxAccessToken, environment } from '../../config';
 import { formatDateTimeExtended, startCoordinate } from '../../utils';
 import { connect } from 'react-redux';
 import * as actions from '../../redux/actions/traces';
-import {
-  wrapApiResult,
-  getFromState
-} from '../../redux/utils';
-import { handleExportToJosm } from './utils';
+import { wrapApiResult, getFromState } from '../../redux/utils';
+import { handleExportToJosm, downloadTrace } from './utils';
 
 import App from '../common/app';
 import {
@@ -35,9 +33,7 @@ import {
 } from '../common/view-wrappers';
 import { LinkToOsmProfile } from '../common/link';
 import toasts from '../common/toasts';
-import {
-  confirmDeleteItem
-} from '../common/confirmation-prompt';
+import { confirmDeleteItem } from '../common/confirmation-prompt';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 
 // Mapbox access token
@@ -261,7 +257,7 @@ class Traces extends React.Component {
           )}
 
           <FormLabel>Length</FormLabel>
-          <p>{trace.length}</p>
+          <p>{trace.length} m</p>
           <FormLabel>Owner</FormLabel>
           <p>
             <LinkToOsmProfile osmDisplayName={trace.ownerDisplayName} />
@@ -345,6 +341,10 @@ class Traces extends React.Component {
           useIcon='download'
           variation='primary-raised-dark'
           size='xlarge'
+          onClick={e => {
+            e.preventDefault();
+            downloadTrace(this.props.accessToken, traceId);
+          }}
           disabled={isEditing}
         >
           Download
@@ -370,13 +370,14 @@ class Traces extends React.Component {
 
 if (environment !== 'production') {
   Traces.propTypes = {
+    accessToken: T.string,
+    authenticatedUser: T.object,
     deleteTrace: T.func,
-    updateTrace: T.func,
     fetchTrace: T.func,
     history: T.object,
     match: T.object,
     trace: T.object,
-    authenticatedUser: T.object
+    updateTrace: T.func
   };
 }
 
@@ -386,7 +387,8 @@ function mapStateToProps (state, props) {
 
   return {
     trace: wrapApiResult(getFromState(individualTraces, traceId)),
-    authenticatedUser: wrapApiResult(authenticatedUser)
+    authenticatedUser: wrapApiResult(authenticatedUser),
+    accessToken: get(state, 'authenticatedUser.data.accessToken')
   };
 }
 
