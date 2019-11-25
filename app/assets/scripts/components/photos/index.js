@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { PropTypes as T } from 'prop-types';
 import { Link } from 'react-router-dom';
-import { environment } from '../../config';
+import { environment, osmUrl } from '../../config';
 import * as actions from '../../redux/actions/photos';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 import DataTable from '../../styles/table';
@@ -24,7 +24,8 @@ import {
   InputWrapper,
   InputWithIcon,
   InputIcon,
-  FilterLabel } from '../../styles/form/filters';
+  FilterLabel
+} from '../../styles/form/filters';
 
 import Pagination from '../../styles/button/pagination';
 import Prose from '../../styles/type/prose';
@@ -75,7 +76,11 @@ class Photos extends React.Component {
         <FilterToolbar>
           <InputWrapper>
             <FilterLabel htmlFor='userSearch'>Search by user</FilterLabel>
-            <InputWithIcon type='text' id='userSearch' placeholder='User Name' />
+            <InputWithIcon
+              type='text'
+              id='userSearch'
+              placeholder='User Name'
+            />
             <InputIcon htmlFor='userSearch' useIcon='magnifier-left' />
           </InputWrapper>
           <InputWrapper>
@@ -138,7 +143,7 @@ class Photos extends React.Component {
               <span>Coordinates</span>
             </th>
             <th scope='col'>
-              <span>OSM Objects</span>
+              <span>OSM Element</span>
             </th>
             <th scope='col'>
               <span>Actions</span>
@@ -161,7 +166,19 @@ class Photos extends React.Component {
           <td>{photo.ownerDisplayName}</td>
           <td>{new Date(photo.createdAt).toLocaleDateString()}</td>
           <td>{featureToCoords(photo.location)}</td>
-          <td>W W N</td>
+          <td>
+            {photo.osmElement ? (
+              <a
+                target='_blank'
+                rel='noopener noreferrer'
+                href={`${osmUrl}/${photo.osmElement}`}
+              >
+                {photo.osmElement}
+              </a>
+            ) : (
+              '-'
+            )}
+          </td>
           <td>...</td>
         </tr>
       );
@@ -207,7 +224,4 @@ function dispatcher (dispatch) {
   };
 }
 
-export default connect(
-  mapStateToProps,
-  dispatcher
-)(Photos);
+export default connect(mapStateToProps, dispatcher)(Photos);
