@@ -18,7 +18,7 @@ import {
   InpageTitle,
   InpageBody,
   InpageBodyInner
-} from '../common/Inpage';
+} from '../common/inpage';
 import Button from '../../styles/button/button';
 import Form from '../../styles/form/form';
 import FormInput from '../../styles/form/input';
