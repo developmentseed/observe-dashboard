@@ -177,7 +177,7 @@ class Photos extends React.Component {
       ownerDisplayName,
       location,
       bearing,
-      osmObjects,
+      osmElement,
       createdAt,
       uploadedAt
     } = photo;
@@ -221,23 +221,17 @@ class Photos extends React.Component {
           <p>{featureToCoords(location)}</p>
           <FormLabel>Bearing</FormLabel>
           <p>{bearing}</p>
-          <FormLabel>OSM Objects</FormLabel>
-          {osmObjects && osmObjects.length > 0 ? (
-            <ul>
-              {osmObjects.map((o, i) => (
-                <li key={o}>
-                  <a
-                    href={`${osmUrl}/${o}`}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                  >
-                    {o}
-                  </a>
-                </li>
-              ))}
-            </ul>
+          <FormLabel>OSM Element</FormLabel>
+          {osmElement ? (
+            <a
+              target='_blank'
+              rel='noopener noreferrer'
+              href={`${osmUrl}/${osmElement}`}
+            >
+              {osmElement}
+            </a>
           ) : (
-            <p>No assigned objects</p>
+            <p>Unassigned.</p>
           )}
           <FormLabel>Created at</FormLabel>
           <p>{formatDateTimeExtended(createdAt)}</p>
