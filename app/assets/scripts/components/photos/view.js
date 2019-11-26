@@ -6,6 +6,7 @@ import { environment, osmUrl } from '../../config';
 import { featureToCoords, formatDateTimeExtended } from '../../utils';
 import { wrapApiResult, getFromState, deleteItem } from '../../redux/utils';
 import * as actions from '../../redux/actions/photos';
+import { saveAs } from 'file-saver';
 
 import App from '../common/app';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
@@ -164,7 +165,7 @@ class Photos extends React.Component {
       <PhotoBox>
         <img
           alt={`Photo {photo.id}`}
-          src='https://via.placeholder.com/800x600'
+          src={photo.urls.default}
         />
       </PhotoBox>
     );
@@ -265,7 +266,7 @@ class Photos extends React.Component {
   }
 
   renderActionButtons (photo) {
-    const { ownerId, description } = photo;
+    const { ownerId, description, urls } = photo;
     const { osmId: userId, isAdmin } = this.props.authenticatedUser.getData();
 
     return (
@@ -295,6 +296,10 @@ class Photos extends React.Component {
           useIcon='download'
           variation='primary-raised-dark'
           size='xlarge'
+          onClick={e => {
+            e.preventDefault();
+            saveAs(urls.full, urls.full.split('/').pop());
+          }}
         >
           Download
         </Button>
