@@ -49,6 +49,7 @@ export const InpageBackLink = styled(Link)`
   display:flex;
   position: relative;
   top: -0.5rem;
+  text-decoration: none;
   &:before{
     ${collecticon('chevron-left--small')};
   }
