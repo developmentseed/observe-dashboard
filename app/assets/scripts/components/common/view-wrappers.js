@@ -31,9 +31,6 @@ export const Infobox = styled.div`
       list-style: none;
       margin: 0;
     }
-    a {
-      text-decoration: underline;
-    }
   }
 `;
 
