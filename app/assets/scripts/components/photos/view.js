@@ -6,6 +6,7 @@ import { environment, osmUrl } from '../../config';
 import { featureToCoords, formatDateTimeExtended } from '../../utils';
 import { wrapApiResult, getFromState, deleteItem } from '../../redux/utils';
 import * as actions from '../../redux/actions/photos';
+import { saveAs } from 'file-saver';
 
 import App from '../common/app';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
@@ -164,7 +165,7 @@ class Photos extends React.Component {
       <PhotoBox>
         <img
           alt={`Photo {photo.id}`}
-          src='https://via.placeholder.com/800x600'
+          src={photo.urls.default}
         />
       </PhotoBox>
     );
@@ -177,7 +178,7 @@ class Photos extends React.Component {
       ownerDisplayName,
       location,
       bearing,
-      osmObjects,
+      osmElement,
       createdAt,
       uploadedAt
     } = photo;
@@ -221,23 +222,17 @@ class Photos extends React.Component {
           <p>{featureToCoords(location)}</p>
           <FormLabel>Bearing</FormLabel>
           <p>{bearing}</p>
-          <FormLabel>OSM Objects</FormLabel>
-          {osmObjects && osmObjects.length > 0 ? (
-            <ul>
-              {osmObjects.map((o, i) => (
-                <li key={o}>
-                  <a
-                    href={`${osmUrl}/${o}`}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                  >
-                    {o}
-                  </a>
-                </li>
-              ))}
-            </ul>
+          <FormLabel>OSM Element</FormLabel>
+          {osmElement ? (
+            <a
+              target='_blank'
+              rel='noopener noreferrer'
+              href={`${osmUrl}/${osmElement}`}
+            >
+              {osmElement}
+            </a>
           ) : (
-            <p>No assigned objects</p>
+            <p>Unassigned.</p>
           )}
           <FormLabel>Created at</FormLabel>
           <p>{formatDateTimeExtended(createdAt)}</p>
@@ -271,7 +266,7 @@ class Photos extends React.Component {
   }
 
   renderActionButtons (photo) {
-    const { ownerId, description } = photo;
+    const { ownerId, description, urls } = photo;
     const { osmId: userId, isAdmin } = this.props.authenticatedUser.getData();
 
     return (
@@ -301,6 +296,10 @@ class Photos extends React.Component {
           useIcon='download'
           variation='primary-raised-dark'
           size='xlarge'
+          onClick={e => {
+            e.preventDefault();
+            saveAs(urls.full, urls.full.split('/').pop());
+          }}
         >
           Download
         </Button>

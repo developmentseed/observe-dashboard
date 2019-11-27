@@ -28,6 +28,9 @@ const PageHeadInner = styled.div`
   align-items: center;
   justify-content: space-between;
   min-width: 100%;
+  a {
+    text-decoration: none;
+  }
 `;
 
 const PageTitle = styled.h1`

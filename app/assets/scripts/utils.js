@@ -33,10 +33,7 @@ export function startCoordinate (feature) {
  * @param {string} date Date as ISO string
  */
 export function formatDateTimeExtended (date) {
-  return new Date(date).toLocaleDateString('en-GB', {
-    dateStyle: 'long',
-    timeStyle: 'short'
-  });
+  return new Date(date).toString();
 }
 
 /**

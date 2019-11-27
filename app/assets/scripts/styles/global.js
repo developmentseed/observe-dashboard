@@ -43,7 +43,6 @@ const baseStyles = css`
   a {
     cursor: pointer;
     color: ${themeVal('color.link')};
-    text-decoration: none;
     transition: opacity 0.24s ease 0s;
   }
   a:visited {
