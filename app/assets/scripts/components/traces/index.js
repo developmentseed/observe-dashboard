@@ -4,10 +4,11 @@ import { Link } from 'react-router-dom';
 import { PropTypes as T } from 'prop-types';
 import styled from 'styled-components';
 import get from 'lodash.get';
-import { environment } from '../../config';
+import { environment, pageLimit } from '../../config';
 import * as actions from '../../redux/actions/traces';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 import { handleExportToJosm, downloadTrace } from './utils';
+import QsState from '../../utils/qs-state';
 
 import App from '../common/app';
 import { confirmDeleteItem } from '../common/confirmation-prompt';
@@ -50,10 +51,31 @@ class Traces extends React.Component {
       traceLength: {
         min: 0,
         max: 100
+      filterIsTouched: false,
+      page: 1,
+      limit: pageLimit,
+      filterValues: {
+        username: ''
       }
     };
 
     this.updateData = this.updateData.bind(this);
+    this.handleFilterChange = this.handleFilterChange.bind(this);
+    this.handleFilterSubmit = this.handleFilterSubmit.bind(this);
+    this.renderResults = this.renderResults.bind(this);
+
+    // Setup the qsState for url state management.
+    this.qsState = new QsState({
+      page: {
+        accessor: 'page'
+      },
+      limit: {
+        accessor: 'limit'
+      },
+      username: {
+        accessor: 'filterValues.username'
+      }
+    });
   }
 
   async componentDidMount () {
@@ -71,6 +93,37 @@ class Traces extends React.Component {
     const searchParams = this.props.location.search;
     await this.props.fetchTraces(searchParams);
     hideGlobalLoading();
+  }
+
+  handleFilterSubmit (e) {
+    e.preventDefault();
+
+    const { filterIsTouched } = this.state;
+    if (filterIsTouched) {
+      this.updateData();
+    }
+  }
+
+  handleFilterChange (e) {
+    e.preventDefault();
+
+    // Get id/value pair from event
+    const { id, value } = e.target;
+
+    const currentValue = this.state.filterValues[id];
+
+    // Filter values haven't changed, return
+    if (currentValue === value) return;
+
+    // Update value and marked is filters as touched
+    const { filterValues } = this.state;
+    this.setState({
+      filterIsTouched: true,
+      filterValues: {
+        ...filterValues,
+        [id]: value
+      }
+    });
   }
 
   async deleteTrace (e, traceId) {
@@ -117,16 +170,19 @@ class Traces extends React.Component {
 
   renderFilters () {
     return (
-      <Form>
+      <Form onSubmit={this.handleFilterSubmit}>
         <FilterToolbar>
           <InputWrapper>
-            <FilterLabel htmlFor='userSearch'>Search by user</FilterLabel>
+            <FilterLabel htmlFor='username'>Search by user</FilterLabel>
             <InputWithIcon
               type='text'
-              id='userSearch'
-              placeholder='User Name'
+              id='username'
+              placeholder='User name'
+              onChange={this.handleFilterChange}
+              autoFocus
+              autoComplete='off'
             />
-            <InputIcon htmlFor='userSearch' useIcon='magnifier-left' />
+            <InputIcon htmlFor='username' useIcon='magnifier-left' />
           </InputWrapper>
           <InputWrapper>
             <FilterLabel htmlFor='startDate'>Start Date</FilterLabel>
@@ -174,10 +230,33 @@ class Traces extends React.Component {
       );
     }
 
+    // Get page indexes
+    const firstPage = 1;
+    const lastPage = meta.pageCount;
+    const currentPage = meta.page;
+    const previousPage =
+      currentPage - 1 < firstPage ? firstPage : currentPage - 1;
+    const nextPage = currentPage + 1 > lastPage ? lastPage : currentPage + 1;
+
+    const getQs = page =>
+      this.qsState.getQs({
+        ...this.state,
+        page
+      });
+
     return (
       <>
         {this.renderTable()}
-        <Pagination pathname='/traces' meta={meta} />
+        <Pagination
+          pathname='/traces'
+          meta={{
+            ...meta,
+            first: getQs(firstPage),
+            previous: getQs(previousPage),
+            next: getQs(nextPage),
+            last: getQs(lastPage)
+          }}
+        />
       </>
     );
   }
