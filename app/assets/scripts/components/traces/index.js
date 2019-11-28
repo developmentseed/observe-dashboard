@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { PropTypes as T } from 'prop-types';
-import styled from 'styled-components';
 import get from 'lodash.get';
 import { environment, pageLimit } from '../../config';
 import * as actions from '../../redux/actions/traces';
@@ -23,7 +22,6 @@ import {
 } from '../common/inpage';
 import Button from '../../styles/button/button';
 import Form from '../../styles/form/form';
-import FormInput from '../../styles/form/input';
 import {
   FilterToolbar,
   InputWrapper,
@@ -35,27 +33,16 @@ import DataTable from '../../styles/table';
 import Pagination from '../../styles/button/pagination';
 import Prose from '../../styles/type/prose';
 import { wrapApiResult } from '../../redux/utils';
-import Dropdown from '../common/dropdown';
-import RangeSlider from '../common/range-slider';
-
-const DropSlider = styled(Dropdown)`
-  max-width: 24rem;
-  padding-bottom: 2rem;
-`;
 
 class Traces extends React.Component {
   constructor (props) {
     super(props);
 
     this.state = {
-      traceLength: {
-        min: 0,
-        max: 100
-      filterIsTouched: false,
       page: 1,
       limit: pageLimit,
+      filterIsTouched: false,
       filterValues: {
-        username: ''
       }
     };
 
@@ -80,6 +67,12 @@ class Traces extends React.Component {
       },
       endDate: {
         accessor: 'filterValues.endDate'
+      },
+      lengthMin: {
+        accessor: 'filterValues.lengthMin'
+      },
+      lengthMax: {
+        accessor: 'filterValues.lengthMax'
       }
     });
   }
@@ -189,7 +182,7 @@ class Traces extends React.Component {
   }
 
   renderFilters () {
-    const { username, startDate, endDate } = this.state.filterValues;
+    const { username, startDate, endDate, lengthMin, lengthMax } = this.state.filterValues;
 
     return (
       <Form onSubmit={this.handleFilterSubmit}>
@@ -232,25 +225,24 @@ class Traces extends React.Component {
             <InputIcon htmlFor='endDate' useIcon='calendar' />
           </InputWrapper>
           <InputWrapper>
-            <FilterLabel htmlFor='length'>Trace Length</FilterLabel>
-            <DropSlider
-              ref={this.dropRef}
-              alignment='left'
-              direction='down'
-              triggerElement={
-                <FormInput type='select' id='length' placeholder='Length' />
-              }
-            >
-              <Form>
-                <RangeSlider
-                  min={0}
-                  max={100}
-                  id='trace-length'
-                  value={this.state.traceLength}
-                  onChange={v => this.setState({ traceLength: v })}
-                />
-              </Form>
-            </DropSlider>
+            <FilterLabel htmlFor='lengthMin'>Min. Length</FilterLabel>
+            <InputWithIcon
+              type='number'
+              id='lengthMin'
+              value={lengthMin}
+              onChange={this.handleFilterChange}
+            />
+            <InputIcon htmlFor='lengthMin' useIcon='calendar' />
+          </InputWrapper>
+          <InputWrapper>
+            <FilterLabel htmlFor='lengthMax'>Max. Length</FilterLabel>
+            <InputWithIcon
+              type='number'
+              id='lengthMax'
+              value={lengthMax}
+              onChange={this.handleFilterChange}
+            />
+            <InputIcon htmlFor='lengthMin' useIcon='calendar' />
           </InputWrapper>
         </FilterToolbar>
       </Form>
