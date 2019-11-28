@@ -177,7 +177,7 @@ class Photos extends React.Component {
       description,
       ownerDisplayName,
       location,
-      bearing,
+      heading,
       osmElement,
       createdAt,
       uploadedAt
@@ -220,8 +220,8 @@ class Photos extends React.Component {
           </p>
           <FormLabel>Location</FormLabel>
           <p>{featureToCoords(location)}</p>
-          <FormLabel>Bearing</FormLabel>
-          <p>{bearing}</p>
+          <FormLabel>Heading</FormLabel>
+          <p>{heading}°</p>
           <FormLabel>OSM Element</FormLabel>
           {osmElement ? (
             <a
