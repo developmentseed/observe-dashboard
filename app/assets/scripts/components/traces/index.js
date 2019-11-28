@@ -79,6 +79,13 @@ class Traces extends React.Component {
   }
 
   async componentDidMount () {
+    // Load location search into state
+    let qsState = this.qsState.getState(this.props.location.search.substr(1));
+    Object.keys(qsState).forEach(k => {
+      if (qsState[k] === undefined) delete qsState[k];
+    });
+    this.setState(qsState);
+
     await this.updateData();
   }
 
@@ -100,6 +107,13 @@ class Traces extends React.Component {
 
     const { filterIsTouched } = this.state;
     if (filterIsTouched) {
+      // When making new query, reset to page one
+      this.setState({ page: 1, filterIsTouched: false });
+
+      // Update location.
+      const qString = this.qsState.getQs(this.state);
+      this.props.history.push({ search: qString });
+
       this.updateData();
     }
   }
@@ -169,6 +183,8 @@ class Traces extends React.Component {
   }
 
   renderFilters () {
+    const { username } = this.state.filterValues;
+
     return (
       <Form onSubmit={this.handleFilterSubmit}>
         <FilterToolbar>
@@ -179,10 +195,15 @@ class Traces extends React.Component {
               id='username'
               placeholder='User name'
               onChange={this.handleFilterChange}
+              value={username}
               autoFocus
               autoComplete='off'
             />
-            <InputIcon htmlFor='username' useIcon='magnifier-left' />
+            <InputIcon
+              htmlFor='username'
+              useIcon='magnifier-left'
+              onClick={this.handleFilterSubmit}
+            />
           </InputWrapper>
           <InputWrapper>
             <FilterLabel htmlFor='startDate'>Start Date</FilterLabel>
@@ -370,6 +391,7 @@ if (environment !== 'production') {
     accessToken: T.string,
     fetchTraces: T.func,
     traces: T.object,
+    history: T.object,
     location: T.object,
     deleteTrace: T.func
   };
