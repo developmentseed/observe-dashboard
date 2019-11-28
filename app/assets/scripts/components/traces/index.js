@@ -74,6 +74,12 @@ class Traces extends React.Component {
       },
       username: {
         accessor: 'filterValues.username'
+      },
+      startDate: {
+        accessor: 'filterValues.startDate'
+      },
+      endDate: {
+        accessor: 'filterValues.endDate'
       }
     });
   }
@@ -183,7 +189,7 @@ class Traces extends React.Component {
   }
 
   renderFilters () {
-    const { username } = this.state.filterValues;
+    const { username, startDate, endDate } = this.state.filterValues;
 
     return (
       <Form onSubmit={this.handleFilterSubmit}>
@@ -207,12 +213,22 @@ class Traces extends React.Component {
           </InputWrapper>
           <InputWrapper>
             <FilterLabel htmlFor='startDate'>Start Date</FilterLabel>
-            <InputWithIcon type='date' id='startDate' />
+            <InputWithIcon
+              type='date'
+              id='startDate'
+              value={startDate}
+              onChange={this.handleFilterChange}
+            />
             <InputIcon htmlFor='startDate' useIcon='calendar' />
           </InputWrapper>
           <InputWrapper>
             <FilterLabel htmlFor='endDate'>End Date</FilterLabel>
-            <InputWithIcon type='date' id='endDate' placeholder='End date' />
+            <InputWithIcon
+              type='date'
+              id='endDate'
+              value={endDate}
+              onChange={this.handleFilterChange}
+            />
             <InputIcon htmlFor='endDate' useIcon='calendar' />
           </InputWrapper>
           <InputWrapper>
