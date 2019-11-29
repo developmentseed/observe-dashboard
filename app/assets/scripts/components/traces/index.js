@@ -42,8 +42,7 @@ class Traces extends React.Component {
       page: 1,
       limit: pageLimit,
       filterIsTouched: false,
-      filterValues: {
-      }
+      filterValues: {}
     };
 
     this.updateData = this.updateData.bind(this);
@@ -102,8 +101,6 @@ class Traces extends React.Component {
   }
 
   handleFilterSubmit (e) {
-    e.preventDefault();
-
     const { filterIsTouched } = this.state;
     if (filterIsTouched) {
       // When making new query, reset to page one
@@ -118,8 +115,6 @@ class Traces extends React.Component {
   }
 
   handleFilterChange (e) {
-    e.preventDefault();
-
     // Get id/value pair from event
     const { id, value } = e.target;
 
@@ -182,10 +177,23 @@ class Traces extends React.Component {
   }
 
   renderFilters () {
-    const { username, startDate, endDate, lengthMin, lengthMax } = this.state.filterValues;
+    const {
+      username,
+      startDate,
+      endDate,
+      lengthMin,
+      lengthMax
+    } = this.state.filterValues;
+
+    const submitOnEnter = e => {
+      if (e.key === 'Enter') {
+        this.handleFilterChange(e);
+        this.handleFilterSubmit();
+      }
+    };
 
     return (
-      <Form onSubmit={this.handleFilterSubmit}>
+      <Form>
         <FilterToolbar>
           <InputWrapper>
             <FilterLabel htmlFor='username'>Search by user</FilterLabel>
@@ -194,14 +202,10 @@ class Traces extends React.Component {
               id='username'
               placeholder='User name'
               onChange={this.handleFilterChange}
+              onKeyDown={submitOnEnter}
               value={username}
               autoFocus
               autoComplete='off'
-            />
-            <InputIcon
-              htmlFor='username'
-              useIcon='magnifier-left'
-              onClick={this.handleFilterSubmit}
             />
           </InputWrapper>
           <InputWrapper>
@@ -210,6 +214,7 @@ class Traces extends React.Component {
               type='date'
               id='startDate'
               value={startDate}
+              onKeyDown={submitOnEnter}
               onChange={this.handleFilterChange}
             />
             <InputIcon htmlFor='startDate' useIcon='calendar' />
@@ -220,30 +225,40 @@ class Traces extends React.Component {
               type='date'
               id='endDate'
               value={endDate}
+              onKeyDown={submitOnEnter}
               onChange={this.handleFilterChange}
             />
             <InputIcon htmlFor='endDate' useIcon='calendar' />
           </InputWrapper>
           <InputWrapper>
-            <FilterLabel htmlFor='lengthMin'>Min. Length</FilterLabel>
+            <FilterLabel htmlFor='lengthMin'>From length</FilterLabel>
             <InputWithIcon
               type='number'
               id='lengthMin'
               value={lengthMin}
+              placeholder='Min. value'
+              onKeyDown={submitOnEnter}
               onChange={this.handleFilterChange}
             />
-            <InputIcon htmlFor='lengthMin' useIcon='calendar' />
           </InputWrapper>
           <InputWrapper>
-            <FilterLabel htmlFor='lengthMax'>Max. Length</FilterLabel>
+            <FilterLabel htmlFor='lengthMax'>To length</FilterLabel>
             <InputWithIcon
               type='number'
               id='lengthMax'
+              placeholder='Max. value'
               value={lengthMax}
+              onKeyDown={submitOnEnter}
               onChange={this.handleFilterChange}
             />
-            <InputIcon htmlFor='lengthMin' useIcon='calendar' />
           </InputWrapper>
+          <Button
+            size='small'
+            variation='primary-raised-dark'
+            onClick={this.handleFilterSubmit}
+          >
+            Apply filters
+          </Button>
         </FilterToolbar>
       </Form>
     );
