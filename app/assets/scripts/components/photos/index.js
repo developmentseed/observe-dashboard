@@ -251,10 +251,34 @@ class Photos extends React.Component {
       );
     }
 
+    // Get page indexes
+    const firstPage = 1;
+    const lastPage = meta.pageCount;
+    const currentPage = meta.page;
+    const previousPage =
+      currentPage - 1 < firstPage ? firstPage : currentPage - 1;
+    const nextPage = currentPage + 1 > lastPage ? lastPage : currentPage + 1;
+
+    // Get querystring by merging with state to keep filters
+    const getQs = page =>
+      this.qsState.getQs({
+        ...this.state,
+        page
+      });
+
     return (
       <>
         {this.renderTable()}
-        <Pagination pathname='/photos' meta={meta} />
+        <Pagination
+          pathname='/photos'
+          meta={{
+            ...meta,
+            first: getQs(firstPage),
+            previous: getQs(previousPage),
+            next: getQs(nextPage),
+            last: getQs(lastPage)
+          }}
+        />
       </>
     );
   }
