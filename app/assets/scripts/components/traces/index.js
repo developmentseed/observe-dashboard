@@ -253,7 +253,6 @@ class Traces extends React.Component {
             />
           </InputWrapper>
           <Button
-            size='small'
             variation='primary-raised-dark'
             onClick={this.handleFilterSubmit}
           >

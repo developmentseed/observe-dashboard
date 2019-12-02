@@ -6,7 +6,7 @@ import collecticon from '../collecticons';
 import { themeVal } from '../utils/general';
 
 export const FilterToolbar = styled(FormToolbar)`
-/* stylelint-disable-next-line */
+  align-items: flex-end;
 `;
 
 export const InputWrapper = styled.div`
