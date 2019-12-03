@@ -1,12 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { PropTypes as T } from 'prop-types';
+import * as yup from 'yup';
 import { Link } from 'react-router-dom';
 import { environment, osmUrl, pageLimit } from '../../config';
 import * as actions from '../../redux/actions/photos';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 import DataTable from '../../styles/table';
 import QsState from '../../utils/qs-state';
+import toasts from '../common/toasts';
 
 import App from '../common/app';
 import {
@@ -35,6 +37,29 @@ import { featureToCoords } from '../../utils';
 import FormInput from '../../styles/form/input';
 import Button from '../../styles/button/button';
 
+const filterSchema = yup.object().shape({
+  username: yup.string().typeError('Username must be a string.'),
+  startDate: yup.date().typeError('Invalid start date.'),
+  endDate: yup.date().typeError('Invalid start date.'),
+  osmElementType: yup.string().typeError('Invalid OSM element type.'),
+  osmElementId: yup
+    .number()
+    .integer('OSM element id must be a integer.')
+    .typeError('OSM element id must be a integer.')
+});
+
+const paramsSchema = yup.object().shape({
+  page: yup
+    .number()
+    .integer('Page must be a integer.')
+    .typeError('Page must be a integer.'),
+  limit: yup
+    .number()
+    .integer('Page must be a integer.')
+    .typeError('Page must be a integer.'),
+  filterValues: filterSchema
+});
+
 class Photos extends React.Component {
   constructor (props) {
     super(props);
@@ -42,7 +67,6 @@ class Photos extends React.Component {
     this.state = {
       page: 1,
       limit: pageLimit,
-      filterIsTouched: false,
       filterValues: {}
     };
 
@@ -53,7 +77,8 @@ class Photos extends React.Component {
     // Setup the qsState for url state management.
     this.qsState = new QsState({
       page: {
-        accessor: 'page'
+        accessor: 'page',
+        default: 1
       },
       limit: {
         accessor: 'limit'
@@ -95,23 +120,29 @@ class Photos extends React.Component {
 
   async updateData () {
     showGlobalLoading();
-    const searchParams = this.props.location.search;
-    await this.props.fetchPhotos(searchParams);
+
+    // Get search string
+    const searchString = this.props.location.search;
+
+    // Validate passed params
+    const params = this.qsState.getState(this.props.location.search);
+    try {
+      await paramsSchema.validate(params);
+    } catch (error) {
+      toasts.error(error.message);
+    }
+
+    // Fetch data
+    await this.props.fetchPhotos(searchString);
     hideGlobalLoading();
   }
 
   handleFilterSubmit (e) {
-    const { filterIsTouched } = this.state;
-    if (filterIsTouched) {
-      // When making new query, reset to page one
-      this.setState({ page: 1, filterIsTouched: false });
+    this.setState({ page: 1 });
 
-      // Update location.
-      const qString = this.qsState.getQs(this.state);
-      this.props.history.push({ search: qString });
-
-      this.updateData();
-    }
+    // Update location.
+    const qString = this.qsState.getQs(this.state);
+    this.props.history.push({ search: qString });
   }
 
   handleFilterChange (e) {
@@ -126,7 +157,6 @@ class Photos extends React.Component {
     // Update value and marked is filters as touched
     const { filterValues } = this.state;
     this.setState({
-      filterIsTouched: true,
       filterValues: {
         ...filterValues,
         [id]: value
@@ -138,12 +168,15 @@ class Photos extends React.Component {
     const { isReady, hasError } = this.props.photos;
 
     if (!isReady()) return null;
-    if (hasError()) return <p>Something went wrong. Try again.</p>;
 
     return (
       <>
         {this.renderFilters()}
-        {this.renderResults()}
+        {hasError() ? (
+          <p>Something went wrong. Try again.</p>
+        ) : (
+          this.renderResults()
+        )}
       </>
     );
   }
