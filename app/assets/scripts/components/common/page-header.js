@@ -135,7 +135,7 @@ class PageHeader extends React.Component {
       <PageHead>
         <PageHeadInner>
           <PageTitle>
-            <Link to='/' title='Go to Dashboard'>
+            <Link to='' title='Go to Dashboard'>
               <ObserveIcon />
               {this.props.pageTitle}
               <span>API Dashboard</span>
@@ -149,7 +149,7 @@ class PageHeader extends React.Component {
                     <GlobalMenuLink
                       as={NavLinkFilter}
                       exact
-                      to='/traces'
+                      to='traces'
                       useIcon='chart-line'
                       title='View traces page'
                     >
@@ -160,7 +160,7 @@ class PageHeader extends React.Component {
                     <GlobalMenuLink
                       as={NavLinkFilter}
                       exact
-                      to='/photos'
+                      to='photos'
                       useIcon='camera'
                       title='View photos page'
                     >
@@ -183,7 +183,7 @@ class PageHeader extends React.Component {
                       as={NavLinkFilter}
                       exact
                       useIcon='logout'
-                      to='/logout'
+                      to='logout'
                       title='Proceed to logout'
                     >
                       <span>Logout</span>

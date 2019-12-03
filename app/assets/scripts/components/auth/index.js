@@ -1,7 +1,7 @@
 /* eslint-disable react/no-access-state-in-setstate */
 import React from 'react';
 import { connect } from 'react-redux';
-import { environment, apiUrl, baseUrl } from '../../config';
+import { environment, apiUrl, appPathname } from '../../config';
 import { Inpage, InpageBody } from '../common/inpage';
 import * as authActions from '../../redux/actions/auth';
 import { PropTypes as T } from 'prop-types';
@@ -51,14 +51,14 @@ class Login extends React.Component {
 
     // Open API login route in popup window to start OAuth
     window.open(
-      `${apiUrl}/login?redirect=${baseUrl}/login/redirect`,
+      `${apiUrl}/login?redirect=${window.location.origin}${appPathname}/login/redirect`,
       'oauth_window',
       settings
     );
   }
 
   renderRedirectToIndex () {
-    return <Redirect to='/' />;
+    return <Redirect to='' />;
   }
 
   renderContent () {

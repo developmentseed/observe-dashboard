@@ -1,5 +1,6 @@
 'use strict';
 
 export default {
-  environment: 'production'
+  environment: 'production',
+  appPathname: '/observe'
 };
