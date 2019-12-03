@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { PropTypes as T } from 'prop-types';
 import { rgba } from 'polished';
 import { connect } from 'react-redux';
-import config from '../../config';
 import { wrapApiResult } from '../../redux/utils';
 import { Link, NavLink } from 'react-router-dom';
 import { themeVal, stylizeFunction } from '../../styles/utils/general';
@@ -141,30 +140,6 @@ class PageHeader extends React.Component {
           </PageTitle>
           <PageNav>
             <GlobalMenu>
-              {config.environment !== 'production' && (
-                <li>
-                  <GlobalMenuLink
-                    as={NavLinkFilter}
-                    exact
-                    useIcon='brand-development-seed-2'
-                    to='/sandbox'
-                    title='View sandbox page'
-                  >
-                    <span>Sandbox</span>
-                  </GlobalMenuLink>
-                </li>
-              )}
-              <li>
-                <GlobalMenuLink
-                  as={NavLinkFilter}
-                  exact
-                  useIcon='circle-information'
-                  to='/about'
-                  title='View about page'
-                >
-                  <span>About</span>
-                </GlobalMenuLink>
-              </li>
               {!isLogged ? (
                 <li>
                   <GlobalMenuLink
@@ -199,6 +174,17 @@ class PageHeader extends React.Component {
                       title='View photos page'
                     >
                       <span>Photos</span>
+                    </GlobalMenuLink>
+                  </li>
+                  <li>
+                    <GlobalMenuLink
+                      as={NavLinkFilter}
+                      exact
+                      to='/users'
+                      useIcon='user'
+                      title='View users page'
+                    >
+                      <span>Users</span>
                     </GlobalMenuLink>
                   </li>
                   <li>

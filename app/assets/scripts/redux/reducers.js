@@ -19,6 +19,18 @@ const authenticatedUserReducer = baseAPIReducer(
 );
 
 /**
+ * USERS reducer
+ */
+const usersReducerInitialState = {
+  fetching: false,
+  fetched: false,
+  error: null,
+  data: []
+};
+
+const usersReducer = baseAPIReducer('USERS', usersReducerInitialState);
+
+/**
  * TRACES reducer
  */
 const tracesReducerInitialState = {
@@ -115,6 +127,7 @@ function photoReducer (state = photoReducerInitialState, action) {
  */
 export default combineReducers({
   authenticatedUser: authenticatedUserReducer,
+  users: usersReducer,
   traces: tracesReducer,
   photos: photosReducer,
   individualTraces: traceReducer,
