@@ -253,7 +253,7 @@ class Photos extends React.Component {
           <InputWrapper>
             <FilterLabel htmlFor='username'>OSM Element Id</FilterLabel>
             <FormInput
-              type='text'
+              type='number'
               id='osmElementId'
               placeholder='OSM id'
               onChange={this.handleFilterChange}
