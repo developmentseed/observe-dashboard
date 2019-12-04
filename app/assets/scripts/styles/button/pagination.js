@@ -4,7 +4,6 @@ import Button from './button';
 import { PropTypes as T } from 'prop-types';
 import Link from '../../components/common/link';
 import { environment } from '../../config';
-import { getSearchParams } from '../../utils';
 
 const Pager = styled.ul`
   display: flex;
@@ -28,7 +27,7 @@ const Pagination = ({ pathname, meta }) => {
           as={Link}
           useIcon='chevron-left-trail--small'
           variation='base-raised-semidark'
-          to={`${pathname}?${getSearchParams(first)}`}
+          to={`${pathname}?${first}`}
           hideText
           disabled={page === 1}
         >
@@ -40,9 +39,9 @@ const Pagination = ({ pathname, meta }) => {
           as={Link}
           useIcon='chevron-left--small'
           variation='base-raised-semidark'
-          to={`${pathname}?${getSearchParams(previous)}`}
+          to={`${pathname}?${previous}`}
           hideText
-          disabled={!previous}
+          disabled={page === 1}
         >
           <span>previous</span>
         </Button>
@@ -55,9 +54,9 @@ const Pagination = ({ pathname, meta }) => {
           as={Link}
           useIcon='chevron-right--small'
           variation='base-raised-semidark'
-          to={`${pathname}?${getSearchParams(next)}`}
+          to={`${pathname}?${next}`}
           hideText
-          disabled={!next}
+          disabled={page === pageCount}
         >
           <span>next</span>
         </Button>
@@ -67,7 +66,7 @@ const Pagination = ({ pathname, meta }) => {
           as={Link}
           useIcon='chevron-right-trail--small'
           variation='base-raised-semidark'
-          to={`${pathname}?${getSearchParams(last)}`}
+          to={`${pathname}?${last}`}
           hideText
           disabled={page === pageCount}
         >

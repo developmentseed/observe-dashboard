@@ -2,12 +2,12 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { PropTypes as T } from 'prop-types';
-import styled from 'styled-components';
 import get from 'lodash.get';
-import { environment } from '../../config';
+import { environment, pageLimit } from '../../config';
 import * as actions from '../../redux/actions/traces';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 import { handleExportToJosm, downloadTrace } from './utils';
+import QsState from '../../utils/qs-state';
 
 import App from '../common/app';
 import { confirmDeleteItem } from '../common/confirmation-prompt';
@@ -22,7 +22,6 @@ import {
 } from '../common/inpage';
 import Button from '../../styles/button/button';
 import Form from '../../styles/form/form';
-import FormInput from '../../styles/form/input';
 import {
   FilterToolbar,
   InputWrapper,
@@ -34,29 +33,57 @@ import DataTable from '../../styles/table';
 import Pagination from '../../styles/button/pagination';
 import Prose from '../../styles/type/prose';
 import { wrapApiResult } from '../../redux/utils';
-import Dropdown from '../common/dropdown';
-import RangeSlider from '../common/range-slider';
-
-const DropSlider = styled(Dropdown)`
-  max-width: 24rem;
-  padding-bottom: 2rem;
-`;
 
 class Traces extends React.Component {
   constructor (props) {
     super(props);
 
     this.state = {
-      traceLength: {
-        min: 0,
-        max: 100
-      }
+      page: 1,
+      limit: pageLimit,
+      filterIsTouched: false,
+      filterValues: {}
     };
 
     this.updateData = this.updateData.bind(this);
+    this.handleFilterChange = this.handleFilterChange.bind(this);
+    this.handleFilterSubmit = this.handleFilterSubmit.bind(this);
+    this.renderResults = this.renderResults.bind(this);
+
+    // Setup the qsState for url state management.
+    this.qsState = new QsState({
+      page: {
+        accessor: 'page'
+      },
+      limit: {
+        accessor: 'limit'
+      },
+      username: {
+        accessor: 'filterValues.username'
+      },
+      startDate: {
+        accessor: 'filterValues.startDate'
+      },
+      endDate: {
+        accessor: 'filterValues.endDate'
+      },
+      lengthMin: {
+        accessor: 'filterValues.lengthMin'
+      },
+      lengthMax: {
+        accessor: 'filterValues.lengthMax'
+      }
+    });
   }
 
   async componentDidMount () {
+    // Load location search into state
+    let qsState = this.qsState.getState(this.props.location.search.substr(1));
+    Object.keys(qsState).forEach(k => {
+      if (qsState[k] === undefined) delete qsState[k];
+    });
+    this.setState(qsState);
+
     await this.updateData();
   }
 
@@ -71,6 +98,40 @@ class Traces extends React.Component {
     const searchParams = this.props.location.search;
     await this.props.fetchTraces(searchParams);
     hideGlobalLoading();
+  }
+
+  handleFilterSubmit (e) {
+    const { filterIsTouched } = this.state;
+    if (filterIsTouched) {
+      // When making new query, reset to page one
+      this.setState({ page: 1, filterIsTouched: false });
+
+      // Update location.
+      const qString = this.qsState.getQs(this.state);
+      this.props.history.push({ search: qString });
+
+      this.updateData();
+    }
+  }
+
+  handleFilterChange (e) {
+    // Get id/value pair from event
+    const { id, value } = e.target;
+
+    const currentValue = this.state.filterValues[id];
+
+    // Filter values haven't changed, return
+    if (currentValue === value) return;
+
+    // Update value and marked is filters as touched
+    const { filterValues } = this.state;
+    this.setState({
+      filterIsTouched: true,
+      filterValues: {
+        ...filterValues,
+        [id]: value
+      }
+    });
   }
 
   async deleteTrace (e, traceId) {
@@ -116,49 +177,87 @@ class Traces extends React.Component {
   }
 
   renderFilters () {
+    const {
+      username,
+      startDate,
+      endDate,
+      lengthMin,
+      lengthMax
+    } = this.state.filterValues;
+
+    const submitOnEnter = e => {
+      if (e.key === 'Enter') {
+        this.handleFilterChange(e);
+        this.handleFilterSubmit();
+      }
+    };
+
     return (
       <Form>
         <FilterToolbar>
           <InputWrapper>
-            <FilterLabel htmlFor='userSearch'>Search by user</FilterLabel>
+            <FilterLabel htmlFor='username'>Search by user</FilterLabel>
             <InputWithIcon
               type='text'
-              id='userSearch'
-              placeholder='User Name'
+              id='username'
+              placeholder='User name'
+              onChange={this.handleFilterChange}
+              onKeyDown={submitOnEnter}
+              value={username}
+              autoFocus
+              autoComplete='off'
             />
-            <InputIcon htmlFor='userSearch' useIcon='magnifier-left' />
           </InputWrapper>
           <InputWrapper>
             <FilterLabel htmlFor='startDate'>Start Date</FilterLabel>
-            <InputWithIcon type='date' id='startDate' />
+            <InputWithIcon
+              type='date'
+              id='startDate'
+              value={startDate}
+              onKeyDown={submitOnEnter}
+              onChange={this.handleFilterChange}
+            />
             <InputIcon htmlFor='startDate' useIcon='calendar' />
           </InputWrapper>
           <InputWrapper>
             <FilterLabel htmlFor='endDate'>End Date</FilterLabel>
-            <InputWithIcon type='date' id='endDate' placeholder='End date' />
+            <InputWithIcon
+              type='date'
+              id='endDate'
+              value={endDate}
+              onKeyDown={submitOnEnter}
+              onChange={this.handleFilterChange}
+            />
             <InputIcon htmlFor='endDate' useIcon='calendar' />
           </InputWrapper>
           <InputWrapper>
-            <FilterLabel htmlFor='length'>Trace Length</FilterLabel>
-            <DropSlider
-              ref={this.dropRef}
-              alignment='left'
-              direction='down'
-              triggerElement={
-                <FormInput type='select' id='length' placeholder='Length' />
-              }
-            >
-              <Form>
-                <RangeSlider
-                  min={0}
-                  max={100}
-                  id='trace-length'
-                  value={this.state.traceLength}
-                  onChange={v => this.setState({ traceLength: v })}
-                />
-              </Form>
-            </DropSlider>
+            <FilterLabel htmlFor='lengthMin'>From length</FilterLabel>
+            <InputWithIcon
+              type='number'
+              id='lengthMin'
+              value={lengthMin}
+              placeholder='Min. value'
+              onKeyDown={submitOnEnter}
+              onChange={this.handleFilterChange}
+            />
           </InputWrapper>
+          <InputWrapper>
+            <FilterLabel htmlFor='lengthMax'>To length</FilterLabel>
+            <InputWithIcon
+              type='number'
+              id='lengthMax'
+              placeholder='Max. value'
+              value={lengthMax}
+              onKeyDown={submitOnEnter}
+              onChange={this.handleFilterChange}
+            />
+          </InputWrapper>
+          <Button
+            variation='primary-raised-dark'
+            onClick={this.handleFilterSubmit}
+          >
+            Apply filters
+          </Button>
         </FilterToolbar>
       </Form>
     );
@@ -174,10 +273,33 @@ class Traces extends React.Component {
       );
     }
 
+    // Get page indexes
+    const firstPage = 1;
+    const lastPage = meta.pageCount;
+    const currentPage = meta.page;
+    const previousPage =
+      currentPage - 1 < firstPage ? firstPage : currentPage - 1;
+    const nextPage = currentPage + 1 > lastPage ? lastPage : currentPage + 1;
+
+    const getQs = page =>
+      this.qsState.getQs({
+        ...this.state,
+        page
+      });
+
     return (
       <>
         {this.renderTable()}
-        <Pagination pathname='/traces' meta={meta} />
+        <Pagination
+          pathname='/traces'
+          meta={{
+            ...meta,
+            first: getQs(firstPage),
+            previous: getQs(previousPage),
+            next: getQs(nextPage),
+            last: getQs(lastPage)
+          }}
+        />
       </>
     );
   }
@@ -291,6 +413,7 @@ if (environment !== 'production') {
     accessToken: T.string,
     fetchTraces: T.func,
     traces: T.object,
+    history: T.object,
     location: T.object,
     deleteTrace: T.func
   };

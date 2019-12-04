@@ -6,7 +6,14 @@ import collecticon from '../collecticons';
 import { themeVal } from '../utils/general';
 
 export const FilterToolbar = styled(FormToolbar)`
-/* stylelint-disable-next-line */
+  align-items: flex-end;
+
+  & input {
+    max-width: 11rem;
+  }
+  & > * {
+    margin-right: 1rem;
+  }
 `;
 
 export const InputWrapper = styled.div`
@@ -14,9 +21,6 @@ export const InputWrapper = styled.div`
   display: flex;
   flex-flow: column nowrap;
   justify-content: flex-end;
-  &:not(:first-child) {
-    margin-left: 1rem !important;
-  }
 `;
 
 export const InputWithIcon = styled(FormInput)`
