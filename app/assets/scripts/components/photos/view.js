@@ -151,7 +151,7 @@ class Photos extends React.Component {
     return (
       <>
         <InpageHeadline>
-          <InpageBackLink to='photos'>Back to photos</InpageBackLink>
+          <InpageBackLink to='/photos'>Back to photos</InpageBackLink>
           <InpageTitle>Photo {photo.id}</InpageTitle>
         </InpageHeadline>
         <ContentWrapper>

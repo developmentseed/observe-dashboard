@@ -197,7 +197,7 @@ class Traces extends React.Component {
     return (
       <>
         <InpageHeadline>
-          <InpageBackLink to='traces'>Back to traces</InpageBackLink>
+          <InpageBackLink to='/traces'>Back to traces</InpageBackLink>
           <InpageTitle>Trace {trace.id}</InpageTitle>
         </InpageHeadline>
         <ContentWrapper>
