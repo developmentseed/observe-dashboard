@@ -5,12 +5,13 @@
     <meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no' />
     <meta name='description' content='A dashboard to browse and manage Observe data.' />
 
+    <base href="/observe/">
     <!-- Twitter -->
     <meta name='twitter:card' content='summary' />
     <meta name='twitter:site' content='@developmentseed' />
     <meta name='twitter:title' content='Observe Dashboard' />
     <meta name='twitter:description' content='A dashboard to browse and manage Observe data.' />
-    <meta name='twitter:image:src' content='assets/graphics/meta/default-meta-image.png' />
+    <meta name='twitter:image:src' content='./assets/graphics/meta/default-meta-image.png' />
     <!--/ Twitter -->
 
     <!-- OG -->
@@ -19,16 +20,16 @@
     <meta property='og:url' content='' />
     <meta property='og:type' content='website' />
     <meta property='og:description' content='A dashboard to browse and manage Observe data.' />
-    <meta property='og:image' content='assets/graphics/meta/default-meta-image.png' />
+    <meta property='og:image' content='./assets/graphics/meta/default-meta-image.png' />
     <!--/ OG -->
 
-    <link rel='icon' type='image/png' sizes='96x96' href='assets/graphics/meta/favicon.png' />
-    <link rel='icon' type='image/png' sizes='192x192' href='assets/graphics/meta/android-chrome.png' />
-    <link rel='apple-touch-icon' sizes='180x180' href='assets/graphics/meta/apple-touch-icon.png' />
+    <link rel='icon' type='image/png' sizes='96x96' href='./assets/graphics/meta/favicon.png' />
+    <link rel='icon' type='image/png' sizes='192x192' href='./assets/graphics/meta/android-chrome.png' />
+    <link rel='apple-touch-icon' sizes='180x180' href='./assets/graphics/meta/apple-touch-icon.png' />
 
     <title>Observe Dashboard</title>
 
-    <!-- build:css assets/styles/vendor.css -->
+    <!-- build:css ./assets/styles/vendor.css -->
     <link rel="stylesheet" href="../node_modules/mapbox-gl/dist/mapbox-gl.css" />
     <link rel="stylesheet" href="../node_modules/react-input-range/lib/css/input-range/input-range.css" />
     <!-- endbuild -->
@@ -65,16 +66,16 @@
     <div id='app-container'>
       <!-- Content rendered here via React -->
       <h1 class='welcome-banner'>
-        <img src='assets/graphics/layout/ds-logo-pos.svg' alt='Development Seed banner' width='1440' height='320' />
+        <img src='./assets/graphics/layout/ds-logo-pos.svg' alt='Development Seed banner' width='1440' height='320' />
       </h1>
       <!-- Content rendered here via React -->
     </div>
 
-    <!-- build:js assets/scripts/vendor.js -->
+    <!-- build:js ./assets/scripts/vendor.js -->
     <script src='/assets/scripts/vendor.js'></script>
     <!-- endbuild -->
 
-    <!-- build:js assets/scripts/bundle.js -->
+    <!-- build:js ./assets/scripts/bundle.js -->
     <script src='/assets/scripts/bundle.js'></script>
     <!-- endbuild -->
   </body>

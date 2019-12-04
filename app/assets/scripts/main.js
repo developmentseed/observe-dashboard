@@ -4,10 +4,11 @@ import React from 'react';
 import { ThemeProvider } from 'styled-components';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
-import { Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import theme from './styles/theme/theme';
 
+import { appPathname } from './config';
 import store from './store';
 import history from './utils/history';
 
@@ -29,7 +30,7 @@ import { ToastContainerCustom } from './components/common/toasts';
 // Root component. Used by the router.
 const Root = () => (
   <Provider store={store}>
-    <Router history={history}>
+    <Router basename={appPathname} history={history}>
       <ThemeProvider theme={theme.main}>
         <ErrorBoundary>
           <GlobalStyles />
