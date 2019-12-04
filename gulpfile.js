@@ -44,7 +44,7 @@ if (process.env.CIRCLE_BRANCH) {
 // ------------------------- Helper functions --------------------------------//
 // ---------------------------------------------------------------------------//
 
-const isProd = () => process.env.NODE_ENV === 'production';
+const isProd = () => process.env.NODE_ENV !== 'development';
 const readPackage = () => JSON.parse(fs.readFileSync('package.json'));
 
 // /////////////////////////////////////////////////////////////////////////////
