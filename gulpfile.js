@@ -215,7 +215,12 @@ function finish () {
 // After being rendered by jekyll process the html files. (merge css files, etc)
 function html () {
   return gulp.src('app/*.html')
-    .pipe($.useref({ searchPath: ['.tmp', 'app', '.'] }))
+    .pipe($.useref({
+      searchPath: ['.tmp', 'app', '.'],
+      basepath: content => {
+        return (isProd()) ? '<base href="/observe/" />' : content;
+      }
+    }))
     .pipe(cacheUseref())
     // Do not compress comparisons, to avoid MapboxGLJS minification issue
     // https://github.com/mapbox/mapbox-gl-js/issues/4359#issuecomment-286277540
