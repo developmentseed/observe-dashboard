@@ -1,4 +1,4 @@
-import { fetchAuth } from '../utils';
+import { fetchAuth, patchItem } from '../utils';
 import { apiUrl } from '../../config';
 
 /*
@@ -33,4 +33,24 @@ export function fetchUsers (searchParams) {
     requestFn: requestUsers,
     receiveFn: receiveUsers
   });
+}
+
+/*
+ * Update individual user
+ */
+
+export const UPDATE_USER = 'UPDATE_USER';
+
+export function updateUserAction (id, data) {
+  return { type: UPDATE_USER, id, data };
+}
+
+export function updateUser (id, data) {
+  return async (dispatch, getState) => {
+    const state = getState();
+
+    await patchItem(state, 'users', id, data);
+
+    dispatch(updateUserAction(id, data));
+  };
 }

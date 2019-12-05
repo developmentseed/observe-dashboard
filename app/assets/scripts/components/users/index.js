@@ -1,14 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
 import { PropTypes as T } from 'prop-types';
 import get from 'lodash.get';
-import { environment } from '../../config';
+import { environment, osmUrl, pageLimit } from '../../config';
 import * as actions from '../../redux/actions/users';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
+import QsState from '../../utils/qs-state';
 
 import App from '../common/app';
-import { confirmDeleteItem } from '../common/confirmation-prompt';
 import toasts from '../common/toasts';
 import {
   Inpage,
@@ -36,69 +35,129 @@ class Users extends React.Component {
   constructor (props) {
     super(props);
 
-    this.updateData = this.updateData.bind(this);
+    this.state = {
+      page: 1,
+      limit: pageLimit,
+      filterValues: {}
+    };
+
+    this.fetchData = this.fetchData.bind(this);
+    this.updateUser = this.updateUser.bind(this);
+    this.handleFilterChange = this.handleFilterChange.bind(this);
+    this.handleFilterSubmit = this.handleFilterSubmit.bind(this);
+
+    // Setup the qsState for url state management.
+    this.qsState = new QsState({
+      page: {
+        accessor: 'page'
+      },
+      limit: {
+        accessor: 'limit'
+      },
+      username: {
+        accessor: 'filterValues.username'
+      }
+    });
   }
 
   async componentDidMount () {
-    await this.updateData();
+    // Load location search into state
+    let qsState = this.qsState.getState(this.props.location.search.substr(1));
+    Object.keys(qsState).forEach(k => {
+      if (qsState[k] === undefined) delete qsState[k];
+    });
+    this.setState(qsState);
+
+    await this.fetchData();
   }
 
   async componentDidUpdate (prevProps) {
     if (prevProps.location.search !== this.props.location.search) {
-      await this.updateData();
+      await this.fetchData();
     }
   }
 
-  async updateData () {
+  async fetchData () {
     showGlobalLoading();
     const searchParams = this.props.location.search;
     await this.props.fetchUsers(searchParams);
     hideGlobalLoading();
   }
 
-  async deleteTrace (e, userId) {
-    e.preventDefault();
+  async updateUser (e, user, values) {
+    showGlobalLoading();
+    try {
+      // Make delete request
+      await this.props.updateUser(user.osmId, values);
 
-    // Confirm delete
-    const { result } = await confirmDeleteItem('user', userId);
+      // Refresh table if successful
+      this.fetchData();
 
-    // When delete is confirmed
-    if (result) {
-      showGlobalLoading();
-
-      try {
-        // Make delete request
-        await this.props.deleteTrace(userId);
-
-        // Refresh table if successful
-        this.updateData();
-
-        // Show success toast.
-        toasts.info(`Trace ${userId} was successfully deleted.`);
-      } catch (error) {
-        // Show error toast.
-        toasts.error(`An error occurred, user ${userId} was not deleted.`);
-      }
-
-      hideGlobalLoading();
+      // Show success toast.
+      toasts.info(`User ${user.osmDisplayName} was successfully updated.`);
+    } catch (error) {
+      // Show error toast.
+      toasts.error(
+        `An error occurred, user ${user.osmDisplayName} was not updated.`
+      );
     }
+    hideGlobalLoading();
+  }
+
+  handleFilterSubmit (e) {
+    this.setState({ page: 1 });
+
+    // Update location.
+    const qString = this.qsState.getQs(this.state);
+    this.props.history.push({ search: qString });
+  }
+
+  handleFilterChange (e) {
+    // Get id/value pair from event
+    const { id, value } = e.target;
+
+    const currentValue = this.state.filterValues[id];
+
+    // Filter values haven't changed, return
+    if (currentValue === value) return;
+
+    // Update value and marked is filters as touched
+    const { filterValues } = this.state;
+    this.setState({
+      filterValues: {
+        ...filterValues,
+        [id]: value
+      }
+    });
   }
 
   renderContent () {
     const { isReady, hasError } = this.props.users;
 
     if (!isReady()) return null;
-    if (hasError()) return <p>Something went wrong. Try again.</p>;
 
     return (
       <>
         {this.renderFilters()}
-        {this.renderResults()}
+        {hasError() ? (
+          <p>Something went wrong. Try again.</p>
+        ) : (
+          this.renderResults()
+        )}
       </>
     );
   }
 
   renderFilters () {
+    const { username } = this.state.filterValues;
+
+    const submitOnEnter = e => {
+      if (e.key === 'Enter') {
+        this.handleFilterChange(e);
+        this.handleFilterSubmit();
+      }
+    };
+
     return (
       <Form>
         <FilterToolbar>
@@ -106,8 +165,13 @@ class Users extends React.Component {
             <FilterLabel htmlFor='userSearch'>Search by user</FilterLabel>
             <InputWithIcon
               type='text'
-              id='userSearch'
+              id='username'
               placeholder='User Name'
+              onChange={this.handleFilterChange}
+              onKeyDown={submitOnEnter}
+              value={username}
+              autoFocus
+              autoComplete='off'
             />
             <InputIcon htmlFor='userSearch' useIcon='magnifier-left' />
           </InputWrapper>
@@ -126,10 +190,33 @@ class Users extends React.Component {
       );
     }
 
+    // Get page indexes
+    const firstPage = 1;
+    const lastPage = meta.pageCount;
+    const currentPage = meta.page;
+    const previousPage =
+      currentPage - 1 < firstPage ? firstPage : currentPage - 1;
+    const nextPage = currentPage + 1 > lastPage ? lastPage : currentPage + 1;
+
+    const getQs = page =>
+      this.qsState.getQs({
+        ...this.state,
+        page
+      });
+
     return (
       <>
         {this.renderTable()}
-        <Pagination pathname='/users' meta={meta} />
+        <Pagination
+          pathname='/users'
+          meta={{
+            ...meta,
+            first: getQs(firstPage),
+            previous: getQs(previousPage),
+            next: getQs(nextPage),
+            last: getQs(lastPage)
+          }}
+        />
       </>
     );
   }
@@ -173,11 +260,15 @@ class Users extends React.Component {
 
     return getData().map(user => {
       return (
-        <tr key={user.id}>
+        <tr key={user.osmId}>
           <td>
-            <Link to={`/users/${user.osmDisplayName}`}>
+            <a
+              target='_blank'
+              rel='noopener noreferrer'
+              href={`${osmUrl}/user/${user.osmDisplayName}`}
+            >
               {user.osmDisplayName}
-            </Link>
+            </a>
           </td>
           <td>{new Date(user.osmCreatedAt).toLocaleDateString()}</td>
           <td>{user.traces}</td>
@@ -191,7 +282,23 @@ class Users extends React.Component {
           </td>
           {isAdmin && (
             <td style={{ textAlign: 'center' }}>
-              {user.isAdmin ? 'Promote' : 'Demote'}
+              {!user.isAdmin ? (
+                <Button
+                  size='small'
+                  variation='primary-raised-dark'
+                  onClick={e => this.updateUser(e, user, { isAdmin: true })}
+                >
+                  Promote
+                </Button>
+              ) : (
+                <Button
+                  size='small'
+                  variation='danger-raised-dark'
+                  onClick={e => this.updateUser(e, user, { isAdmin: false })}
+                >
+                  Demote
+                </Button>
+              )}
             </td>
           )}
         </tr>
@@ -222,9 +329,10 @@ if (environment !== 'production') {
   Users.propTypes = {
     authenticatedUser: T.object,
     fetchUsers: T.func,
-    users: T.object,
+    history: T.object,
     location: T.object,
-    deleteTrace: T.func
+    updateUser: T.func,
+    users: T.object
   };
 }
 
@@ -239,7 +347,7 @@ function mapStateToProps (state) {
 function dispatcher (dispatch) {
   return {
     fetchUsers: (...args) => dispatch(actions.fetchUsers(...args)),
-    deleteTrace: (...args) => dispatch(actions.deleteTrace(...args))
+    updateUser: (...args) => dispatch(actions.updateUser(...args))
   };
 }
 
