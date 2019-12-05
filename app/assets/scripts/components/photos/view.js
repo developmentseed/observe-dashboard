@@ -221,7 +221,7 @@ class Photos extends React.Component {
           <FormLabel>Location</FormLabel>
           <p>{featureToCoords(location)}</p>
           <FormLabel>Heading</FormLabel>
-          <p>{heading}°</p>
+          <p>{heading ? `${heading}°` : 'Not available.'}</p>
           <FormLabel>OSM Element</FormLabel>
           {osmElement ? (
             <a
