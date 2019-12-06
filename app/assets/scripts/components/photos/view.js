@@ -164,7 +164,7 @@ class Photos extends React.Component {
     return (
       <PhotoBox>
         <img
-          alt={`Photo {photo.id}`}
+          alt='Photo not available.'
           src={photo.urls.default}
         />
       </PhotoBox>

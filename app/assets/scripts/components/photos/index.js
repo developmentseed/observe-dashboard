@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { PropTypes as T } from 'prop-types';
 import { Link } from 'react-router-dom';
@@ -34,6 +35,12 @@ import { wrapApiResult } from '../../redux/utils';
 import { featureToCoords } from '../../utils';
 import FormInput from '../../styles/form/input';
 import Button from '../../styles/button/button';
+
+const PhotoBox = styled.div`
+  img {
+    max-width: 100%;
+  }
+`;
 
 class Photos extends React.Component {
   constructor (props) {
@@ -349,7 +356,7 @@ class Photos extends React.Component {
       <DataTable>
         <thead>
           <tr>
-            <th scope='col'>{this.renderColumnHead('ID', 'id')}</th>
+            <th scope='col'>Preview</th>
             <th scope='col'>{this.renderColumnHead('Owner', 'username')}</th>
             <th scope='col'>{this.renderColumnHead('Date', 'createdAt')}</th>
             <th scope='col'>
@@ -374,7 +381,11 @@ class Photos extends React.Component {
       return (
         <tr key={photo.id}>
           <td>
-            <Link to={`/photos/${photo.id}`}>{photo.id}</Link>
+            <PhotoBox>
+              <Link to={`/photos/${photo.id}`}>
+                <img alt='Photo not available.' src={photo.urls.thumb} />
+              </Link>
+            </PhotoBox>
           </td>
           <td>{photo.ownerDisplayName}</td>
           <td>{new Date(photo.createdAt).toLocaleDateString()}</td>
