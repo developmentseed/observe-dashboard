@@ -1,5 +1,6 @@
 import { fetchAuth, patchItem } from '../utils';
 import { apiUrl } from '../../config';
+import qs from 'qs';
 
 /*
  * List of users
@@ -26,10 +27,11 @@ export function receiveUsers (data, error = null) {
   };
 }
 
-export function fetchUsers (searchParams) {
+export function fetchUsers (params) {
+  const searchParams = qs.stringify(params);
   return fetchAuth({
     statePath: 'users',
-    url: `${apiUrl}/users${searchParams || ''}`,
+    url: `${apiUrl}/users?${searchParams}`,
     requestFn: requestUsers,
     receiveFn: receiveUsers
   });

@@ -35,12 +35,6 @@ class Users extends React.Component {
   constructor (props) {
     super(props);
 
-    this.state = {
-      page: 1,
-      limit: pageLimit,
-      filterValues: {}
-    };
-
     this.fetchData = this.fetchData.bind(this);
     this.updateUser = this.updateUser.bind(this);
     this.handleFilterChange = this.handleFilterChange.bind(this);
@@ -58,16 +52,11 @@ class Users extends React.Component {
         accessor: 'filterValues.username'
       }
     });
+
+    this.state = this.qsState.getState(this.props.location.search.substr(1));
   }
 
   async componentDidMount () {
-    // Load location search into state
-    let qsState = this.qsState.getState(this.props.location.search.substr(1));
-    Object.keys(qsState).forEach(k => {
-      if (qsState[k] === undefined) delete qsState[k];
-    });
-    this.setState(qsState);
-
     await this.fetchData();
   }
 
@@ -79,9 +68,51 @@ class Users extends React.Component {
 
   async fetchData () {
     showGlobalLoading();
-    const searchParams = this.props.location.search;
-    await this.props.fetchUsers(searchParams);
+
+    // Get query params from state
+    const {
+      page,
+      limit,
+      sort,
+      filterValues: {
+        username
+      }
+    } = this.qsState.getState(this.props.location.search.substr(1));
+
+    await this.props.fetchUsers({
+      page,
+      limit,
+      sort,
+      username
+    });
+
     hideGlobalLoading();
+  }
+
+  handleFilterSubmit (e) {
+    this.setState({ page: 1 }, () => {
+      const qString = this.qsState.getQs(this.state);
+      this.props.history.push({ search: qString });
+    });
+  }
+
+  handleFilterChange (e) {
+    // Get id/value pair from event
+    const { id, value } = e.target;
+
+    const currentValue = this.state.filterValues[id];
+
+    // Filter values haven't changed, return
+    if (currentValue === value) return;
+
+    // Update value and marked is filters as touched
+    const { filterValues } = this.state;
+    this.setState({
+      filterValues: {
+        ...filterValues,
+        [id]: value
+      }
+    });
   }
 
   async updateUser (e, user, values) {
@@ -102,33 +133,6 @@ class Users extends React.Component {
       );
     }
     hideGlobalLoading();
-  }
-
-  handleFilterSubmit (e) {
-    this.setState({ page: 1 });
-
-    // Update location.
-    const qString = this.qsState.getQs(this.state);
-    this.props.history.push({ search: qString });
-  }
-
-  handleFilterChange (e) {
-    // Get id/value pair from event
-    const { id, value } = e.target;
-
-    const currentValue = this.state.filterValues[id];
-
-    // Filter values haven't changed, return
-    if (currentValue === value) return;
-
-    // Update value and marked is filters as touched
-    const { filterValues } = this.state;
-    this.setState({
-      filterValues: {
-        ...filterValues,
-        [id]: value
-      }
-    });
   }
 
   renderContent () {
@@ -175,6 +179,12 @@ class Users extends React.Component {
             />
             <InputIcon htmlFor='userSearch' useIcon='magnifier-left' />
           </InputWrapper>
+          <Button
+            variation='primary-raised-dark'
+            onClick={this.handleFilterSubmit}
+          >
+            Apply Filter
+          </Button>
         </FilterToolbar>
       </Form>
     );
