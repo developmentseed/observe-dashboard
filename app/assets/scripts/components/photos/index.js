@@ -270,10 +270,10 @@ class Photos extends React.Component {
       currentPage - 1 < firstPage ? firstPage : currentPage - 1;
     const nextPage = currentPage + 1 > lastPage ? lastPage : currentPage + 1;
 
-    // Get querystring by merging with state to keep filters
+    // Merge page into current query string
     const getQs = page =>
       this.qsState.getQs({
-        ...this.state,
+        ...this.qsState.getState(this.props.location.search.substr(1)),
         page
       });
 
