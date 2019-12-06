@@ -55,4 +55,4 @@ workflows:
             - test
           filters:
             branches:
-              only: develop
+              only: feature/sorting-n-fixes
