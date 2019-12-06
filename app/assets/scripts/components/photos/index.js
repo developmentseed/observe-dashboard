@@ -76,6 +76,12 @@ class Photos extends React.Component {
     await this.updateData();
   }
 
+  async componentDidUpdate (prevProps) {
+    if (prevProps.location.search !== this.props.location.search) {
+      await this.updateData();
+    }
+  }
+
   async updateData () {
     showGlobalLoading();
 
@@ -91,7 +97,7 @@ class Photos extends React.Component {
         osmElementType,
         osmElementId
       }
-    } = this.state;
+    } = this.qsState.getState(this.props.location.search.substr(1));
 
     // Execute update action
     await this.props.fetchPhotos({
@@ -112,7 +118,6 @@ class Photos extends React.Component {
     this.setState({ page: 1 }, () => {
       const qString = this.qsState.getQs(this.state);
       this.props.history.push({ search: qString });
-      this.updateData();
     });
   }
 
