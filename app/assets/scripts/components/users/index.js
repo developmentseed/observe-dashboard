@@ -2,7 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { PropTypes as T } from 'prop-types';
 import get from 'lodash.get';
-import { environment, osmUrl, pageLimit } from '../../config';
+import { Link } from 'react-router-dom';
+import { environment, osmUrl } from '../../config';
 import * as actions from '../../redux/actions/users';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 import QsState from '../../utils/qs-state';
@@ -47,6 +48,9 @@ class Users extends React.Component {
       },
       limit: {
         accessor: 'limit'
+      },
+      sort: {
+        accessor: 'sort'
       },
       username: {
         accessor: 'filterValues.username'
@@ -208,9 +212,10 @@ class Users extends React.Component {
       currentPage - 1 < firstPage ? firstPage : currentPage - 1;
     const nextPage = currentPage + 1 > lastPage ? lastPage : currentPage + 1;
 
+    // Merge page into current query string
     const getQs = page =>
       this.qsState.getQs({
-        ...this.state,
+        ...this.qsState.getState(this.props.location.search.substr(1)),
         page
       });
 
@@ -231,6 +236,56 @@ class Users extends React.Component {
     );
   }
 
+  renderColumnHead (label, property) {
+    const state = this.qsState.getState(this.props.location.search.substr(1));
+
+    // Update sort on querystring
+    const getQs = direction =>
+      this.qsState.getQs({
+        ...state,
+        sort: {
+          [property]: direction
+        }
+      });
+
+    // Get next sort state link
+    const nextSortLink = () => {
+      if (!state.sort || !state.sort[property]) {
+        return getQs('asc');
+      } else {
+        const direction = state.sort[property];
+        if (direction === 'asc') return getQs('desc');
+        else return getQs();
+      }
+    };
+
+    const getIcon = () => {
+      if (!state.sort || !state.sort[property]) {
+        return 'sort-none';
+      } else {
+        const direction = state.sort[property];
+        if (direction === 'asc') return 'sort-asc';
+        else if (direction === 'desc') return 'sort-desc';
+        else return 'sort-desc';
+      }
+    };
+
+    return (
+      <>
+        <span>{label}</span>
+        <Button
+          as={Link}
+          useIcon={getIcon()}
+          variation='base-plain-semidark'
+          to={`/users?${nextSortLink()}`}
+          hideText
+        >
+          <span>sort</span>
+        </Button>
+      </>
+    );
+  }
+
   renderTable () {
     const { isAdmin } = this.props.authenticatedUser.getData();
     return (
@@ -238,19 +293,19 @@ class Users extends React.Component {
         <thead>
           <tr>
             <th scope='col'>
-              <span>ID</span>
+              {this.renderColumnHead('USERNAME', 'username')}
             </th>
             <th scope='col'>
-              <span>Mapper Since</span>
+              {this.renderColumnHead('Mapper Since', 'createdAt')}
             </th>
             <th scope='col'>
-              <span>Traces</span>
+              {this.renderColumnHead('Traces', 'traces')}
             </th>
             <th scope='col' style={{ width: '10%', textAlign: 'center' }}>
-              <span>Photos</span>
+              {this.renderColumnHead('Photos', 'photos')}
             </th>
             <th scope='col' style={{ width: '10%', textAlign: 'center' }}>
-              <span>Admin</span>
+              {this.renderColumnHead('Admin', 'isAdmin')}
             </th>
             {isAdmin && (
               <th scope='col' style={{ width: '10%', textAlign: 'center' }}>
