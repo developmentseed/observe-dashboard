@@ -52,6 +52,9 @@ class Photos extends React.Component {
       limit: {
         accessor: 'limit'
       },
+      sort: {
+        accessor: 'sort'
+      },
       username: {
         accessor: 'filterValues.username'
       },
@@ -291,25 +294,69 @@ class Photos extends React.Component {
     );
   }
 
+  renderColumnHead (label, property) {
+    const state = this.qsState.getState(this.props.location.search.substr(1));
+
+    // Update sort on querystring
+    const getQs = direction =>
+      this.qsState.getQs({
+        ...state,
+        sort: {
+          [property]: direction
+        }
+      });
+
+    // Get next sort state link
+    const nextSortLink = () => {
+      if (!state.sort || !state.sort[property]) {
+        return getQs('asc');
+      } else {
+        const direction = state.sort[property];
+        if (direction === 'asc') return getQs('desc');
+        else return getQs();
+      }
+    };
+
+    const getIcon = () => {
+      if (!state.sort || !state.sort[property]) {
+        return 'sort-none';
+      } else {
+        const direction = state.sort[property];
+        if (direction === 'asc') return 'sort-asc';
+        else if (direction === 'desc') return 'sort-desc';
+        else return 'sort-desc';
+      }
+    };
+
+    return (
+      <>
+        <span>{label}</span>
+        <Button
+          as={Link}
+          useIcon={getIcon()}
+          variation='base-plain-semidark'
+          to={`/photos?${nextSortLink()}`}
+          hideText
+        >
+          <span>sort</span>
+        </Button>
+      </>
+    );
+  }
+
   renderTable () {
     return (
       <DataTable>
         <thead>
           <tr>
-            <th scope='col'>
-              <span>ID</span>
-            </th>
-            <th scope='col'>
-              <span>Owner</span>
-            </th>
-            <th scope='col'>
-              <span>Date</span>
-            </th>
+            <th scope='col'>{this.renderColumnHead('ID', 'id')}</th>
+            <th scope='col'>{this.renderColumnHead('Owner', 'username')}</th>
+            <th scope='col'>{this.renderColumnHead('Date', 'createdAt')}</th>
             <th scope='col'>
               <span>Coordinates</span>
             </th>
             <th scope='col'>
-              <span>OSM Element</span>
+              {this.renderColumnHead('OSM Element', 'osmElement')}
             </th>
             <th scope='col'>
               <span>Actions</span>
