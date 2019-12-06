@@ -1,5 +1,6 @@
 import { fetchAuth, patchItem, deleteItem } from '../utils';
 import { apiUrl } from '../../config';
+import qs from 'qs';
 
 /*
  * List of traces
@@ -26,10 +27,11 @@ export function receiveTraces (data, error = null) {
   };
 }
 
-export function fetchTraces (searchParams) {
+export function fetchTraces (params) {
+  const searchParams = qs.stringify(params);
   return fetchAuth({
     statePath: 'traces',
-    url: `${apiUrl}/traces${searchParams || ''}`,
+    url: `${apiUrl}/traces?${searchParams}`,
     requestFn: requestTraces,
     receiveFn: receiveTraces
   });

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { PropTypes as T } from 'prop-types';
 import get from 'lodash.get';
-import { environment, pageLimit } from '../../config';
+import { environment } from '../../config';
 import * as actions from '../../redux/actions/traces';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 import { handleExportToJosm, downloadTrace } from './utils';
@@ -38,13 +38,6 @@ class Traces extends React.Component {
   constructor (props) {
     super(props);
 
-    this.state = {
-      page: 1,
-      limit: pageLimit,
-      filterIsTouched: false,
-      filterValues: {}
-    };
-
     this.updateData = this.updateData.bind(this);
     this.handleFilterChange = this.handleFilterChange.bind(this);
     this.handleFilterSubmit = this.handleFilterSubmit.bind(this);
@@ -57,6 +50,9 @@ class Traces extends React.Component {
       },
       limit: {
         accessor: 'limit'
+      },
+      sort: {
+        accessor: 'sort'
       },
       username: {
         accessor: 'filterValues.username'
@@ -74,16 +70,11 @@ class Traces extends React.Component {
         accessor: 'filterValues.lengthMax'
       }
     });
+
+    this.state = this.qsState.getState(this.props.location.search.substr(1));
   }
 
   async componentDidMount () {
-    // Load location search into state
-    let qsState = this.qsState.getState(this.props.location.search.substr(1));
-    Object.keys(qsState).forEach(k => {
-      if (qsState[k] === undefined) delete qsState[k];
-    });
-    this.setState(qsState);
-
     await this.updateData();
   }
 
@@ -95,23 +86,34 @@ class Traces extends React.Component {
 
   async updateData () {
     showGlobalLoading();
-    const searchParams = this.props.location.search;
-    await this.props.fetchTraces(searchParams);
+
+    // Get query params from state
+    const {
+      page,
+      limit,
+      sort,
+      filterValues: { username, startDate, endDate, lengthMin, lengthMax }
+    } = this.qsState.getState(this.props.location.search.substr(1));
+
+    await this.props.fetchTraces({
+      page,
+      limit,
+      sort,
+      username,
+      startDate,
+      endDate,
+      lengthMin,
+      lengthMax
+    });
+
     hideGlobalLoading();
   }
 
   handleFilterSubmit (e) {
-    const { filterIsTouched } = this.state;
-    if (filterIsTouched) {
-      // When making new query, reset to page one
-      this.setState({ page: 1, filterIsTouched: false });
-
-      // Update location.
+    this.setState({ page: 1 }, () => {
       const qString = this.qsState.getQs(this.state);
       this.props.history.push({ search: qString });
-
-      this.updateData();
-    }
+    });
   }
 
   handleFilterChange (e) {
@@ -281,9 +283,10 @@ class Traces extends React.Component {
       currentPage - 1 < firstPage ? firstPage : currentPage - 1;
     const nextPage = currentPage + 1 > lastPage ? lastPage : currentPage + 1;
 
+    // Merge page into current query string
     const getQs = page =>
       this.qsState.getQs({
-        ...this.state,
+        ...this.qsState.getState(this.props.location.search.substr(1)),
         page
       });
 
@@ -304,21 +307,67 @@ class Traces extends React.Component {
     );
   }
 
+  renderColumnHead (label, property) {
+    const state = this.qsState.getState(this.props.location.search.substr(1));
+
+    // Update sort on querystring
+    const getQs = direction =>
+      this.qsState.getQs({
+        ...state,
+        sort: {
+          [property]: direction
+        }
+      });
+
+    // Get next sort state link
+    const nextSortLink = () => {
+      if (!state.sort || !state.sort[property]) {
+        return getQs('asc');
+      } else {
+        const direction = state.sort[property];
+        if (direction === 'asc') return getQs('desc');
+        else return getQs();
+      }
+    };
+
+    const getIcon = () => {
+      if (!state.sort || !state.sort[property]) {
+        return 'sort-none';
+      } else {
+        const direction = state.sort[property];
+        if (direction === 'asc') return 'sort-asc';
+        else if (direction === 'desc') return 'sort-desc';
+        else return 'sort-desc';
+      }
+    };
+
+    return (
+      <>
+        <span>{label}</span>
+        <Button
+          as={Link}
+          useIcon={getIcon()}
+          variation='base-plain-semidark'
+          to={`/traces?${nextSortLink()}`}
+          hideText
+        >
+          <span>sort</span>
+        </Button>
+      </>
+    );
+  }
+
   renderTable () {
     return (
       <DataTable>
         <thead>
           <tr>
-            <th scope='col'>ID</th>
+            <th scope='col'>{this.renderColumnHead('ID', 'id')}</th>
+            <th scope='col'>{this.renderColumnHead('Owner', 'username')}</th>
             <th scope='col'>
-              <span>Owner</span>
+              {this.renderColumnHead('Recorded At', 'recordedAt')}
             </th>
-            <th scope='col'>
-              <span>Date</span>
-            </th>
-            <th scope='col'>
-              <span>Length</span>
-            </th>
+            <th scope='col'>{this.renderColumnHead('Length', 'length')}</th>
             <th scope='col' style={{ width: '10%', textAlign: 'center' }}>
               <span>Export to JOSM</span>
             </th>
