@@ -6,10 +6,13 @@ import { Link } from 'react-router-dom';
 import { environment, osmUrl } from '../../config';
 import * as actions from '../../redux/actions/photos';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
+import { downloadPhoto } from './utils';
 import DataTable from '../../styles/table';
 import QsState from '../../utils/qs-state';
+import toasts from '../common/toasts';
 
 import App from '../common/app';
+import { confirmDeleteItem } from '../common/confirmation-prompt';
 import {
   Inpage,
   InpageHeader,
@@ -148,6 +151,34 @@ class Photos extends React.Component {
         [id]: value
       }
     });
+  }
+
+  async deletePhoto (e, photoId) {
+    e.preventDefault();
+
+    // Confirm delete
+    const { result } = await confirmDeleteItem('photo', photoId);
+
+    // When delete is confirmed
+    if (result) {
+      showGlobalLoading();
+
+      try {
+        // Make delete request
+        await this.props.deletePhoto(photoId);
+
+        // Refresh table if successful
+        this.updateData();
+
+        // Show success toast.
+        toasts.info(`Photo ${photoId} was successfully deleted.`);
+      } catch (error) {
+        // Show error toast.
+        toasts.error(`An error occurred, photo ${photoId} was not deleted.`);
+      }
+
+      hideGlobalLoading();
+    }
   }
 
   renderContent () {
@@ -366,7 +397,10 @@ class Photos extends React.Component {
               {this.renderColumnHead('OSM Element', 'osmElement')}
             </th>
             <th scope='col'>
-              <span>Actions</span>
+              <span>Download</span>
+            </th>
+            <th scope='col'>
+              <span>Delete</span>
             </th>
           </tr>
         </thead>
@@ -376,6 +410,7 @@ class Photos extends React.Component {
   }
 
   renderTableRows () {
+    const { isAdmin, osmId: userId } = this.props.authenticatedUser.getData();
     const { getData } = this.props.photos;
     return getData().map(photo => {
       return (
@@ -403,7 +438,30 @@ class Photos extends React.Component {
               '-'
             )}
           </td>
-          <td>...</td>
+          <td style={{ textAlign: 'center' }}>
+            <Button
+              useIcon='download'
+              variation='primary-plain'
+              size='small'
+              onClick={() => downloadPhoto(photo)}
+              hideText
+            >
+              Download photo
+            </Button>
+          </td>
+          <td style={{ textAlign: 'center' }}>
+            {(isAdmin || userId === photo.ownerId) && (
+              <Button
+                useIcon='trash-bin'
+                variation='danger-plain'
+                size='small'
+                hideText
+                onClick={e => this.deletePhoto(e, photo.id)}
+              >
+                Delete Photo
+              </Button>
+            )}
+          </td>
         </tr>
       );
     });
@@ -430,22 +488,26 @@ class Photos extends React.Component {
 
 if (environment !== 'production') {
   Photos.propTypes = {
+    authenticatedUser: T.object,
     fetchPhotos: T.func,
     history: T.object,
     photos: T.object,
-    location: T.object
+    location: T.object,
+    deletePhoto: T.func
   };
 }
 
 function mapStateToProps (state) {
   return {
+    authenticatedUser: wrapApiResult(state.authenticatedUser),
     photos: wrapApiResult(state.photos)
   };
 }
 
 function dispatcher (dispatch) {
   return {
-    fetchPhotos: (...args) => dispatch(actions.fetchPhotos(...args))
+    fetchPhotos: (...args) => dispatch(actions.fetchPhotos(...args)),
+    deletePhoto: (...args) => dispatch(actions.deletePhoto(...args))
   };
 }
 

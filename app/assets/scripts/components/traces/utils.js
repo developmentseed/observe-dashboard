@@ -19,7 +19,7 @@ export async function handleExportToJosm (e, traceId) {
 }
 
 /*
- * Helper function to download a trace from the API using a token.
+ * Download a trace from the API using a token.
  */
 export async function downloadTrace (accessToken, traceId) {
   const geojsonUrl = `${apiUrl}/traces/${traceId}?token=${accessToken}`;
