@@ -1,14 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { PropTypes as T } from 'prop-types';
-import * as yup from 'yup';
 import { Link } from 'react-router-dom';
-import { environment, osmUrl, pageLimit } from '../../config';
+import { environment, osmUrl } from '../../config';
 import * as actions from '../../redux/actions/photos';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 import DataTable from '../../styles/table';
 import QsState from '../../utils/qs-state';
-import toasts from '../common/toasts';
 
 import App from '../common/app';
 import {
@@ -37,38 +35,9 @@ import { featureToCoords } from '../../utils';
 import FormInput from '../../styles/form/input';
 import Button from '../../styles/button/button';
 
-const filterSchema = yup.object().shape({
-  username: yup.string().typeError('Username must be a string.'),
-  startDate: yup.date().typeError('Invalid start date.'),
-  endDate: yup.date().typeError('Invalid start date.'),
-  osmElementType: yup.string().typeError('Invalid OSM element type.'),
-  osmElementId: yup
-    .number()
-    .integer('OSM element id must be a integer.')
-    .typeError('OSM element id must be a integer.')
-});
-
-const paramsSchema = yup.object().shape({
-  page: yup
-    .number()
-    .integer('Page must be a integer.')
-    .typeError('Page must be a integer.'),
-  limit: yup
-    .number()
-    .integer('Page must be a integer.')
-    .typeError('Page must be a integer.'),
-  filterValues: filterSchema
-});
-
 class Photos extends React.Component {
   constructor (props) {
     super(props);
-
-    this.state = {
-      page: 1,
-      limit: pageLimit,
-      filterValues: {}
-    };
 
     this.updateData = this.updateData.bind(this);
     this.handleFilterChange = this.handleFilterChange.bind(this);
@@ -99,50 +68,52 @@ class Photos extends React.Component {
         accessor: 'filterValues.osmElementId'
       }
     });
+
+    this.state = this.qsState.getState(this.props.location.search.substr(1));
   }
 
   async componentDidMount () {
-    // Load location search into state
-    let qsState = this.qsState.getState(this.props.location.search.substr(1));
-    Object.keys(qsState).forEach(k => {
-      if (qsState[k] === undefined) delete qsState[k];
-    });
-    this.setState(qsState);
-
     await this.updateData();
-  }
-
-  async componentDidUpdate (prevProps) {
-    if (prevProps.location.search !== this.props.location.search) {
-      await this.updateData();
-    }
   }
 
   async updateData () {
     showGlobalLoading();
 
-    // Get search string
-    const searchString = this.props.location.search;
+    // Get query params from state
+    const {
+      page,
+      limit,
+      sort,
+      filterValues: {
+        username,
+        startDate,
+        endDate,
+        osmElementType,
+        osmElementId
+      }
+    } = this.state;
 
-    // Validate passed params
-    const params = this.qsState.getState(this.props.location.search);
-    try {
-      await paramsSchema.validate(params);
-    } catch (error) {
-      toasts.error(error.message);
-    }
+    // Execute update action
+    await this.props.fetchPhotos({
+      page,
+      limit,
+      sort,
+      username,
+      startDate,
+      endDate,
+      osmElementType,
+      osmElementId
+    });
 
-    // Fetch data
-    await this.props.fetchPhotos(searchString);
     hideGlobalLoading();
   }
 
   handleFilterSubmit (e) {
-    this.setState({ page: 1 });
-
-    // Update location.
-    const qString = this.qsState.getQs(this.state);
-    this.props.history.push({ search: qString });
+    this.setState({ page: 1 }, () => {
+      const qString = this.qsState.getQs(this.state);
+      this.props.history.push({ search: qString });
+      this.updateData();
+    });
   }
 
   handleFilterChange (e) {

@@ -1,5 +1,6 @@
 import { fetchAuth, patchItem } from '../utils';
 import { apiUrl } from '../../config';
+import qs from 'qs';
 
 /*
  * List of photos
@@ -26,10 +27,11 @@ export function receivePhotos (data, error = null) {
   };
 }
 
-export function fetchPhotos (searchParams) {
+export function fetchPhotos (params) {
+  const searchParams = qs.stringify(params);
   return fetchAuth({
     statePath: 'photos',
-    url: `${apiUrl}/photos${searchParams || ''}`,
+    url: `${apiUrl}/photos?${searchParams}`,
     requestFn: requestPhotos,
     receiveFn: receivePhotos
   });
