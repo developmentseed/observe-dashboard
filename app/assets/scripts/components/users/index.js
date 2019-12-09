@@ -276,7 +276,7 @@ class Users extends React.Component {
         <Button
           as={Link}
           useIcon={getIcon()}
-          variation='base-plain-semidark'
+          variation='base-plain'
           to={`/users?${nextSortLink()}`}
           hideText
         >
@@ -298,17 +298,17 @@ class Users extends React.Component {
             <th scope='col'>
               {this.renderColumnHead('Mapper Since', 'createdAt')}
             </th>
-            <th scope='col'>
+            <th scope='col' style={{ width: '10%' }}>
               {this.renderColumnHead('Traces', 'traces')}
             </th>
-            <th scope='col' style={{ width: '10%', textAlign: 'center' }}>
+            <th scope='col' style={{ width: '10%' }}>
               {this.renderColumnHead('Photos', 'photos')}
             </th>
-            <th scope='col' style={{ width: '10%', textAlign: 'center' }}>
+            <th scope='col' style={{ width: '12%', textAlign: 'center' }}>
               {this.renderColumnHead('Admin', 'isAdmin')}
             </th>
             {isAdmin && (
-              <th scope='col' style={{ width: '10%', textAlign: 'center' }}>
+              <th scope='col' style={{ width: '12%', textAlign: 'center' }}>
                 <span>Action</span>
               </th>
             )}
@@ -336,8 +336,8 @@ class Users extends React.Component {
             </a>
           </td>
           <td>{new Date(user.osmCreatedAt).toLocaleDateString()}</td>
-          <td>{user.traces}</td>
-          <td>{user.photos}</td>
+          <td style={{ textAlign: 'center' }}>{user.traces}</td>
+          <td style={{ textAlign: 'center' }}>{user.photos}</td>
           <td style={{ textAlign: 'center' }}>
             {user.isAdmin && (
               <Button useIcon='tick' size='small' hideText>

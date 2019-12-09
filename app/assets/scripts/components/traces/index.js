@@ -347,7 +347,7 @@ class Traces extends React.Component {
         <Button
           as={Link}
           useIcon={getIcon()}
-          variation='base-plain-semidark'
+          variation='base-plain'
           to={`/traces?${nextSortLink()}`}
           hideText
         >
@@ -368,7 +368,7 @@ class Traces extends React.Component {
               {this.renderColumnHead('Recorded At', 'recordedAt')}
             </th>
             <th scope='col'>{this.renderColumnHead('Length', 'length')}</th>
-            <th scope='col' style={{ width: '10%', textAlign: 'center' }}>
+            <th scope='col' style={{ width: '13%', textAlign: 'center' }}>
               <span>Export to JOSM</span>
             </th>
             <th scope='col' style={{ width: '10%', textAlign: 'center' }}>

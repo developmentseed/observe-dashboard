@@ -42,6 +42,8 @@ import Button from '../../styles/button/button';
 const PhotoBox = styled.div`
   img {
     max-width: 100%;
+    font-size: 12px;
+    text-transform: initial;
   }
 `;
 
@@ -372,7 +374,7 @@ class Photos extends React.Component {
         <Button
           as={Link}
           useIcon={getIcon()}
-          variation='base-plain-semidark'
+          variation='base-plain'
           to={`/photos?${nextSortLink()}`}
           hideText
         >
@@ -396,10 +398,10 @@ class Photos extends React.Component {
             <th scope='col'>
               {this.renderColumnHead('OSM Element', 'osmElement')}
             </th>
-            <th scope='col'>
+            <th scope='col' style={{ width: '10%', textAlign: 'center' }}>
               <span>Download</span>
             </th>
-            <th scope='col'>
+            <th scope='col' style={{ width: '10%', textAlign: 'center' }}>
               <span>Delete</span>
             </th>
           </tr>
@@ -418,7 +420,7 @@ class Photos extends React.Component {
           <td>
             <PhotoBox>
               <Link to={`/photos/${photo.id}`}>
-                <img alt='Photo not available.' src={photo.urls.thumb} />
+                <img alt='Photo not available' src={photo.urls.thumb} />
               </Link>
             </PhotoBox>
           </td>

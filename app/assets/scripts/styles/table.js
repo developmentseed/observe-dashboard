@@ -20,7 +20,7 @@ const DataTable = styled.table`
   th,
   td {
     padding: ${multiply(glbsp, 0.75)} ${glbsp};
-    vertical-align: top;
+    vertical-align: middle;
   }
 
   thead th {
