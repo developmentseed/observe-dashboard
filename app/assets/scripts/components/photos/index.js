@@ -1,16 +1,18 @@
 import React from 'react';
+import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { PropTypes as T } from 'prop-types';
-import * as yup from 'yup';
 import { Link } from 'react-router-dom';
-import { environment, osmUrl, pageLimit } from '../../config';
+import { environment, osmUrl } from '../../config';
 import * as actions from '../../redux/actions/photos';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
+import { downloadPhoto } from './utils';
 import DataTable from '../../styles/table';
 import QsState from '../../utils/qs-state';
 import toasts from '../common/toasts';
 
 import App from '../common/app';
+import { confirmDeleteItem } from '../common/confirmation-prompt';
 import {
   Inpage,
   InpageHeader,
@@ -37,38 +39,17 @@ import { featureToCoords } from '../../utils';
 import FormInput from '../../styles/form/input';
 import Button from '../../styles/button/button';
 
-const filterSchema = yup.object().shape({
-  username: yup.string().typeError('Username must be a string.'),
-  startDate: yup.date().typeError('Invalid start date.'),
-  endDate: yup.date().typeError('Invalid start date.'),
-  osmElementType: yup.string().typeError('Invalid OSM element type.'),
-  osmElementId: yup
-    .number()
-    .integer('OSM element id must be a integer.')
-    .typeError('OSM element id must be a integer.')
-});
-
-const paramsSchema = yup.object().shape({
-  page: yup
-    .number()
-    .integer('Page must be a integer.')
-    .typeError('Page must be a integer.'),
-  limit: yup
-    .number()
-    .integer('Page must be a integer.')
-    .typeError('Page must be a integer.'),
-  filterValues: filterSchema
-});
+const PhotoBox = styled.div`
+  img {
+    max-width: 100%;
+    font-size: 12px;
+    text-transform: initial;
+  }
+`;
 
 class Photos extends React.Component {
   constructor (props) {
     super(props);
-
-    this.state = {
-      page: 1,
-      limit: pageLimit,
-      filterValues: {}
-    };
 
     this.updateData = this.updateData.bind(this);
     this.handleFilterChange = this.handleFilterChange.bind(this);
@@ -82,6 +63,9 @@ class Photos extends React.Component {
       },
       limit: {
         accessor: 'limit'
+      },
+      sort: {
+        accessor: 'sort'
       },
       username: {
         accessor: 'filterValues.username'
@@ -99,16 +83,11 @@ class Photos extends React.Component {
         accessor: 'filterValues.osmElementId'
       }
     });
+
+    this.state = this.qsState.getState(this.props.location.search.substr(1));
   }
 
   async componentDidMount () {
-    // Load location search into state
-    let qsState = this.qsState.getState(this.props.location.search.substr(1));
-    Object.keys(qsState).forEach(k => {
-      if (qsState[k] === undefined) delete qsState[k];
-    });
-    this.setState(qsState);
-
     await this.updateData();
   }
 
@@ -121,28 +100,40 @@ class Photos extends React.Component {
   async updateData () {
     showGlobalLoading();
 
-    // Get search string
-    const searchString = this.props.location.search;
+    // Get query params from state
+    const {
+      page,
+      limit,
+      sort,
+      filterValues: {
+        username,
+        startDate,
+        endDate,
+        osmElementType,
+        osmElementId
+      }
+    } = this.qsState.getState(this.props.location.search.substr(1));
 
-    // Validate passed params
-    const params = this.qsState.getState(this.props.location.search);
-    try {
-      await paramsSchema.validate(params);
-    } catch (error) {
-      toasts.error(error.message);
-    }
+    // Execute update action
+    await this.props.fetchPhotos({
+      page,
+      limit,
+      sort,
+      username,
+      startDate,
+      endDate,
+      osmElementType,
+      osmElementId
+    });
 
-    // Fetch data
-    await this.props.fetchPhotos(searchString);
     hideGlobalLoading();
   }
 
   handleFilterSubmit (e) {
-    this.setState({ page: 1 });
-
-    // Update location.
-    const qString = this.qsState.getQs(this.state);
-    this.props.history.push({ search: qString });
+    this.setState({ page: 1 }, () => {
+      const qString = this.qsState.getQs(this.state);
+      this.props.history.push({ search: qString });
+    });
   }
 
   handleFilterChange (e) {
@@ -162,6 +153,34 @@ class Photos extends React.Component {
         [id]: value
       }
     });
+  }
+
+  async deletePhoto (e, photoId) {
+    e.preventDefault();
+
+    // Confirm delete
+    const { result } = await confirmDeleteItem('photo', photoId);
+
+    // When delete is confirmed
+    if (result) {
+      showGlobalLoading();
+
+      try {
+        // Make delete request
+        await this.props.deletePhoto(photoId);
+
+        // Refresh table if successful
+        this.updateData();
+
+        // Show success toast.
+        toasts.info(`Photo ${photoId} was successfully deleted.`);
+      } catch (error) {
+        // Show error toast.
+        toasts.error(`An error occurred, photo ${photoId} was not deleted.`);
+      }
+
+      hideGlobalLoading();
+    }
   }
 
   renderContent () {
@@ -291,10 +310,10 @@ class Photos extends React.Component {
       currentPage - 1 < firstPage ? firstPage : currentPage - 1;
     const nextPage = currentPage + 1 > lastPage ? lastPage : currentPage + 1;
 
-    // Get querystring by merging with state to keep filters
+    // Merge page into current query string
     const getQs = page =>
       this.qsState.getQs({
-        ...this.state,
+        ...this.qsState.getState(this.props.location.search.substr(1)),
         page
       });
 
@@ -315,28 +334,75 @@ class Photos extends React.Component {
     );
   }
 
+  renderColumnHead (label, property) {
+    const state = this.qsState.getState(this.props.location.search.substr(1));
+
+    // Update sort on querystring
+    const getQs = direction =>
+      this.qsState.getQs({
+        ...state,
+        sort: {
+          [property]: direction
+        }
+      });
+
+    // Get next sort state link
+    const nextSortLink = () => {
+      if (!state.sort || !state.sort[property]) {
+        return getQs('asc');
+      } else {
+        const direction = state.sort[property];
+        if (direction === 'asc') return getQs('desc');
+        else return getQs();
+      }
+    };
+
+    const getIcon = () => {
+      if (!state.sort || !state.sort[property]) {
+        return 'sort-none';
+      } else {
+        const direction = state.sort[property];
+        if (direction === 'asc') return 'sort-asc';
+        else if (direction === 'desc') return 'sort-desc';
+        else return 'sort-desc';
+      }
+    };
+
+    return (
+      <>
+        <span>{label}</span>
+        <Button
+          as={Link}
+          useIcon={getIcon()}
+          variation='base-plain'
+          to={`/photos?${nextSortLink()}`}
+          hideText
+        >
+          <span>sort</span>
+        </Button>
+      </>
+    );
+  }
+
   renderTable () {
     return (
       <DataTable>
         <thead>
           <tr>
-            <th scope='col'>
-              <span>ID</span>
-            </th>
-            <th scope='col'>
-              <span>Owner</span>
-            </th>
-            <th scope='col'>
-              <span>Date</span>
-            </th>
+            <th scope='col'>Preview</th>
+            <th scope='col'>{this.renderColumnHead('Owner', 'username')}</th>
+            <th scope='col'>{this.renderColumnHead('Date', 'createdAt')}</th>
             <th scope='col'>
               <span>Coordinates</span>
             </th>
             <th scope='col'>
-              <span>OSM Element</span>
+              {this.renderColumnHead('OSM Element', 'osmElement')}
             </th>
-            <th scope='col'>
-              <span>Actions</span>
+            <th scope='col' style={{ width: '10%', textAlign: 'center' }}>
+              <span>Download</span>
+            </th>
+            <th scope='col' style={{ width: '10%', textAlign: 'center' }}>
+              <span>Delete</span>
             </th>
           </tr>
         </thead>
@@ -346,12 +412,17 @@ class Photos extends React.Component {
   }
 
   renderTableRows () {
+    const { isAdmin, osmId: userId } = this.props.authenticatedUser.getData();
     const { getData } = this.props.photos;
     return getData().map(photo => {
       return (
         <tr key={photo.id}>
           <td>
-            <Link to={`/photos/${photo.id}`}>{photo.id}</Link>
+            <PhotoBox>
+              <Link to={`/photos/${photo.id}`}>
+                <img alt='Photo not available' src={photo.urls.thumb} />
+              </Link>
+            </PhotoBox>
           </td>
           <td>{photo.ownerDisplayName}</td>
           <td>{new Date(photo.createdAt).toLocaleDateString()}</td>
@@ -369,7 +440,30 @@ class Photos extends React.Component {
               '-'
             )}
           </td>
-          <td>...</td>
+          <td style={{ textAlign: 'center' }}>
+            <Button
+              useIcon='download'
+              variation='primary-plain'
+              size='small'
+              onClick={() => downloadPhoto(photo)}
+              hideText
+            >
+              Download photo
+            </Button>
+          </td>
+          <td style={{ textAlign: 'center' }}>
+            {(isAdmin || userId === photo.ownerId) && (
+              <Button
+                useIcon='trash-bin'
+                variation='danger-plain'
+                size='small'
+                hideText
+                onClick={e => this.deletePhoto(e, photo.id)}
+              >
+                Delete Photo
+              </Button>
+            )}
+          </td>
         </tr>
       );
     });
@@ -396,22 +490,26 @@ class Photos extends React.Component {
 
 if (environment !== 'production') {
   Photos.propTypes = {
+    authenticatedUser: T.object,
     fetchPhotos: T.func,
     history: T.object,
     photos: T.object,
-    location: T.object
+    location: T.object,
+    deletePhoto: T.func
   };
 }
 
 function mapStateToProps (state) {
   return {
+    authenticatedUser: wrapApiResult(state.authenticatedUser),
     photos: wrapApiResult(state.photos)
   };
 }
 
 function dispatcher (dispatch) {
   return {
-    fetchPhotos: (...args) => dispatch(actions.fetchPhotos(...args))
+    fetchPhotos: (...args) => dispatch(actions.fetchPhotos(...args)),
+    deletePhoto: (...args) => dispatch(actions.deletePhoto(...args))
   };
 }
 

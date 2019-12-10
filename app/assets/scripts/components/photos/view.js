@@ -6,7 +6,6 @@ import { environment, osmUrl } from '../../config';
 import { featureToCoords, formatDateTimeExtended } from '../../utils';
 import { wrapApiResult, getFromState, deleteItem } from '../../redux/utils';
 import * as actions from '../../redux/actions/photos';
-import { saveAs } from 'file-saver';
 
 import App from '../common/app';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
@@ -32,6 +31,7 @@ import {
 import { LinkToOsmProfile } from '../common/link';
 import toasts from '../common/toasts';
 import { confirmDeleteItem } from '../common/confirmation-prompt';
+import { downloadPhoto } from './utils';
 
 const EditButtons = styled.div`
   display: flex;
@@ -164,7 +164,7 @@ class Photos extends React.Component {
     return (
       <PhotoBox>
         <img
-          alt={`Photo {photo.id}`}
+          alt='Photo not available'
           src={photo.urls.default}
         />
       </PhotoBox>
@@ -221,7 +221,7 @@ class Photos extends React.Component {
           <FormLabel>Location</FormLabel>
           <p>{featureToCoords(location)}</p>
           <FormLabel>Heading</FormLabel>
-          <p>{heading}°</p>
+          <p>{heading ? `${heading}°` : 'Not available.'}</p>
           <FormLabel>OSM Element</FormLabel>
           {osmElement ? (
             <a
@@ -266,7 +266,7 @@ class Photos extends React.Component {
   }
 
   renderActionButtons (photo) {
-    const { ownerId, description, urls } = photo;
+    const { ownerId, description } = photo;
     const { osmId: userId, isAdmin } = this.props.authenticatedUser.getData();
 
     return (
@@ -296,10 +296,7 @@ class Photos extends React.Component {
           useIcon='download'
           variation='primary-raised-dark'
           size='xlarge'
-          onClick={e => {
-            e.preventDefault();
-            saveAs(urls.full, urls.full.split('/').pop());
-          }}
+          onClick={() => downloadPhoto(photo)}
         >
           Download
         </Button>

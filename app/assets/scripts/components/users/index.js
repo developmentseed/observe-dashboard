@@ -1,16 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
 import { PropTypes as T } from 'prop-types';
 import get from 'lodash.get';
-import { environment } from '../../config';
-import * as actions from '../../redux/actions/traces';
+import { Link } from 'react-router-dom';
+import { environment, osmUrl } from '../../config';
+import * as actions from '../../redux/actions/users';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
-import { handleExportToJosm, downloadTrace } from './utils';
 import QsState from '../../utils/qs-state';
 
 import App from '../common/app';
-import { confirmDeleteItem } from '../common/confirmation-prompt';
 import toasts from '../common/toasts';
 import {
   Inpage,
@@ -34,14 +32,14 @@ import Pagination from '../../styles/button/pagination';
 import Prose from '../../styles/type/prose';
 import { wrapApiResult } from '../../redux/utils';
 
-class Traces extends React.Component {
+class Users extends React.Component {
   constructor (props) {
     super(props);
 
-    this.updateData = this.updateData.bind(this);
+    this.fetchData = this.fetchData.bind(this);
+    this.updateUser = this.updateUser.bind(this);
     this.handleFilterChange = this.handleFilterChange.bind(this);
     this.handleFilterSubmit = this.handleFilterSubmit.bind(this);
-    this.renderResults = this.renderResults.bind(this);
 
     // Setup the qsState for url state management.
     this.qsState = new QsState({
@@ -56,18 +54,6 @@ class Traces extends React.Component {
       },
       username: {
         accessor: 'filterValues.username'
-      },
-      startDate: {
-        accessor: 'filterValues.startDate'
-      },
-      endDate: {
-        accessor: 'filterValues.endDate'
-      },
-      lengthMin: {
-        accessor: 'filterValues.lengthMin'
-      },
-      lengthMax: {
-        accessor: 'filterValues.lengthMax'
       }
     });
 
@@ -75,16 +61,16 @@ class Traces extends React.Component {
   }
 
   async componentDidMount () {
-    await this.updateData();
+    await this.fetchData();
   }
 
   async componentDidUpdate (prevProps) {
     if (prevProps.location.search !== this.props.location.search) {
-      await this.updateData();
+      await this.fetchData();
     }
   }
 
-  async updateData () {
+  async fetchData () {
     showGlobalLoading();
 
     // Get query params from state
@@ -92,18 +78,16 @@ class Traces extends React.Component {
       page,
       limit,
       sort,
-      filterValues: { username, startDate, endDate, lengthMin, lengthMax }
+      filterValues: {
+        username
+      }
     } = this.qsState.getState(this.props.location.search.substr(1));
 
-    await this.props.fetchTraces({
+    await this.props.fetchUsers({
       page,
       limit,
       sort,
-      username,
-      startDate,
-      endDate,
-      lengthMin,
-      lengthMax
+      username
     });
 
     hideGlobalLoading();
@@ -128,7 +112,6 @@ class Traces extends React.Component {
     // Update value and marked is filters as touched
     const { filterValues } = this.state;
     this.setState({
-      filterIsTouched: true,
       filterValues: {
         ...filterValues,
         [id]: value
@@ -136,56 +119,45 @@ class Traces extends React.Component {
     });
   }
 
-  async deleteTrace (e, traceId) {
-    e.preventDefault();
+  async updateUser (e, user, values) {
+    showGlobalLoading();
+    try {
+      // Make delete request
+      await this.props.updateUser(user.osmId, values);
 
-    // Confirm delete
-    const { result } = await confirmDeleteItem('trace', traceId);
+      // Refresh table if successful
+      this.fetchData();
 
-    // When delete is confirmed
-    if (result) {
-      showGlobalLoading();
-
-      try {
-        // Make delete request
-        await this.props.deleteTrace(traceId);
-
-        // Refresh table if successful
-        this.updateData();
-
-        // Show success toast.
-        toasts.info(`Trace ${traceId} was successfully deleted.`);
-      } catch (error) {
-        // Show error toast.
-        toasts.error(`An error occurred, trace ${traceId} was not deleted.`);
-      }
-
-      hideGlobalLoading();
+      // Show success toast.
+      toasts.info(`User ${user.osmDisplayName} was successfully updated.`);
+    } catch (error) {
+      // Show error toast.
+      toasts.error(
+        `An error occurred, user ${user.osmDisplayName} was not updated.`
+      );
     }
+    hideGlobalLoading();
   }
 
   renderContent () {
-    const { isReady, hasError } = this.props.traces;
+    const { isReady, hasError } = this.props.users;
 
     if (!isReady()) return null;
-    if (hasError()) return <p>Something went wrong. Try again.</p>;
 
     return (
       <>
         {this.renderFilters()}
-        {this.renderResults()}
+        {hasError() ? (
+          <p>Something went wrong. Try again.</p>
+        ) : (
+          this.renderResults()
+        )}
       </>
     );
   }
 
   renderFilters () {
-    const {
-      username,
-      startDate,
-      endDate,
-      lengthMin,
-      lengthMax
-    } = this.state.filterValues;
+    const { username } = this.state.filterValues;
 
     const submitOnEnter = e => {
       if (e.key === 'Enter') {
@@ -198,67 +170,24 @@ class Traces extends React.Component {
       <Form>
         <FilterToolbar>
           <InputWrapper>
-            <FilterLabel htmlFor='username'>Search by user</FilterLabel>
+            <FilterLabel htmlFor='userSearch'>Search by user</FilterLabel>
             <InputWithIcon
               type='text'
               id='username'
-              placeholder='User name'
+              placeholder='User Name'
               onChange={this.handleFilterChange}
               onKeyDown={submitOnEnter}
               value={username}
               autoFocus
               autoComplete='off'
             />
-          </InputWrapper>
-          <InputWrapper>
-            <FilterLabel htmlFor='startDate'>Start Date</FilterLabel>
-            <InputWithIcon
-              type='date'
-              id='startDate'
-              value={startDate}
-              onKeyDown={submitOnEnter}
-              onChange={this.handleFilterChange}
-            />
-            <InputIcon htmlFor='startDate' useIcon='calendar' />
-          </InputWrapper>
-          <InputWrapper>
-            <FilterLabel htmlFor='endDate'>End Date</FilterLabel>
-            <InputWithIcon
-              type='date'
-              id='endDate'
-              value={endDate}
-              onKeyDown={submitOnEnter}
-              onChange={this.handleFilterChange}
-            />
-            <InputIcon htmlFor='endDate' useIcon='calendar' />
-          </InputWrapper>
-          <InputWrapper>
-            <FilterLabel htmlFor='lengthMin'>From length</FilterLabel>
-            <InputWithIcon
-              type='number'
-              id='lengthMin'
-              value={lengthMin}
-              placeholder='Min. value'
-              onKeyDown={submitOnEnter}
-              onChange={this.handleFilterChange}
-            />
-          </InputWrapper>
-          <InputWrapper>
-            <FilterLabel htmlFor='lengthMax'>To length</FilterLabel>
-            <InputWithIcon
-              type='number'
-              id='lengthMax'
-              placeholder='Max. value'
-              value={lengthMax}
-              onKeyDown={submitOnEnter}
-              onChange={this.handleFilterChange}
-            />
+            <InputIcon htmlFor='userSearch' useIcon='magnifier-left' />
           </InputWrapper>
           <Button
             variation='primary-raised-dark'
             onClick={this.handleFilterSubmit}
           >
-            Apply filters
+            Apply Filter
           </Button>
         </FilterToolbar>
       </Form>
@@ -266,7 +195,7 @@ class Traces extends React.Component {
   }
 
   renderResults () {
-    const { getMeta } = this.props.traces;
+    const { getMeta } = this.props.users;
     const meta = getMeta();
 
     if (meta.count === 0) {
@@ -294,7 +223,7 @@ class Traces extends React.Component {
       <>
         {this.renderTable()}
         <Pagination
-          pathname='/traces'
+          pathname='/users'
           meta={{
             ...meta,
             first: getQs(firstPage),
@@ -348,7 +277,7 @@ class Traces extends React.Component {
           as={Link}
           useIcon={getIcon()}
           variation='base-plain'
-          to={`/traces?${nextSortLink()}`}
+          to={`/users?${nextSortLink()}`}
           hideText
         >
           <span>sort</span>
@@ -358,25 +287,31 @@ class Traces extends React.Component {
   }
 
   renderTable () {
+    const { isAdmin } = this.props.authenticatedUser.getData();
     return (
       <DataTable>
         <thead>
           <tr>
-            <th scope='col'>{this.renderColumnHead('ID', 'id')}</th>
-            <th scope='col'>{this.renderColumnHead('Owner', 'username')}</th>
             <th scope='col'>
-              {this.renderColumnHead('Recorded At', 'recordedAt')}
+              {this.renderColumnHead('USERNAME', 'username')}
             </th>
-            <th scope='col'>{this.renderColumnHead('Length', 'length')}</th>
-            <th scope='col' style={{ width: '13%', textAlign: 'center' }}>
-              <span>Export to JOSM</span>
+            <th scope='col'>
+              {this.renderColumnHead('Mapper Since', 'createdAt')}
             </th>
-            <th scope='col' style={{ width: '10%', textAlign: 'center' }}>
-              <span>Download</span>
+            <th scope='col' style={{ width: '10%' }}>
+              {this.renderColumnHead('Traces', 'traces')}
             </th>
-            <th scope='col' style={{ width: '10%', textAlign: 'center' }}>
-              <span>Delete</span>
+            <th scope='col' style={{ width: '10%' }}>
+              {this.renderColumnHead('Photos', 'photos')}
             </th>
+            <th scope='col' style={{ width: '12%', textAlign: 'center' }}>
+              {this.renderColumnHead('Admin', 'isAdmin')}
+            </th>
+            {isAdmin && (
+              <th scope='col' style={{ width: '12%', textAlign: 'center' }}>
+                <span>Action</span>
+              </th>
+            )}
           </tr>
         </thead>
         <tbody>{this.renderTableRows()}</tbody>
@@ -385,54 +320,52 @@ class Traces extends React.Component {
   }
 
   renderTableRows () {
-    const { getData } = this.props.traces;
-    const { accessToken } = this.props;
+    const { getData } = this.props.users;
+    const { isAdmin } = this.props.authenticatedUser.getData();
 
-    return getData().map(trace => {
+    return getData().map(user => {
       return (
-        <tr key={trace.id}>
+        <tr key={user.osmId}>
           <td>
-            <Link to={`/traces/${trace.id}`}>{trace.id}</Link>
-          </td>
-          <td>{trace.ownerDisplayName}</td>
-          <td>{new Date(trace.recordedAt).toLocaleDateString()}</td>
-          <td>{trace.length} m</td>
-          <td style={{ textAlign: 'center' }}>
-            <Button
-              useIcon='share'
-              variation='base-plain'
-              size='small'
-              hideText
-              onClick={e => handleExportToJosm(e, trace.id)}
+            <a
+              target='_blank'
+              rel='noopener noreferrer'
+              href={`${osmUrl}/user/${user.osmDisplayName}`}
             >
-              Export to JOSM
-            </Button>
+              {user.osmDisplayName}
+            </a>
           </td>
+          <td>{new Date(user.osmCreatedAt).toLocaleDateString()}</td>
+          <td style={{ textAlign: 'center' }}>{user.traces}</td>
+          <td style={{ textAlign: 'center' }}>{user.photos}</td>
           <td style={{ textAlign: 'center' }}>
-            <Button
-              useIcon='download'
-              variation='primary-plain'
-              size='small'
-              onClick={e => {
-                e.preventDefault();
-                downloadTrace(accessToken, trace.id);
-              }}
-              hideText
-            >
-              Download trace
-            </Button>
+            {user.isAdmin && (
+              <Button useIcon='tick' size='small' hideText>
+                Admin user
+              </Button>
+            )}
           </td>
-          <td style={{ textAlign: 'center' }}>
-            <Button
-              useIcon='trash-bin'
-              variation='danger-plain'
-              size='small'
-              hideText
-              onClick={e => this.deleteTrace(e, trace.id)}
-            >
-              Delete trace
-            </Button>
-          </td>
+          {isAdmin && (
+            <td style={{ textAlign: 'center' }}>
+              {!user.isAdmin ? (
+                <Button
+                  size='small'
+                  variation='primary-raised-dark'
+                  onClick={e => this.updateUser(e, user, { isAdmin: true })}
+                >
+                  Promote
+                </Button>
+              ) : (
+                <Button
+                  size='small'
+                  variation='danger-raised-dark'
+                  onClick={e => this.updateUser(e, user, { isAdmin: false })}
+                >
+                  Demote
+                </Button>
+              )}
+            </td>
+          )}
         </tr>
       );
     });
@@ -440,13 +373,13 @@ class Traces extends React.Component {
 
   render () {
     return (
-      <App pageTitle='Traces'>
+      <App pageTitle='Users'>
         <Inpage>
           <InpageHeader />
           <InpageBody>
             <InpageBodyInner>
               <InpageHeadline>
-                <InpageTitle>Traces</InpageTitle>
+                <InpageTitle>Users</InpageTitle>
               </InpageHeadline>
               <Prose>{this.renderContent()}</Prose>
             </InpageBodyInner>
@@ -458,28 +391,29 @@ class Traces extends React.Component {
 }
 
 if (environment !== 'production') {
-  Traces.propTypes = {
-    accessToken: T.string,
-    fetchTraces: T.func,
-    traces: T.object,
+  Users.propTypes = {
+    authenticatedUser: T.object,
+    fetchUsers: T.func,
     history: T.object,
     location: T.object,
-    deleteTrace: T.func
+    updateUser: T.func,
+    users: T.object
   };
 }
 
 function mapStateToProps (state) {
   return {
-    traces: wrapApiResult(state.traces),
+    users: wrapApiResult(state.users),
+    authenticatedUser: wrapApiResult(state.authenticatedUser),
     accessToken: get(state, 'authenticatedUser.data.accessToken')
   };
 }
 
 function dispatcher (dispatch) {
   return {
-    fetchTraces: (...args) => dispatch(actions.fetchTraces(...args)),
-    deleteTrace: (...args) => dispatch(actions.deleteTrace(...args))
+    fetchUsers: (...args) => dispatch(actions.fetchUsers(...args)),
+    updateUser: (...args) => dispatch(actions.updateUser(...args))
   };
 }
 
-export default connect(mapStateToProps, dispatcher)(Traces);
+export default connect(mapStateToProps, dispatcher)(Users);

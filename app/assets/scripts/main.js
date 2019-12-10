@@ -15,9 +15,8 @@ import GlobalStyles from './styles/global';
 
 // Views
 import Home from './components/home';
-import Sandbox from './components/sandbox';
-import About from './components/about';
 import Auth from './components/auth';
+import UsersIndex from './components/users';
 import TracesIndex from './components/traces';
 import TracesView from './components/traces/view';
 import PhotosIndex from './components/photos';
@@ -43,8 +42,7 @@ const Root = () => (
             <Route exact path='/traces' component={TracesIndex} />
             <Route exact path='/photos/:photoId' component={PhotosView} />
             <Route exact path='/photos' component={PhotosIndex} />
-            <Route exact path='/sandbox' component={Sandbox} />
-            <Route exact path='/about' component={About} />
+            <Route exact path='/users' component={UsersIndex} />
             <Route path='*' component={UhOh} />
           </Switch>
           <ConfirmationPrompt />

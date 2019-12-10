@@ -1,5 +1,6 @@
-import { fetchAuth, patchItem } from '../utils';
+import { fetchAuth, patchItem, deleteItem } from '../utils';
 import { apiUrl } from '../../config';
+import qs from 'qs';
 
 /*
  * List of photos
@@ -26,10 +27,11 @@ export function receivePhotos (data, error = null) {
   };
 }
 
-export function fetchPhotos (searchParams) {
+export function fetchPhotos (params) {
+  const searchParams = qs.stringify(params);
   return fetchAuth({
     statePath: 'photos',
-    url: `${apiUrl}/photos${searchParams || ''}`,
+    url: `${apiUrl}/photos?${searchParams}`,
     requestFn: requestPhotos,
     receiveFn: receivePhotos
   });
@@ -87,5 +89,19 @@ export function updatePhoto (id, data) {
     await patchItem(state, 'photos', id, data);
 
     dispatch(updatePhotoAction(id, data));
+  };
+}
+
+/*
+ * Delete individual trace
+ */
+
+export function deletePhoto (id) {
+  return async (dispatch, getState) => {
+    const state = getState();
+
+    await deleteItem(state, 'photos', id);
+
+    dispatch(invalidatePhoto(id));
   };
 }
