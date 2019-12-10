@@ -50,6 +50,9 @@ const PageTitle = styled.h1`
     color: inherit;
     display: flex;
     padding: 0 2rem 0.5rem;
+    &:active {
+      transform: none;
+    }
   }
   span {
     font-size: 0.575rem;

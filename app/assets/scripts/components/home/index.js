@@ -4,31 +4,93 @@ import { PropTypes as T } from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
+import { rgba } from 'polished';
 
 import * as authActions from '../../redux/actions/auth';
 import { wrapApiResult } from '../../redux/utils';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 
 import { environment, apiUrl, baseUrl } from '../../config';
+import { themeVal, stylizeFunction } from '../../styles/utils/general';
+import media from '../../styles/utils/media-queries';
 import App from '../common/app';
 import { Inpage } from '../common/inpage';
 import Button from '../../styles/button/button';
 
-const InpageBody = styled.div`
-  background: transparent;
-  display: grid;
-  min-height: 100%;
-  padding: 4rem;
-  grid-template-columns: 1fr 20rem;
+const _rgba = stylizeFunction(rgba);
+
+const Homepage = styled(Inpage)`
+  background: linear-gradient(128deg, ${_rgba(themeVal('color.primary'), 0.8)}, ${_rgba(0, 0, 0, 0.4)} 68%),
+              url('../assets/graphics/content/bgmap-sat.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
 `;
 
-const IntroSection = styled.div``;
+const InpageBody = styled.div`
+  background-image: url('../assets/graphics/content/bg-devices.svg');
+  background-repeat: no-repeat;
+  background-position: right -40rem bottom -12rem;
+  background-attachment: fixed;
+  display: grid;
+  min-height: calc(100vh - 4rem);
+  padding: 4rem;
+  grid-template-columns: 1fr 0;
+  justify-content: center;
+  overflow: hidden;
+  max-width: 100%;
+  ${media.largeUp`
+    padding-left: 12vw;
+    background-size: contain;
+    background-position: right -40rem bottom -12rem;
+  `}
+`;
 
-const Title = styled.div``;
+const IntroSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  text-shadow: 0px 0px 2px ${_rgba(0, 0, 0, 0.4)};
+  ${media.largeUp`
+    justify-content: center;
+  `}
+`;
 
-const Lead = styled.div``;
+const Title = styled.div`
+  display: flex;
+  font-weight: ${themeVal('type.base.bold')};
+  font-size: 2rem;
+  color: white;
+  letter-spacing: 0.25rem;
+  text-transform: uppercase;
+  h1 {
+    margin: 0 1rem 0.5rem;
+  }
+  img {
+    width: 5rem;
+  }
+  ${media.largeUp`
+    font-size: 2.5rem;
+    img {
+      width: 6rem;
+    }
+  `}
+`;
 
-const Buttons = styled.div``;
+const Lead = styled.div`
+  font-size: 1.5rem;
+  color: white;
+  font-weight: ${themeVal('type.base.light')};
+  margin: 1rem 0 2rem;
+  ${media.largeUp`
+    font-size: 1.75rem;
+  `}
+`;
+
+const Buttons = styled.div`
+  & * {
+    font-size: 1.25rem;
+  }
+`;
 
 class Home extends React.Component {
   async componentDidMount () {
@@ -77,10 +139,11 @@ class Home extends React.Component {
 
     return (
       <App pageTitle='Home' hideFooter>
-        <Inpage>
+        <Homepage>
           <InpageBody>
             <IntroSection>
               <Title>
+                <img src='../assets/graphics/content/ObserveIcon.svg' />
                 <h1>Observe</h1>
               </Title>
               <Lead>
@@ -89,6 +152,7 @@ class Home extends React.Component {
               <Buttons>
                 <Button
                   useIcon='login'
+                  size='xlarge'
                   variation='primary-raised-dark'
                   onClick={() => this.login()}
                 >
@@ -97,7 +161,7 @@ class Home extends React.Component {
               </Buttons>
             </IntroSection>
           </InpageBody>
-        </Inpage>
+        </Homepage>
       </App>
     );
   }
