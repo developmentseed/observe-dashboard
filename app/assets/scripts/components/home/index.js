@@ -57,21 +57,21 @@ const IntroSection = styled.div`
 
 const Title = styled.div`
   display: flex;
-  font-weight: ${themeVal('type.base.bold')};
   font-size: 2rem;
   color: white;
   letter-spacing: 0.25rem;
   text-transform: uppercase;
   h1 {
     margin: 0 1rem 0.5rem;
+    font-weight: ${themeVal('type.base.black')};
   }
   img {
     width: 5rem;
   }
   ${media.largeUp`
-    font-size: 2.5rem;
+    font-size: 3.5rem;
     img {
-      width: 6rem;
+      width: 8rem;
     }
   `}
 `;
