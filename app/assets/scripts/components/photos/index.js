@@ -452,17 +452,16 @@ class Photos extends React.Component {
             </Button>
           </td>
           <td style={{ textAlign: 'center' }}>
-            {(isAdmin || userId === photo.ownerId) && (
-              <Button
-                useIcon='trash-bin'
-                variation='danger-plain'
-                size='small'
-                hideText
-                onClick={e => this.deletePhoto(e, photo.id)}
-              >
+            <Button
+              useIcon='trash-bin'
+              variation='danger-plain'
+              size='small'
+              hideText
+              disabled={!(isAdmin || userId === photo.ownerId)}
+              onClick={e => this.deletePhoto(e, photo.id)}
+            >
                 Delete Photo
-              </Button>
-            )}
+            </Button>
           </td>
         </tr>
       );
