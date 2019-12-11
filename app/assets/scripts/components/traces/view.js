@@ -10,6 +10,7 @@ import { connect } from 'react-redux';
 import * as actions from '../../redux/actions/traces';
 import { wrapApiResult, getFromState } from '../../redux/utils';
 import { handleExportToJosm, downloadTrace } from './utils';
+import { Redirect } from 'react-router-dom';
 
 import App from '../common/app';
 import {
@@ -20,7 +21,6 @@ import {
   InpageBodyInner,
   InpageBackLink
 } from '../common/inpage';
-import UhOh from '../uhoh';
 import Prose from '../../styles/type/prose';
 import Button from '../../styles/button/button';
 import Form from '../../styles/form/form';
@@ -186,7 +186,10 @@ class Traces extends React.Component {
     const { isReady, hasError, getData } = this.props.trace;
 
     if (!isReady()) return null;
-    if (hasError()) return <UhOh />;
+    if (hasError()) {
+      toasts.error('Trace not found.');
+      return <Redirect to='/traces' />;
+    }
 
     // Get trace data
     const { properties: trace, geometry } = getData();
