@@ -33,6 +33,7 @@ import DataTable from '../../styles/table';
 import Pagination from '../../styles/button/pagination';
 import Prose from '../../styles/type/prose';
 import { wrapApiResult } from '../../redux/utils';
+import { getUTCDate } from '../../utils';
 
 class Traces extends React.Component {
   constructor (props) {
@@ -391,7 +392,7 @@ class Traces extends React.Component {
     return getData().map(trace => {
       return (
         <tr key={trace.id}>
-          <td>{new Date(trace.recordedAt).toLocaleDateString()}</td>
+          <td>{getUTCDate(trace.recordedAt)}</td>
           <td>
             <Link to={`/traces/${trace.id}`}>{trace.id}</Link>
           </td>
