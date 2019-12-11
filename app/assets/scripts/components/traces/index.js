@@ -386,6 +386,7 @@ class Traces extends React.Component {
   }
 
   renderTableRows () {
+    const { isAdmin, osmId: userId } = this.props.authenticatedUser.getData();
     const { getData } = this.props.traces;
     const { accessToken } = this.props;
 
@@ -429,6 +430,7 @@ class Traces extends React.Component {
               variation='danger-plain'
               size='small'
               hideText
+              disabled={!(isAdmin || userId === trace.ownerId)}
               onClick={e => this.deleteTrace(e, trace.id)}
             >
               Delete trace
@@ -472,7 +474,8 @@ if (environment !== 'production') {
 function mapStateToProps (state) {
   return {
     traces: wrapApiResult(state.traces),
-    accessToken: get(state, 'authenticatedUser.data.accessToken')
+    accessToken: get(state, 'authenticatedUser.data.accessToken'),
+    authenticatedUser: wrapApiResult(state.authenticatedUser)
   };
 }
 
