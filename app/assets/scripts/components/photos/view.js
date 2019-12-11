@@ -3,9 +3,10 @@ import { PropTypes as T } from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { environment, osmUrl } from '../../config';
-import { featureToCoords, formatDateTimeExtended } from '../../utils';
+import { featureToCoords, getUTCDateTime } from '../../utils';
 import { wrapApiResult, getFromState, deleteItem } from '../../redux/utils';
 import * as actions from '../../redux/actions/photos';
+import { Redirect } from 'react-router-dom';
 
 import App from '../common/app';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
@@ -17,7 +18,6 @@ import {
   InpageBackLink,
   InpageBodyInner
 } from '../common/inpage';
-import UhOh from '../uhoh';
 import Button from '../../styles/button/button';
 import Prose from '../../styles/type/prose';
 import Form from '../../styles/form/form';
@@ -140,7 +140,10 @@ class Photos extends React.Component {
     const { isReady, hasError } = this.props.photo;
 
     if (!isReady()) return null;
-    if (hasError()) return <UhOh />;
+    if (hasError()) {
+      toasts.error('Photo not found.');
+      return <Redirect to='/photos' />;
+    }
 
     const { getData } = this.props.photo;
     const photo = getData();
@@ -235,9 +238,9 @@ class Photos extends React.Component {
             <p>Unassigned.</p>
           )}
           <FormLabel>Created at</FormLabel>
-          <p>{formatDateTimeExtended(createdAt)}</p>
+          <p>{getUTCDateTime(createdAt)}</p>
           <FormLabel>Uploaded at</FormLabel>
-          <p>{formatDateTimeExtended(uploadedAt)}</p>
+          <p>{getUTCDateTime(uploadedAt)}</p>
           {isEditing && (
             <EditButtons>
               <Button

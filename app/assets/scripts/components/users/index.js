@@ -7,6 +7,7 @@ import { environment, osmUrl } from '../../config';
 import * as actions from '../../redux/actions/users';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 import QsState from '../../utils/qs-state';
+import { getUTCDate } from '../../utils';
 
 import App from '../common/app';
 import toasts from '../common/toasts';
@@ -335,7 +336,7 @@ class Users extends React.Component {
               {user.osmDisplayName}
             </a>
           </td>
-          <td>{new Date(user.osmCreatedAt).toLocaleDateString()}</td>
+          <td>{getUTCDate(user.osmCreatedAt)}</td>
           <td style={{ textAlign: 'center' }}>{user.traces}</td>
           <td style={{ textAlign: 'center' }}>{user.photos}</td>
           <td style={{ textAlign: 'center' }}>
