@@ -363,10 +363,10 @@ class Traces extends React.Component {
       <DataTable>
         <thead>
           <tr>
+            <th scope='col'>{this.renderColumnHead('ID', 'id')}</th>
             <th scope='col'>
               {this.renderColumnHead('Recorded At', 'recordedAt')}
             </th>
-            <th scope='col'>{this.renderColumnHead('ID', 'id')}</th>
             <th scope='col'>{this.renderColumnHead('Owner', 'username')}</th>
             <th scope='col'>{this.renderColumnHead('Length', 'length')}</th>
             <th scope='col' style={{ width: '13%', textAlign: 'center' }}>
@@ -393,10 +393,10 @@ class Traces extends React.Component {
     return getData().map(trace => {
       return (
         <tr key={trace.id}>
-          <td>{getUTCDate(trace.recordedAt)}</td>
           <td>
             <Link to={`/traces/${trace.id}`}>{trace.id}</Link>
           </td>
+          <td>{getUTCDate(trace.recordedAt)}</td>
           <td>{trace.ownerDisplayName}</td>
           <td>{trace.length} m</td>
           <td style={{ textAlign: 'center' }}>
@@ -463,6 +463,7 @@ class Traces extends React.Component {
 if (environment !== 'production') {
   Traces.propTypes = {
     accessToken: T.string,
+    authenticatedUser: T.object,
     fetchTraces: T.func,
     traces: T.object,
     history: T.object,
