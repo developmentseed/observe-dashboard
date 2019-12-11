@@ -362,11 +362,11 @@ class Traces extends React.Component {
       <DataTable>
         <thead>
           <tr>
-            <th scope='col'>{this.renderColumnHead('ID', 'id')}</th>
-            <th scope='col'>{this.renderColumnHead('Owner', 'username')}</th>
             <th scope='col'>
               {this.renderColumnHead('Recorded At', 'recordedAt')}
             </th>
+            <th scope='col'>{this.renderColumnHead('ID', 'id')}</th>
+            <th scope='col'>{this.renderColumnHead('Owner', 'username')}</th>
             <th scope='col'>{this.renderColumnHead('Length', 'length')}</th>
             <th scope='col' style={{ width: '13%', textAlign: 'center' }}>
               <span>Export to JOSM</span>
@@ -391,11 +391,11 @@ class Traces extends React.Component {
     return getData().map(trace => {
       return (
         <tr key={trace.id}>
+          <td>{new Date(trace.recordedAt).toLocaleDateString()}</td>
           <td>
             <Link to={`/traces/${trace.id}`}>{trace.id}</Link>
           </td>
           <td>{trace.ownerDisplayName}</td>
-          <td>{new Date(trace.recordedAt).toLocaleDateString()}</td>
           <td>{trace.length} m</td>
           <td style={{ textAlign: 'center' }}>
             <Button
