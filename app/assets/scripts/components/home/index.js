@@ -21,7 +21,7 @@ const _rgba = stylizeFunction(rgba);
 
 const Homepage = styled(Inpage)`
   background: linear-gradient(128deg, ${_rgba(themeVal('color.primary'), 0.8)}, ${_rgba(0, 0, 0, 0.4)} 68%),
-              url('../assets/graphics/content/bgmap-sat.png');
+              url('../assets/graphics/content/bg-greatlakes.jpg');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -30,7 +30,8 @@ const Homepage = styled(Inpage)`
 const InpageBody = styled.div`
   background-image: url('../assets/graphics/content/bg-devices.svg');
   background-repeat: no-repeat;
-  background-position: right -40rem bottom -12rem;
+  background-size: 120%;
+  background-position: right -40vw bottom -20vw;
   background-attachment: fixed;
   display: grid;
   min-height: calc(100vh - 4rem);
@@ -39,17 +40,19 @@ const InpageBody = styled.div`
   justify-content: center;
   overflow: hidden;
   max-width: 100%;
+  ${media.smallUp`
+    background-size: contain;
+  `}
   ${media.largeUp`
     padding-left: 12vw;
-    background-size: contain;
-    background-position: right -40rem bottom -12rem;
+    background-position: right -20rem bottom -12rem;
   `}
 `;
 
 const IntroSection = styled.div`
   display: flex;
   flex-direction: column;
-  text-shadow: 0px 0px 2px ${_rgba(0, 0, 0, 0.4)};
+  text-shadow: 0px 1px 20px ${_rgba(0, 0, 0, 0.4)};
   ${media.largeUp`
     justify-content: center;
   `}
