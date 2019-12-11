@@ -10,12 +10,24 @@ export function delay (millis) {
 }
 
 /**
+ * Round a float to 5 decimal places, if needed.
+ *
+ * Reference: https://stackoverflow.com/questions/11832914/round-to-at-most-2-decimal-places-only-if-necessary
+ *
+ * @param {float} coord Coordinate as float
+ */
+export function roundToFiveDecimals (coord) {
+  return Math.round(coord * 100000 + Number.EPSILON) / 100000;
+}
+
+/**
  * Get coordinates of GeoJSON feature as text
  *
  * @param {object} feature GeoJSON feature
  */
-export function featureToCoords (feature) {
-  return feature.coordinates.join(', ');
+export function featureToCoords (feature, round) {
+  const coordinates = feature.coordinates;
+  return (round ? coordinates.map(roundToFiveDecimals) : coordinates).join(', ');
 }
 
 /**

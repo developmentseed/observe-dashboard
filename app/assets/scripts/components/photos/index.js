@@ -426,7 +426,7 @@ class Photos extends React.Component {
           </td>
           <td>{photo.ownerDisplayName}</td>
           <td>{new Date(photo.createdAt).toLocaleDateString()}</td>
-          <td>{featureToCoords(photo.location)}</td>
+          <td>{featureToCoords(photo.location, true)}</td>
           <td>
             {photo.osmElement ? (
               <a
