@@ -5,7 +5,7 @@ import bbox from '@turf/bbox';
 import get from 'lodash.get';
 import { PropTypes as T } from 'prop-types';
 import { mapboxAccessToken, environment } from '../../config';
-import { formatDateTimeExtended, startCoordinate } from '../../utils';
+import { getUTCDateTime, startCoordinate } from '../../utils';
 import { connect } from 'react-redux';
 import * as actions from '../../redux/actions/traces';
 import { wrapApiResult, getFromState } from '../../redux/utils';
@@ -268,11 +268,11 @@ class Traces extends React.Component {
           <FormLabel>Start coordinate</FormLabel>
           <p>{startCoordinate(geometry)}</p>
           <FormLabel>Recorded at</FormLabel>
-          <p>{formatDateTimeExtended(trace.recordedAt)}</p>
+          <p>{getUTCDateTime(trace.recordedAt)}</p>
           <FormLabel>Uploaded at</FormLabel>
-          <p>{formatDateTimeExtended(trace.uploadedAt)}</p>
+          <p>{getUTCDateTime(trace.uploadedAt)}</p>
           <FormLabel>Updated at</FormLabel>
-          <p>{formatDateTimeExtended(trace.updatedAt)}</p>
+          <p>{getUTCDateTime(trace.updatedAt)}</p>
           {isEditing && (
             <EditButtons>
               <Button

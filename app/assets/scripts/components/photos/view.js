@@ -3,7 +3,7 @@ import { PropTypes as T } from 'prop-types';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { environment, osmUrl } from '../../config';
-import { featureToCoords, formatDateTimeExtended } from '../../utils';
+import { featureToCoords, getUTCDateTime } from '../../utils';
 import { wrapApiResult, getFromState, deleteItem } from '../../redux/utils';
 import * as actions from '../../redux/actions/photos';
 import { Redirect } from 'react-router-dom';
@@ -238,9 +238,9 @@ class Photos extends React.Component {
             <p>Unassigned.</p>
           )}
           <FormLabel>Created at</FormLabel>
-          <p>{formatDateTimeExtended(createdAt)}</p>
+          <p>{getUTCDateTime(createdAt)}</p>
           <FormLabel>Uploaded at</FormLabel>
-          <p>{formatDateTimeExtended(uploadedAt)}</p>
+          <p>{getUTCDateTime(uploadedAt)}</p>
           {isEditing && (
             <EditButtons>
               <Button
