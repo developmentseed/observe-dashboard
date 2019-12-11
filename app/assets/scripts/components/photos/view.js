@@ -238,9 +238,9 @@ class Photos extends React.Component {
             <p>Unassigned.</p>
           )}
           <FormLabel>Created at</FormLabel>
-          <p>{getUTCDateTime(createdAt)}</p>
+          <p>{getUTCDateTime(createdAt)} UTC</p>
           <FormLabel>Uploaded at</FormLabel>
-          <p>{getUTCDateTime(uploadedAt)}</p>
+          <p>{getUTCDateTime(uploadedAt)} UTC</p>
           {isEditing && (
             <EditButtons>
               <Button

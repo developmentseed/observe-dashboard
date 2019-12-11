@@ -268,11 +268,11 @@ class Traces extends React.Component {
           <FormLabel>Start coordinate</FormLabel>
           <p>{startCoordinate(geometry)}</p>
           <FormLabel>Recorded at</FormLabel>
-          <p>{getUTCDateTime(trace.recordedAt)}</p>
+          <p>{getUTCDateTime(trace.recordedAt)} UTC</p>
           <FormLabel>Uploaded at</FormLabel>
-          <p>{getUTCDateTime(trace.uploadedAt)}</p>
+          <p>{getUTCDateTime(trace.uploadedAt)} UTC</p>
           <FormLabel>Updated at</FormLabel>
-          <p>{getUTCDateTime(trace.updatedAt)}</p>
+          <p>{getUTCDateTime(trace.updatedAt)} UTC</p>
           {isEditing && (
             <EditButtons>
               <Button
