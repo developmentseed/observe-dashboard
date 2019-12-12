@@ -33,6 +33,7 @@ import DataTable from '../../styles/table';
 import Pagination from '../../styles/button/pagination';
 import Prose from '../../styles/type/prose';
 import { wrapApiResult } from '../../redux/utils';
+import { getUTCDate } from '../../utils';
 
 class Traces extends React.Component {
   constructor (props) {
@@ -363,10 +364,10 @@ class Traces extends React.Component {
         <thead>
           <tr>
             <th scope='col'>{this.renderColumnHead('ID', 'id')}</th>
-            <th scope='col'>{this.renderColumnHead('Owner', 'username')}</th>
             <th scope='col'>
               {this.renderColumnHead('Recorded At', 'recordedAt')}
             </th>
+            <th scope='col'>{this.renderColumnHead('Owner', 'username')}</th>
             <th scope='col'>{this.renderColumnHead('Length', 'length')}</th>
             <th scope='col' style={{ width: '13%', textAlign: 'center' }}>
               <span>Export to JOSM</span>
@@ -385,6 +386,7 @@ class Traces extends React.Component {
   }
 
   renderTableRows () {
+    const { isAdmin, osmId: userId } = this.props.authenticatedUser.getData();
     const { getData } = this.props.traces;
     const { accessToken } = this.props;
 
@@ -394,8 +396,8 @@ class Traces extends React.Component {
           <td>
             <Link to={`/traces/${trace.id}`}>{trace.id}</Link>
           </td>
+          <td>{getUTCDate(trace.recordedAt)}</td>
           <td>{trace.ownerDisplayName}</td>
-          <td>{new Date(trace.recordedAt).toLocaleDateString()}</td>
           <td>{trace.length} m</td>
           <td style={{ textAlign: 'center' }}>
             <Button
@@ -428,6 +430,7 @@ class Traces extends React.Component {
               variation='danger-plain'
               size='small'
               hideText
+              disabled={!(isAdmin || userId === trace.ownerId)}
               onClick={e => this.deleteTrace(e, trace.id)}
             >
               Delete trace
@@ -460,6 +463,7 @@ class Traces extends React.Component {
 if (environment !== 'production') {
   Traces.propTypes = {
     accessToken: T.string,
+    authenticatedUser: T.object,
     fetchTraces: T.func,
     traces: T.object,
     history: T.object,
@@ -471,7 +475,8 @@ if (environment !== 'production') {
 function mapStateToProps (state) {
   return {
     traces: wrapApiResult(state.traces),
-    accessToken: get(state, 'authenticatedUser.data.accessToken')
+    accessToken: get(state, 'authenticatedUser.data.accessToken'),
+    authenticatedUser: wrapApiResult(state.authenticatedUser)
   };
 }
 

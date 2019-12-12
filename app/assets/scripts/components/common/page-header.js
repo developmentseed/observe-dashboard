@@ -50,6 +50,9 @@ const PageTitle = styled.h1`
     color: inherit;
     display: flex;
     padding: 0 2rem 0.5rem;
+    &:active {
+      transform: none;
+    }
   }
   span {
     font-size: 0.575rem;
@@ -140,19 +143,7 @@ class PageHeader extends React.Component {
           </PageTitle>
           <PageNav>
             <GlobalMenu>
-              {!isLogged ? (
-                <li>
-                  <GlobalMenuLink
-                    as={NavLinkFilter}
-                    exact
-                    useIcon='login'
-                    to='/login'
-                    title='Proceed to login'
-                  >
-                    <span>Login</span>
-                  </GlobalMenuLink>
-                </li>
-              ) : (
+              {isLogged &&
                 <>
                   <li>
                     <GlobalMenuLink
@@ -198,8 +189,7 @@ class PageHeader extends React.Component {
                       <span>Logout</span>
                     </GlobalMenuLink>
                   </li>
-                </>
-              )}
+                </>}
             </GlobalMenu>
           </PageNav>
         </PageHeadInner>

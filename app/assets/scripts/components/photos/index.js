@@ -35,7 +35,7 @@ import {
 import Pagination from '../../styles/button/pagination';
 import Prose from '../../styles/type/prose';
 import { wrapApiResult } from '../../redux/utils';
-import { featureToCoords } from '../../utils';
+import { featureToCoords, getUTCDate } from '../../utils';
 import FormInput from '../../styles/form/input';
 import Button from '../../styles/button/button';
 
@@ -425,8 +425,8 @@ class Photos extends React.Component {
             </PhotoBox>
           </td>
           <td>{photo.ownerDisplayName}</td>
-          <td>{new Date(photo.createdAt).toLocaleDateString()}</td>
-          <td>{featureToCoords(photo.location)}</td>
+          <td>{getUTCDate(photo.createdAt)}</td>
+          <td>{featureToCoords(photo.location, true)}</td>
           <td>
             {photo.osmElement ? (
               <a
@@ -452,17 +452,16 @@ class Photos extends React.Component {
             </Button>
           </td>
           <td style={{ textAlign: 'center' }}>
-            {(isAdmin || userId === photo.ownerId) && (
-              <Button
-                useIcon='trash-bin'
-                variation='danger-plain'
-                size='small'
-                hideText
-                onClick={e => this.deletePhoto(e, photo.id)}
-              >
+            <Button
+              useIcon='trash-bin'
+              variation='danger-plain'
+              size='small'
+              hideText
+              disabled={!(isAdmin || userId === photo.ownerId)}
+              onClick={e => this.deletePhoto(e, photo.id)}
+            >
                 Delete Photo
-              </Button>
-            )}
+            </Button>
           </td>
         </tr>
       );
