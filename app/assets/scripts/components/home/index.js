@@ -60,6 +60,7 @@ const IntroSection = styled.div`
 
 const Title = styled.div`
   display: flex;
+  align-items: center;
   font-size: 2rem;
   color: white;
   letter-spacing: 0.25rem;
