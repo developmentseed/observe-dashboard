@@ -6,7 +6,7 @@ import get from 'lodash.get';
 import { environment } from '../../config';
 import * as actions from '../../redux/actions/traces';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
-import { handleExportToJosm, downloadTrace } from './utils';
+import { handleExportToJosm, downloadTrace, convertMeter2Kilometer } from './utils';
 import QsState from '../../utils/qs-state';
 
 import App from '../common/app';
@@ -398,7 +398,7 @@ class Traces extends React.Component {
           </td>
           <td>{getUTCDate(trace.recordedAt)}</td>
           <td>{trace.ownerDisplayName}</td>
-          <td>{trace.length} m</td>
+          <td>{convertMeter2Kilometer(trace.length).length} {convertMeter2Kilometer(trace.length).unit}</td>
           <td style={{ textAlign: 'center' }}>
             <Button
               useIcon='share'

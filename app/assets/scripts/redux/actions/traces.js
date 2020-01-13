@@ -1,7 +1,7 @@
 import { fetchAuth, patchItem, deleteItem } from '../utils';
 import { apiUrl } from '../../config';
 import qs from 'qs';
-
+import { convertMeter2Kilometer } from '../../components/traces/utils';
 /*
  * List of traces
  */
@@ -57,7 +57,14 @@ export function receiveTrace (id, data, error = null) {
   return {
     type: RECEIVE_TRACE,
     id,
-    data,
+    data: {
+      ...data,
+      properties: {
+        ...data.properties,
+        length: convertMeter2Kilometer(data.properties.length).length,
+        unit: convertMeter2Kilometer(data.properties.length).unit
+      }
+    },
     error,
     receivedAt: Date.now()
   };
