@@ -38,7 +38,6 @@ export async function downloadTrace (accessToken, traceId) {
  * }
  */
 export function convertMeter2Kilometer (a) {
-  // Exist early if they're the same.
-  if (a > 999.999) return { length: parseFloat((a / 1000).toFixed(1)), unit: 'km' };
-  return { length: a, unit: 'm' };
+  if (a >= 1000) return { length: parseFloat((a / 1000).toFixed(1)), unit: 'km' };
+  return { length: parseFloat(a).toFixed(1), unit: 'm' };
 }

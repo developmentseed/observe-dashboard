@@ -61,8 +61,7 @@ export function receiveTrace (id, data, error = null) {
       ...data,
       properties: {
         ...data.properties,
-        length: convertMeter2Kilometer(data.properties.length).length,
-        unit: convertMeter2Kilometer(data.properties.length).unit
+        ...convertMeter2Kilometer(data.properties.length)
       }
     },
     error,
