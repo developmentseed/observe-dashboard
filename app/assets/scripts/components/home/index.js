@@ -10,7 +10,7 @@ import * as authActions from '../../redux/actions/auth';
 import { wrapApiResult } from '../../redux/utils';
 import { showGlobalLoading, hideGlobalLoading } from '../common/global-loading';
 
-import { environment, apiUrl, baseUrl } from '../../config';
+import { environment, apiUrl, appPathname } from '../../config';
 import { themeVal, stylizeFunction } from '../../styles/utils/general';
 import media from '../../styles/utils/media-queries';
 import App from '../common/app';
@@ -129,7 +129,7 @@ class Home extends React.Component {
 
     // Open API login route in popup window to start OAuth
     window.open(
-      `${apiUrl}/login?redirect=${baseUrl}/login/redirect`,
+      `${apiUrl}/login?redirect=${window.location.origin}${appPathname}/login/redirect`,
       'oauth_window',
       settings
     );
