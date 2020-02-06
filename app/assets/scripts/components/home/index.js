@@ -21,14 +21,14 @@ const _rgba = stylizeFunction(rgba);
 
 const Homepage = styled(Inpage)`
   background: linear-gradient(128deg, ${_rgba(themeVal('color.primary'), 0.8)}, ${_rgba(0, 0, 0, 0.4)} 68%),
-              url('../assets/graphics/content/bg-greatlakes.jpg');
+              url(${appPathname}/assets/graphics/content/bg-greatlakes.jpg);
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
 `;
 
 const InpageBody = styled.div`
-  background-image: url('../assets/graphics/content/bg-devices.svg');
+  background-image: url(${appPathname}/assets/graphics/content/bg-devices.svg);
   background-repeat: no-repeat;
   background-size: 120%;
   background-position: right -40vw bottom -20vw;
@@ -147,7 +147,7 @@ class Home extends React.Component {
           <InpageBody>
             <IntroSection>
               <Title>
-                <img src='../assets/graphics/content/ObserveIcon.svg' />
+                <img src={`${appPathname}/assets/graphics/content/ObserveIcon.svg`} />
                 <h1>Observe</h1>
               </Title>
               <Lead>
