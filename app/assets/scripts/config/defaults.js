@@ -1,6 +1,6 @@
 'use strict';
 
-export default {
+module.exports = {
   appTitle: 'Observe Dashboard',
   appShortTitle: 'Observe',
   appDescription: 'A dashboard to browse and manage Observe platform data.',

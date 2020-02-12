@@ -13,6 +13,7 @@ const log = require('fancy-log');
 const errorify = require('errorify');
 const historyApiFallback = require('connect-history-api-fallback');
 const through2 = require('through2');
+const config = require('./app/assets/scripts/config');
 
 const {
   compile: collecticonsCompile
@@ -218,7 +219,8 @@ function html () {
     .pipe($.useref({
       searchPath: ['.tmp', 'app', '.'],
       basepath: content => {
-        return (isProd()) ? '<base href="/observe/" />' : content;
+        const { appPathname } = config;
+        return (isProd() && appPathname) ? `<base href="${appPathname}/" />` : content;
       }
     }))
     .pipe(cacheUseref())
