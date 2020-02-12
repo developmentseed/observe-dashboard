@@ -6,13 +6,18 @@ const $ = require('gulp-load-plugins')();
 const del = require('del');
 const browserSync = require('browser-sync');
 const browserify = require('browserify');
+const watchify = require('watchify');
 const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
 const log = require('fancy-log');
-const SassString = require('node-sass').types.String;
-const notifier = require('node-notifier');
+const errorify = require('errorify');
 const historyApiFallback = require('connect-history-api-fallback');
 const through2 = require('through2');
+const config = require('./app/assets/scripts/config');
+
+const {
+  compile: collecticonsCompile
+} = require('collecticons-processor');
 
 // /////////////////////////////////////////////////////////////////////////////
 // --------------------------- Variables -------------------------------------//
@@ -40,7 +45,7 @@ if (process.env.CIRCLE_BRANCH) {
 // ------------------------- Helper functions --------------------------------//
 // ---------------------------------------------------------------------------//
 
-const isProd = () => process.env.NODE_ENV === 'production';
+const isProd = () => process.env.NODE_ENV !== 'development';
 const readPackage = () => JSON.parse(fs.readFileSync('package.json'));
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -73,27 +78,26 @@ function serve () {
     '!app/assets/icons/collecticons/**/*'
   ], bs.reload);
 
-  gulp.watch('app/assets/styles/**/*.scss', styles);
-  gulp.watch('app/assets/scripts/**/**', javascript);
+  gulp.watch('app/assets/icons/collecticons/**', collecticons);
   gulp.watch('package.json', vendorScripts);
 }
 
 module.exports.clean = clean;
 module.exports.serve = gulp.series(
+  collecticons,
   gulp.parallel(
     vendorScripts,
-    javascript,
-    styles
+    javascript
   ),
   serve
 );
 module.exports.default = gulp.series(
   clean,
+  collecticons,
   gulp.parallel(
     vendorScripts,
     javascript
   ),
-  styles,
   gulp.parallel(
     html,
     imagesImagemin
@@ -110,9 +114,7 @@ module.exports.default = gulp.series(
 // When including the file in the index.html we need to refer to bundle.js not
 // main.js
 function javascript () {
-  // Ensure package is updated.
-  const pkg = readPackage();
-  return browserify({
+  var brs = browserify({
     entries: ['./app/assets/scripts/main.js'],
     debug: true,
     cache: {},
@@ -120,26 +122,34 @@ function javascript () {
     bundleExternal: false,
     fullPaths: true
   })
-    .external(pkg.dependencies ? Object.keys(pkg.dependencies) : [])
-    .bundle()
-    .on('error', function (e) {
-      notifier.notify({
-        title: 'Oops! Browserify errored:',
-        message: e.message
-      });
-      console.log('Javascript error:', e); // eslint-disable-line
-      if (isProd()) {
-        throw new Error(e);
-      }
-      // Allows the watch to continue.
-      this.emit('end');
-    })
-    .pipe(source('bundle.js'))
-    .pipe(buffer())
-    .pipe($.sourcemaps.init({ loadMaps: true }))
-    .pipe($.sourcemaps.write('./'))
-    .pipe(gulp.dest('.tmp/assets/scripts/'))
-    .pipe(bs.stream());
+    .on('log', log);
+
+  if (!isProd()) {
+    brs
+      .plugin(watchify)
+      .plugin(errorify)
+      .on('update', bundler);
+  }
+
+  function bundler () {
+    var watcher = brs.bundle();
+
+    if (isProd()) {
+      watcher.on('error', function (e) { throw new Error(e); });
+    }
+
+    watcher
+      .pipe(source('bundle.js'))
+      .pipe(buffer())
+      // Source maps.
+      .pipe($.sourcemaps.init({ loadMaps: true }))
+      .pipe($.sourcemaps.write('./'))
+      .pipe(gulp.dest('.tmp/assets/scripts'))
+      .pipe(bs.stream());
+    return watcher;
+  }
+
+  return bundler();
 }
 
 // Vendor scripts. Basically all the dependencies in the package.js.
@@ -147,9 +157,25 @@ function javascript () {
 function vendorScripts () {
   // Ensure package is updated.
   const pkg = readPackage();
+  // Note on how this works:
+  // To have smaller bundles and speed up compilations, the dependencies are
+  // kept in a vendor bundle. Browserify allows us to exclude all external
+  // dependencies, and then require them all in another bundle. To require
+  // them we basically use everything that's under `dependencies` in the
+  // package.json. However when we access files in the module folder directly
+  // (like something inside a folder - my-module/folder/file), browserify can't
+  // find them in the dependencies list. (in this example the dependency would
+  // only be my-module). In these cases they have to be explicitly added.
+  const extra = [
+    // Any file directly accessed on a module folder:
+    // my-module/folder/file
+  ];
   var vb = browserify({
     debug: true,
-    require: pkg.dependencies ? Object.keys(pkg.dependencies) : []
+
+    require: pkg.dependencies
+      ? Object.keys(pkg.dependencies).concat(extra)
+      : []
   });
   return vb.bundle()
     .on('error', log.bind(log, 'Browserify Error'))
@@ -161,6 +187,23 @@ function vendorScripts () {
     .pipe(bs.stream());
 }
 
+// /////////////////////////////////////////////////////////////////////////////
+// ------------------------- Collecticon tasks -------------------------------//
+// --------------------- (Font generation related) ---------------------------//
+// ---------------------------------------------------------------------------//
+function collecticons () {
+  return collecticonsCompile({
+    dirPath: 'app/assets/icons/collecticons/',
+    fontName: 'Collecticons',
+    authorName: 'Development Seed',
+    authorUrl: 'https://developmentseed.org/',
+    catalogDest: 'app/assets/scripts/styles/collecticons/',
+    preview: false,
+    experimentalFontOnCatalog: true,
+    experimentalDisableStyles: true
+  });
+}
+
 // //////////////////////////////////////////////////////////////////////////////
 // --------------------------- Helper tasks -----------------------------------//
 // ----------------------------------------------------------------------------//
@@ -170,43 +213,16 @@ function finish () {
     .pipe($.size({ title: 'build', gzip: true }));
 }
 
-function styles () {
-  return gulp.src('app/assets/styles/main.scss')
-    .pipe($.plumber(function (e) {
-      notifier.notify({
-        title: 'Oops! Sass errored:',
-        message: e.message
-      });
-      console.log('Sass error:', e.toString()); // eslint-disable-line
-      if (isProd()) {
-        throw new Error(e);
-      }
-      // Allows the watch to continue.
-      this.emit('end');
-    }))
-    .pipe($.sourcemaps.init())
-    .pipe($.sass({
-      outputStyle: 'expanded',
-      precision: 10,
-      functions: {
-        'urlencode($url)': function (url) {
-          var v = new SassString();
-          v.setValue(encodeURIComponent(url.getValue()));
-          return v;
-        }
-      },
-      includePaths: require('bourbon').includePaths.concat('node_modules/jeet')
-    }))
-    .pipe($.sourcemaps.write())
-    .pipe(gulp.dest('.tmp/assets/styles'))
-    // https://browsersync.io/docs/gulp#gulp-sass-maps
-    .pipe(bs.stream({ match: '**/*.css' }));
-}
-
 // After being rendered by jekyll process the html files. (merge css files, etc)
 function html () {
   return gulp.src('app/*.html')
-    .pipe($.useref({ searchPath: ['.tmp', 'app', '.'] }))
+    .pipe($.useref({
+      searchPath: ['.tmp', 'app', '.'],
+      basepath: content => {
+        const { appPathname } = config;
+        return (isProd() && appPathname) ? `<base href="${appPathname}/" />` : content;
+      }
+    }))
     .pipe(cacheUseref())
     // Do not compress comparisons, to avoid MapboxGLJS minification issue
     // https://github.com/mapbox/mapbox-gl-js/issues/4359#issuecomment-286277540
@@ -239,6 +255,7 @@ function imagesImagemin () {
  * This happens when there are multiple html pages to process.
  */
 function cacheUseref () {
+  /* eslint-disable-next-line prefer-const */
   let files = {
     // path: content
   };

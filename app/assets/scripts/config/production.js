@@ -1,5 +1,6 @@
 'use strict';
 
-export default {
-  environment: 'production'
+module.exports = {
+  environment: 'production',
+  appPathname: '/observe'
 };

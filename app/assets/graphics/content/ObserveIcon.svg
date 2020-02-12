@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="37px" viewBox="0 0 32 37" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 58 (84663) - https://sketch.com -->
+    <title>ObserveIcon</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="ObserveIcon" transform="translate(5.000000, 5.000000)">
+            <ellipse id="Oval" stroke="#FFFFFF" stroke-width="10.6666667" cx="11" cy="10.8571429" rx="10.6666667" ry="10.5238095"></ellipse>
+            <polygon id="Triangle" fill="#FFFFFF" fill-rule="nonzero" transform="translate(11.011271, 28.636947) scale(-1, 1) rotate(-180.000000) translate(-11.011271, -28.636947) " points="11 25.273894 17.6876628 32.0000009 4.33487956 32.0000009"></polygon>
+        </g>
+    </g>
+</svg>
