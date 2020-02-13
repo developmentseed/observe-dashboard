@@ -1,5 +1,6 @@
 import { fetchDispatchFactory } from '../utils';
 import { apiUrl } from '../../config';
+import get from 'lodash.get';
 
 export const REQUEST_AUTHENTICATED_USER = 'REQUEST_AUTHENTICATED_USER';
 export const RECEIVE_AUTHENTICATED_USER = 'RECEIVE_AUTHENTICATED_USER';
@@ -38,6 +39,14 @@ export function authenticate (accessToken) {
       accessToken // include accessToken after successful request
     })
   });
+}
+
+export function refreshProfile () {
+  return async (dispatch, getState) => {
+    const state = getState();
+    const accessToken = get(state, 'authenticatedUser.data.accessToken');
+    dispatch(authenticate(accessToken));
+  };
 }
 
 export function logout () {
