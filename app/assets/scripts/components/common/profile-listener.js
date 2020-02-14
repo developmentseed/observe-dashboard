@@ -12,6 +12,8 @@ class ProfileListener extends React.Component {
     setInterval(this.refreshUserProfile, refreshProfileInterval);
   }
 
+  componentDidMount () {
+    this.refreshUserProfile();
   }
 
   refreshUserProfile () {
