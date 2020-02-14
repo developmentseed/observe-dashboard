@@ -3,12 +3,15 @@ import { connect } from 'react-redux';
 import { wrapApiResult } from '../../redux/utils';
 import * as authActions from '../../redux/actions/auth';
 import { PropTypes as T } from 'prop-types';
+import { refreshProfileInterval } from '../../config';
 
 class ProfileListener extends React.Component {
   constructor (props) {
     super(props);
     this.refreshUserProfile = this.refreshUserProfile.bind(this);
-    setInterval(this.refreshUserProfile, 2000);
+    setInterval(this.refreshUserProfile, refreshProfileInterval);
+  }
+
   }
 
   refreshUserProfile () {
