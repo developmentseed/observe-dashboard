@@ -16,6 +16,10 @@ class ProfileListener extends React.Component {
     this.refreshUserProfile();
   }
 
+  componentWillUnmount () {
+    clearInterval(this.refreshUserProfile);
+  }
+
   refreshUserProfile () {
     if (this.props.isAuthenticated) {
       this.props.refreshProfile();
