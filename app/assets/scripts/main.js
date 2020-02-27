@@ -26,6 +26,7 @@ import UhOh from './components/uhoh';
 import ErrorBoundary from './fatal-error-boundary';
 import ConfirmationPrompt from './components/common/confirmation-prompt';
 import { ToastContainerCustom } from './components/common/toasts';
+import ProfileListener from './components/common/profile-listener';
 
 // Root component. Used by the router.
 const Root = () => (
@@ -48,6 +49,7 @@ const Root = () => (
           </Switch>
           <ConfirmationPrompt />
           <ToastContainerCustom />
+          <ProfileListener />
         </ErrorBoundary>
       </ThemeProvider>
     </Router>
