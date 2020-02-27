@@ -38,6 +38,6 @@ export async function downloadTrace (accessToken, traceId) {
  * }
  */
 export function convertMeter2Kilometer (a) {
-  if (a >= 1000) return { length: parseFloat((a / 1000).toFixed(1)), unit: 'km' };
+  if (a >= 1000) return { length: parseFloat(a / 1000).toFixed(1), unit: 'km' };
   return { length: parseFloat(a).toFixed(1), unit: 'm' };
 }

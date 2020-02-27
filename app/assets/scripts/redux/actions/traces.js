@@ -19,6 +19,13 @@ export function requestTraces () {
 }
 
 export function receiveTraces (data, error = null) {
+  if (data.results) {
+    data.results.forEach(element => {
+      const lengthUnit = convertMeter2Kilometer(element.length);
+      element['length'] = lengthUnit.length;
+      element['unit'] = lengthUnit.unit;
+    });
+  }
   return {
     type: RECEIVE_TRACES,
     data,
