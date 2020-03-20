@@ -25,3 +25,19 @@ export async function downloadTrace (accessToken, traceId) {
   const geojsonUrl = `${apiUrl}/traces/${traceId}?token=${accessToken}`;
   saveAs(geojsonUrl, `${traceId}.geojson`);
 }
+
+/**
+ * Convert length int to  object.
+ *
+ * @param {number} a length
+ *
+ * @returns {object}
+ * {
+ *   length: length in meters or kilimeters.
+ *   unit: unit of measurement.
+ * }
+ */
+export function convertMeter2Kilometer (a) {
+  if (a >= 1000) return { length: parseFloat(a / 1000).toFixed(1), unit: 'km' };
+  return { length: parseFloat(a).toFixed(1), unit: 'm' };
+}

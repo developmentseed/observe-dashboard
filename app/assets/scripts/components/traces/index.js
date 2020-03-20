@@ -398,7 +398,7 @@ class Traces extends React.Component {
           </td>
           <td>{getUTCDate(trace.recordedAt)}</td>
           <td>{trace.ownerDisplayName}</td>
-          <td>{trace.length} m</td>
+          <td>{trace.length} {trace.unit}</td>
           <td style={{ textAlign: 'center' }}>
             <Button
               useIcon='share'
