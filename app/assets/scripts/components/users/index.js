@@ -331,12 +331,12 @@ class Users extends React.Component {
             <a
               target='_blank'
               rel='noopener noreferrer'
-              href={`${osmUrl}/user/${user.osmDisplayName}`}
+              href={`${osmUrl}/user/${user.displayName}`}
             >
               {user.osmDisplayName}
             </a>
           </td>
-          <td>{getUTCDate(user.osmCreatedAt)}</td>
+          <td>{getUTCDate(user.createdAt)}</td>
           <td style={{ textAlign: 'center' }}>{user.traces}</td>
           <td style={{ textAlign: 'center' }}>{user.photos}</td>
           <td style={{ textAlign: 'center' }}>
